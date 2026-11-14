@@ -6,6 +6,8 @@ import '/services/supabase_service.dart';
 import '/providers/theme_provider.dart';
 import '/core/app_palette.dart';
 import '/services/buddy_matcher_service.dart';
+import '/l10n/app_strings.dart';
+import '/features/chat/widgets/open_buddy_chat.dart';
 
 class LeaderboardTab extends StatefulWidget {
   const LeaderboardTab({super.key});
@@ -288,14 +290,19 @@ class _LeaderboardTabState extends State<LeaderboardTab> {
                   }
                   if (rel == 'me') return const SizedBox.shrink();
                   final label = switch (rel) {
-                    'accepted' => 'هم‌مسیر شما هستند',
+                    'accepted' => context.tr('bc.chat.msg'),
                     'sent' => 'درخواست فرستاده شده',
                     'incoming' => 'درخواستش را در چت‌ها ببین',
                     _ => 'درخواست هم‌مسیری',
                   };
                   return StatefulBuilder(
                     builder: (c2, setS) => GestureDetector(
-                      onTap: rel != 'none' || _sending
+                      onTap: rel == 'accepted'
+                          ? () {
+                              Navigator.pop(ctx);
+                              openBuddyChat(context, id);
+                            }
+                          : rel != 'none' || _sending
                           ? null
                           : () async {
                               setS(() => _sending = true);

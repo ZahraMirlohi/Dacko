@@ -114,6 +114,8 @@ const Map<String, String> ctFa = {
   'ct.up.goals': 'اهداف:',
   'ct.up.back': 'بازگشت به گفتگو',
   'ct.up.today': 'امروز',
+  'ct.bf.accepted': 'درخواست پذیرفته شد',
+  'ct.bf.rejected': 'درخواست رد شد',
 };
 const Map<String, String> ctEn = {
   'ct.bf.nouser': 'No user found with these details',
@@ -230,4 +232,6 @@ const Map<String, String> ctEn = {
   'ct.up.goals': 'Goals:',
   'ct.up.back': 'Back to chat',
   'ct.up.today': 'Today',
+  'ct.bf.accepted': 'Request accepted',
+  'ct.bf.rejected': 'Request declined',
 };

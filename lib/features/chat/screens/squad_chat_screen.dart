@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../widgets/chat_background.dart';
 import '/l10n/app_strings.dart';
 import '../widgets/forward_sheet.dart';
+import '../widgets/open_buddy_chat.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -2171,11 +2172,14 @@ class _SquadChatScreenState extends State<SquadChatScreen>
                   _removeMember(id, ban: false);
                 } else if (value == 'ban') {
                   _removeMember(id, ban: true);
+                } else if (value == 'chat') {
+                  openBuddyChat(context, id);
                 } else if (value == 'report') {
                   _reportMember(id, member['name'] ?? context.tr('sq.user'));
                 }
               },
               itemBuilder: (context) => [
+                PopupMenuItem(value: 'chat', child: Text(context.tr('bc.chat.msg'))),
                 if (_isAdmin && !isAdmin)
                   PopupMenuItem(
                       value: 'make_admin', child: Text(context.tr('sq.makeAdmin'))),

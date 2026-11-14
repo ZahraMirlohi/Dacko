@@ -137,24 +137,31 @@ class _ChatScreenState extends State<ChatScreen>
       // گفتگو از قبل در لیست بارگذاری‌شده هست: بدون هیچ درخواست شبکه‌ای فوری باز شود
       for (final c in _conversations) {
         if (c.type == ConversationType.buddy && c.memberIds.contains(otherId)) {
-          await Navigator.push(context,
+          final res = await Navigator.push(context,
               MaterialPageRoute(builder: (_) => BuddyChatScreen(conversation: c)));
+          if (res == true && mounted) {
+            setState(() => _conversations.removeWhere((x) => x.id == c.id));
+          }
           if (mounted) _loadData();
           return;
         }
       }
       final me = (await _chatService.getCurrentUser())!.id;
       final id = await _chatService.openBuddyConversation(me, otherId);
-      final convs = await _chatService.getUserConversations(me);
+      var convs = await _chatService.getUserConversations(me);
+      if (!convs.any((c) => c.id == id)) {
+        await Future.delayed(const Duration(milliseconds: 400));
+        convs = await _chatService.getUserConversations(me);
+      }
       final conv = convs.firstWhere((c) => c.id == id);
       if (!mounted) return;
       await Navigator.push(context,
           MaterialPageRoute(builder: (_) => BuddyChatScreen(conversation: conv)));
       if (mounted) _loadData();
-    } catch (_) {
+    } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(context.tr('bd.error'))));
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('${context.tr('bd.error')}: $e')));
       }
     } finally {
       _openingChat = false;

@@ -174,6 +174,11 @@ const Map<String, String> bcFa = {
   'bc.k172': 'آیا از پاک کردن تمام پیام‌های این گفتگو مطمئن هستید؟\n\nاین عمل قابل بازگشت نیست.',
   'bc.k173': 'آیا از حذف گفتگو با "{n}" مطمئن هستید؟\n\nبا این کار، این گفتگو از لیست شما حذف می‌شود.',
   'bc.k174': 'با {n} پیام دهید',
+  'bc.act.file': 'در حال ارسال فایل...',
+  'bc.act.music': 'در حال ارسال موزیک...',
+  'bc.act.image': 'در حال ارسال عکس...',
+  'bc.chat.msg': 'پیام',
+  'bc.chat.notBuddy': 'برای پیام دادن ابتدا باید هم‌مسیر شوید',
 };
 
 const Map<String, String> bcEn = {
@@ -351,5 +356,10 @@ const Map<String, String> bcEn = {
   'bc.k172': 'Are you sure you want to delete all messages in this chat?\n\nThis cannot be undone.',
   'bc.k173': 'Are you sure you want to delete the chat with "{n}"?\n\nThis will remove the chat from your list.',
   'bc.k174': 'Message {n}',
+  'bc.act.file': 'Sending a file...',
+  'bc.act.music': 'Sending music...',
+  'bc.act.image': 'Sending a photo...',
+  'bc.chat.msg': 'Message',
+  'bc.chat.notBuddy': 'You need to be buddies before you can message',
 };
 

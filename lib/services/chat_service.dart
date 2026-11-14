@@ -453,7 +453,7 @@ class ChatService {
         'metadata': metadata ?? {},
         'reply_to_id': replyToId,
         'status': 'sent', // وضعیت اولیه sent
-        'created_at': DateTime.now().toIso8601String(),
+        'created_at': DateTime.now().toUtc().toIso8601String(), // سرور با تریگر (sql/14) مقدار نهایی را می‌گذارد
       };
 
       print('[CHAT_SERVICE] Sending message...');
@@ -465,7 +465,7 @@ class ChatService {
 
       await _client
           .from('conversations')
-          .update({'last_message_at': DateTime.now().toIso8601String()}).eq(
+          .update({'last_message_at': DateTime.now().toUtc().toIso8601String()}).eq(
               'id', conversationId);
     } catch (e) {
       print('[CHAT_SERVICE] Error inserting message: $e');

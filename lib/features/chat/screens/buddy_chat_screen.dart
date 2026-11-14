@@ -95,7 +95,14 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
   String? _buddyName;
   String? _buddyAvatar;
   bool _isBuddyOnline = false;
-  bool _isBuddyTyping = false;
+  String _buddyActivity = 'idle';
+  RealtimeChannel? _actChannel;
+  Timer? _actExpire;
+  Timer? _typingIdle;
+  RealtimeChannel? _reactionChannel;
+  Timer? _reactionDebounce;
+  String _lastActSent = 'idle';
+  DateTime _lastActAt = DateTime(2000);
   bool _isSelectMode = false;
   bool _isChatMuted = false;
   bool _isLoadingChallenges = false;
@@ -227,6 +234,11 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
     _statusTimer?.cancel();
     _messageSubscription?.cancel();
     _typingSubscription?.cancel();
+    _actExpire?.cancel();
+    _typingIdle?.cancel();
+    _reactionDebounce?.cancel();
+    if (_actChannel != null) _chatService.client.removeChannel(_actChannel!);
+    if (_reactionChannel != null) _chatService.client.removeChannel(_reactionChannel!);
     _messageController.dispose();
     _scrollController.dispose();
     _focusNode.dispose();
@@ -416,22 +428,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
         }
       });
 
-      _typingSubscription = _chatService
-          .getTypingStatus(widget.conversation.id)
-          .listen((typingData) {
-        if (!mounted || _buddyId == null) return;
-
-        try {
-          final isTyping = typingData[_buddyId] == true;
-          if (mounted && isTyping != _isBuddyTyping) {
-            setState(() {
-              _isBuddyTyping = isTyping;
-            });
-          }
-        } catch (e) {
-          print('❌ Error in typing status: $e');
-        }
-      });
+      _listenActivity();
+      _listenReactions();
     } catch (e) {
       print('❌ Critical error in _initChat: $e');
       if (mounted) {
@@ -1004,6 +1002,15 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
 
   // ==================== ارسال فایل ====================
   Future<void> _sendFile() async {
+    _broadcastActivity('file');
+    try {
+      await _sendFileImpl();
+    } finally {
+      _broadcastActivity('idle');
+    }
+  }
+
+  Future<void> _sendFileImpl() async {
     final isValid = await _supabase.ensureValidSession();
     if (!isValid) {
       if (mounted) {
@@ -1166,6 +1173,15 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
 
   // ==================== ارسال موزیک ====================
   Future<void> _sendMusic() async {
+    _broadcastActivity('music');
+    try {
+      await _sendMusicImpl();
+    } finally {
+      _broadcastActivity('idle');
+    }
+  }
+
+  Future<void> _sendMusicImpl() async {
     final isValid = await _supabase.ensureValidSession();
     if (!isValid) {
       if (mounted) {
@@ -3706,6 +3722,15 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
 
   // ==================== ارسال عکس ====================
   Future<void> _sendImage() async {
+    _broadcastActivity('image');
+    try {
+      await _sendImageImpl();
+    } finally {
+      _broadcastActivity('idle');
+    }
+  }
+
+  Future<void> _sendImageImpl() async {
     final isValid = await _supabase.ensureValidSession();
     if (!isValid) {
       if (mounted) {
@@ -3843,21 +3868,67 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
   }
 
   // ==================== وضعیت تایپ ====================
-  Future<void> _sendTypingStatus(bool isTyping) async {
-    if (_userId == null) return;
-    try {
-      await _chatService.sendTypingStatus(
-        conversationId: widget.conversation.id,
-        userId: _userId!,
-        isTyping: isTyping,
-      );
+  Future<void> _sendTypingStatus(bool isTyping) async =>
+      _broadcastActivity(isTyping ? 'typing' : 'idle');
 
-      if (isTyping) {
-        await _updateLastSeen(_userId!);
-      }
-    } catch (e) {
-      print('⚠️ Typing status error: $e');
-    }
+  // وضعیت لحظه‌ای (تایپ/ارسال فایل...) با Realtime Broadcast؛ بدون نوشتن در دیتابیس
+  void _broadcastActivity(String act) {
+    final ch = _actChannel;
+    if (ch == null || _userId == null) return;
+    final now = DateTime.now();
+    if (act == _lastActSent && now.difference(_lastActAt).inSeconds < 2) return;
+    _lastActSent = act;
+    _lastActAt = now;
+    try {
+      ch.sendBroadcastMessage(event: 'act', payload: {'u': _userId, 'a': act});
+    } catch (_) {}
+  }
+
+  void _onComposeChanged(String v) {
+    _broadcastActivity(v.trim().isEmpty ? 'idle' : 'typing');
+    _typingIdle?.cancel();
+    _typingIdle = Timer(const Duration(seconds: 3), () => _broadcastActivity('idle'));
+  }
+
+  void _listenActivity() {
+    _actChannel = _chatService.client
+        .channel('act_${widget.conversation.id}')
+        .onBroadcast(
+          event: 'act',
+          callback: (p) {
+            if (!mounted || p['u'] != _buddyId) return;
+            final a = (p['a'] as String?) ?? 'idle';
+            _actExpire?.cancel();
+            // اگر پیام «idle» گم شد، بعد از ۶ ثانیه خودکار پاک شود
+            if (a != 'idle') {
+              _actExpire = Timer(const Duration(seconds: 6), () {
+                if (mounted) setState(() => _buddyActivity = 'idle');
+              });
+            }
+            if (a != _buddyActivity) setState(() => _buddyActivity = a);
+          },
+        )
+        .subscribe();
+  }
+
+  // واکنش‌های طرف مقابل بلافاصله دیده شود
+  void _listenReactions() {
+    _reactionChannel = _chatService.client
+        .channel('buddy_reactions_${widget.conversation.id}')
+        .onPostgresChanges(
+          event: PostgresChangeEvent.all,
+          schema: 'public',
+          table: 'message_reactions',
+          callback: (_) {
+            _reactionDebounce?.cancel();
+            _reactionDebounce = Timer(const Duration(milliseconds: 150), () async {
+              if (!mounted) return;
+              final updated = await _loadReactionsForMessages(_messages);
+              if (mounted) setState(() => _messages = updated);
+            });
+          },
+        )
+        .subscribe();
   }
 
   // ==================== ارسال GIF ====================
@@ -6606,7 +6677,7 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  context.tr('bc.k145', {'p0': '${_replyToMessage!.senderName ?? context.tr('bc.user')}'}),
+                  context.tr('bc.k145', {'p0': '${_replyToMessage!.senderName ?? context.tr('bc.k001')}'}),
                   style: TextStyle(
                     fontSize: 12,
                     color: primaryColor,
@@ -6931,7 +7002,7 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
                           ),
                           decoration: InputDecoration(
                             hintText: _replyToMessage != null
-                                ? context.tr('bc.k148', {'p0': '${_replyToMessage!.senderName ?? context.tr('bc.user')}'})
+                                ? context.tr('bc.k148', {'p0': '${_replyToMessage!.senderName ?? context.tr('bc.k001')}'})
                                 : context.tr('bc.k149'),
                             hintStyle: TextStyle(
                               fontSize: 14,
@@ -6955,6 +7026,7 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
                                   )
                                 : null,
                           ),
+                          onChanged: _onComposeChanged,
                           textInputAction: TextInputAction.newline,
                           keyboardType: TextInputType.multiline,
                           maxLines: 4,
@@ -6974,7 +7046,9 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
                     const SizedBox(width: 4),
 
                     // دکمه ارسال
-                    Container(
+                    ValueListenableBuilder<TextEditingValue>(
+                      valueListenable: _messageController,
+                      builder: (context, _, __) => Container(
                       width: 52,
                       height: 52,
                       decoration: BoxDecoration(
@@ -7005,6 +7079,7 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
                                 size: 22,
                               ),
                       ),
+                    ),
                     ),
                   ],
                 ),
@@ -7271,9 +7346,14 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  if (_isBuddyTyping)
+                  if (_buddyActivity != 'idle')
                     Text(
-                      context.tr('bc.k157'),
+                      context.tr(const {
+                        'typing': 'bc.k157',
+                        'file': 'bc.act.file',
+                        'music': 'bc.act.music',
+                        'image': 'bc.act.image',
+                      }[_buddyActivity] ?? 'bc.k157'),
                       style: TextStyle(
                         fontSize: 11,
                         color: primaryColor,

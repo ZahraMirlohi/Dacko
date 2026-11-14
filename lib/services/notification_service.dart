@@ -115,7 +115,7 @@ class NotificationService {
         await _plugin.cancel(_habitBase + i);
       }
       final settings = SettingsProvider.current;
-      if (settings == null || !settings.notifications) return;
+      if (settings == null || !settings.notificationsEnabled) return;
 
       final lang = settings.language;
       final now = tz.TZDateTime.now(tz.local);

@@ -1427,7 +1427,7 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
     try {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Row(
               children: [
                 SizedBox(
@@ -1518,7 +1518,7 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
     try {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Row(
               children: [
                 SizedBox(
@@ -4815,7 +4815,7 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
                                       width: 1,
                                     ),
                                   ),
-                                  child: const Row(
+                                  child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Icon(

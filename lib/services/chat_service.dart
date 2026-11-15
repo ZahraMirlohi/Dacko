@@ -764,11 +764,12 @@ class ChatService {
     try {
       // فقط فرستنده پیام میتواند برای همه حذف کند
       // یا ادمین گروه (برای گروه‌ها)
-      await _client
-          .from('messages')
-          .delete()
-          .eq('id', messageId)
-          .eq('sender_id', userId);
+      await _client.from('messages').update({
+        'is_deleted': true,
+        'deleted_at': DateTime.now().toUtc().toIso8601String(),
+        'content': '',
+        'metadata': {},
+      }).eq('id', messageId).eq('sender_id', userId);
 
       print('Message deleted for everyone: $messageId');
     } catch (e) {
@@ -923,11 +924,7 @@ class ChatService {
   Future<void> deleteMessage(String messageId, String userId) async {
     try {
       // حذف کامل پیام از دیتابیس
-      await _client
-          .from('messages')
-          .delete()
-          .eq('id', messageId)
-          .eq('sender_id', userId);
+      await deleteMessageForEveryone(messageId, userId);
 
       print('Message deleted permanently: $messageId');
     } catch (e) {

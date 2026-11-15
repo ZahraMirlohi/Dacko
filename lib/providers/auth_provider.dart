@@ -22,6 +22,7 @@ enum SignUpResult { signedIn, needsEmailConfirmation }
 /// پاسخ‌های سوال‌های معرفی (همه اختیاری)
 class OnboardingAnswers {
   final String? goal;
+  final List<String> goals;
   final String? firstTask;
   final String? energy; // intro | mixed | extro
   final String? style; // planner | mixed | flow
@@ -31,6 +32,7 @@ class OnboardingAnswers {
 
   const OnboardingAnswers({
     this.goal,
+    this.goals = const [],
     this.firstTask,
     this.energy,
     this.style,
@@ -40,7 +42,7 @@ class OnboardingAnswers {
   });
 
   Map<String, dynamic> toJson() => {
-        'goals': goal == null ? <String>[] : [goal],
+        'goals': goals.isNotEmpty ? goals : (goal == null ? <String>[] : [goal]),
         'goal': goal,
         'first_task': firstTask,
         'energy': energy,

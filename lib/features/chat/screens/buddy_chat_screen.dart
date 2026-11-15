@@ -239,6 +239,7 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
     _reactionDebounce?.cancel();
     if (_actChannel != null) _chatService.client.removeChannel(_actChannel!);
     if (_reactionChannel != null) _chatService.client.removeChannel(_reactionChannel!);
+    if (_convChannel != null) _chatService.client.removeChannel(_convChannel!);
     _messageController.dispose();
     _scrollController.dispose();
     _focusNode.dispose();
@@ -388,6 +389,7 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
       }
 
       await messagesF;
+      _markMessagesAsRead(); // نشانگر خوانده‌نشده سریع پاک شود
 
       _messageSubscription = _chatService
           .getMessages(widget.conversation.id, userId: _userId)
@@ -395,15 +397,22 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
         if (!mounted || _isClearingHistory) return;
 
         try {
-          final messagesWithReactions = await _loadReactionsForMessages(
-            newMessages,
-          );
-
+          final visible = newMessages.where((m) => !m.isDeleted).toList();
+          final shown = _applyReactions(visible, _reactionCache);
+          final oldIds = _messages.map((m) => m.id).toSet();
           if (mounted) {
             final oldMessageCount = _messages.length;
+            if (oldMessageCount > 0) {
+              for (final m in shown) {
+                if (!oldIds.contains(m.id) && m.senderId != _userId && !m.isTemp) {
+                  _freshIds.add(m.id);
+                  Timer(const Duration(milliseconds: 900), () => _freshIds.remove(m.id));
+                }
+              }
+            }
 
             setState(() {
-              _messages = messagesWithReactions.reversed.toList();
+              _messages = shown.reversed.toList();
               try {
                 _pinnedMessage = _messages.firstWhere((m) => m.isPinned);
               } catch (e) {
@@ -411,7 +420,7 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
               }
             });
 
-            await _markMessagesAsRead();
+            _markMessagesAsRead();
 
             if (_messages.length > oldMessageCount) {
               final lastMessage = _messages.last;
@@ -423,6 +432,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
               }
             }
           }
+          // واکنش‌ها بعداً و بدون معطل کردن نمایش پیام
+          _refreshReactions();
         } catch (e) {
           print('❌ Error in realtime update: $e');
         }
@@ -430,6 +441,7 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
 
       _listenActivity();
       _listenReactions();
+      _listenConversationGone();
     } catch (e) {
       print('❌ Critical error in _initChat: $e');
       if (mounted) {
@@ -2643,6 +2655,7 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
     setState(() {
       _isDeleting = true;
     });
+    _iDeletedChat = true;
 
     try {
       await _chatService.deleteConversationForBoth(widget.conversation.id,
@@ -3444,6 +3457,51 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
     }
   }
 
+  Map<String, List<MessageReaction>> _reactionCache = {};
+  final Set<String> _freshIds = {};
+  RealtimeChannel? _convChannel;
+  bool _iDeletedChat = false;
+
+  List<ChatMessage> _applyReactions(
+    List<ChatMessage> messages,
+    Map<String, List<MessageReaction>> allReactions,
+  ) {
+    return messages.map((msg) {
+      final reactions = allReactions[msg.id];
+      if (reactions == null || reactions.isEmpty) return msg;
+      return ChatMessage(
+        id: msg.id,
+        conversationId: msg.conversationId,
+        senderId: msg.senderId,
+        senderName: msg.senderName,
+        senderAvatar: msg.senderAvatar,
+        content: msg.content,
+        type: msg.type,
+        status: msg.status,
+        metadata: msg.metadata,
+        isRead: msg.isRead,
+        isEdited: msg.isEdited,
+        isDeleted: msg.isDeleted,
+        replyToId: msg.replyToId,
+        replyTo: msg.replyTo,
+        reactions: reactions,
+        createdAt: msg.createdAt,
+        editedAt: msg.editedAt,
+        deletedAt: msg.deletedAt,
+        isTemp: msg.isTemp,
+      );
+    }).toList();
+  }
+
+  Future<void> _refreshReactions() async {
+    try {
+      final all = await _chatService.getConversationReactions(widget.conversation.id);
+      if (!mounted) return;
+      _reactionCache = all;
+      setState(() => _messages = _applyReactions(_messages, all));
+    } catch (_) {}
+  }
+
   Future<List<ChatMessage>> _loadReactionsForMessages(
     List<ChatMessage> messages,
   ) async {
@@ -3453,36 +3511,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
       final allReactions = await _chatService.getConversationReactions(
         widget.conversation.id,
       );
-
-      final updatedMessages = messages.map((msg) {
-        final reactions = allReactions[msg.id];
-        if (reactions != null && reactions.isNotEmpty) {
-          return ChatMessage(
-            id: msg.id,
-            conversationId: msg.conversationId,
-            senderId: msg.senderId,
-            senderName: msg.senderName,
-            senderAvatar: msg.senderAvatar,
-            content: msg.content,
-            type: msg.type,
-            status: msg.status,
-            metadata: msg.metadata,
-            isRead: msg.isRead,
-            isEdited: msg.isEdited,
-            isDeleted: msg.isDeleted,
-            replyToId: msg.replyToId,
-            replyTo: msg.replyTo,
-            reactions: reactions,
-            createdAt: msg.createdAt,
-            editedAt: msg.editedAt,
-            deletedAt: msg.deletedAt,
-            isTemp: msg.isTemp,
-          );
-        }
-        return msg;
-      }).toList();
-
-      return updatedMessages;
+      _reactionCache = allReactions;
+      return _applyReactions(messages, allReactions);
     } catch (e) {
       print('❌ Error loading reactions: $e');
       return messages;
@@ -3911,6 +3941,25 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
         .subscribe();
   }
 
+  // اگر طرف مقابل گفتگو را حذف کرد، همین‌جا هم بسته شود
+  void _listenConversationGone() {
+    _convChannel = _chatService.client
+        .channel('conv_gone_${widget.conversation.id}')
+        .onPostgresChanges(
+          event: PostgresChangeEvent.all,
+          schema: 'public',
+          table: 'conversations',
+          callback: (p) {
+            final rec = p.eventType == PostgresChangeEvent.delete ? p.oldRecord : p.newRecord;
+            if (rec['id'] != widget.conversation.id) return;
+            final gone = p.eventType == PostgresChangeEvent.delete || rec['is_active'] == false;
+            if (!gone || _iDeletedChat || !mounted) return;
+            Navigator.of(context).pop(true);
+          },
+        )
+        .subscribe();
+  }
+
   // واکنش‌های طرف مقابل بلافاصله دیده شود
   void _listenReactions() {
     _reactionChannel = _chatService.client
@@ -3921,11 +3970,7 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
           table: 'message_reactions',
           callback: (_) {
             _reactionDebounce?.cancel();
-            _reactionDebounce = Timer(const Duration(milliseconds: 150), () async {
-              if (!mounted) return;
-              final updated = await _loadReactionsForMessages(_messages);
-              if (mounted) setState(() => _messages = updated);
-            });
+            _reactionDebounce = Timer(const Duration(milliseconds: 100), _refreshReactions);
           },
         )
         .subscribe();
@@ -4058,32 +4103,41 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
   Future<void> _deleteSelectedMessages() async {
     if (_selectedMessageIds.isEmpty) return;
 
-    final confirm = await showDialog<bool>(
+    final ids = _selectedMessageIds.toList();
+    final allMine = ids.every((id) {
+      final m = _messages.where((x) => x.id == id);
+      return m.isNotEmpty && m.first.senderId == _userId;
+    });
+
+    final choice = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(context.tr('bc.k095')),
-        content: Text(
-          context.tr('bc.k096', {'p0': '${_selectedMessageIds.length}'}),
-        ),
+        content: Text(context.tr('bc.k096', {'p0': '${ids.length}'})),
+        actionsOverflowDirection: VerticalDirection.down,
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(context.tr('bc.k023')),
+            onPressed: () => Navigator.pop(context, 'me'),
+            child: Text(context.tr('bc.k100')),
           ),
+          if (allMine)
+            TextButton(
+              onPressed: () => Navigator.pop(context, 'all'),
+              child: Text(context.tr('bc.k102'), style: const TextStyle(color: Colors.red)),
+            ),
           TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: Text(context.tr('bc.k097'), style: TextStyle(color: Colors.red)),
+            onPressed: () => Navigator.pop(context),
+            child: Text(context.tr('bc.k023')),
           ),
         ],
       ),
     );
 
-    if (confirm == true && _userId != null) {
+    if (choice != null && _userId != null) {
       try {
-        for (var messageId in _selectedMessageIds) {
-          final message = _messages.firstWhere((msg) => msg.id == messageId);
-          if (message.senderId == _userId) {
+        for (final messageId in ids) {
+          if (choice == 'all') {
             await _chatService.deleteMessageForEveryone(messageId, _userId!);
           } else {
             await _chatService.deleteMessageForMe(messageId, _userId!);
@@ -4091,7 +4145,7 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
         }
 
         setState(() {
-          _messages.removeWhere((msg) => _selectedMessageIds.contains(msg.id));
+          _messages.removeWhere((msg) => ids.contains(msg.id));
           _isSelectMode = false;
           _selectedMessageIds.clear();
         });
@@ -4099,7 +4153,7 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(context.tr('bc.k098', {'p0': '${_selectedMessageIds.length}'})),
+              content: Text(context.tr('bc.k098', {'p0': '${ids.length}'})),
               duration: const Duration(seconds: 1),
             ),
           );
@@ -4581,6 +4635,36 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
 
 // ==================== ساخت پیام ====================
   Widget _buildMessageBubble(
+    ChatMessage message,
+    ThemeProvider theme,
+    Color primaryColor,
+  ) {
+    final core = _buildMessageBubbleCore(message, theme, primaryColor);
+    if (!_freshIds.contains(message.id)) return core;
+    // ورود نرم پیام تازه: محو شدن + سر خوردن از پایین + کمی بزرگ‌نمایی
+    return TweenAnimationBuilder<double>(
+      key: ValueKey('fresh_${message.id}'),
+      tween: Tween(begin: 0, end: 1),
+      duration: const Duration(milliseconds: 380),
+      curve: Curves.easeOutCubic,
+      builder: (context, v, child) => Opacity(
+        opacity: v,
+        child: Transform.translate(
+          offset: Offset(0, 18 * (1 - v)),
+          child: Transform.scale(
+            scale: 0.94 + 0.06 * v,
+            alignment: message.senderId == _userId
+                ? Alignment.bottomRight
+                : Alignment.bottomLeft,
+            child: child,
+          ),
+        ),
+      ),
+      child: core,
+    );
+  }
+
+  Widget _buildMessageBubbleCore(
     ChatMessage message,
     ThemeProvider theme,
     Color primaryColor,

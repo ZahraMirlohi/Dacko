@@ -1287,9 +1287,22 @@ class ChatService {
 
   Future<String> openBuddyConversation(String me, String other) {
     final key = ([me, other]..sort()).join('|');
-    return _openingBuddy[key] ??=
-        createConversation(type: 'buddy', memberIds: [me, other], createdBy: me)
-            .whenComplete(() => _openingBuddy.remove(key));
+    return _openingBuddy[key] ??= _openBuddyViaRpc(me, other)
+        .whenComplete(() => _openingBuddy.remove(key));
+  }
+
+  // اول تابع سرور (sql/16)؛ اگر هنوز ساخته نشده بود، روش قدیمی
+  Future<String> _openBuddyViaRpc(String me, String other) async {
+    try {
+      final id = await _client
+          .rpc('get_or_create_buddy_conversation', params: {'other': other});
+      return id as String;
+    } catch (e) {
+      if (e.toString().contains('not buddies')) rethrow;
+      print('RPC get_or_create_buddy_conversation failed, falling back: $e');
+      return createConversation(
+          type: 'buddy', memberIds: [me, other], createdBy: me);
+    }
   }
 
   /// پایان هم‌مسیری: درخواست‌ها و گفتگو

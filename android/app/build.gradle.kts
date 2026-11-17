@@ -23,9 +23,22 @@ android {
         multiDexEnabled = true
     }
 
+    // امضای ثابت: بدون آن هر بیلد کلید تازه می‌گیرد و اندروید نصبِ روی نسخه‌ی قبلی را رد می‌کند
+    val ksPath = System.getenv("KEYSTORE_PATH")
+    signingConfigs {
+        if (ksPath != null && File(ksPath).exists()) {
+            create("dacko") {
+                storeFile = File(ksPath)
+                storePassword = "dackoKeys2026"
+                keyAlias = "dacko"
+                keyPassword = "dackoKeys2026"
+            }
+        }
+    }
+
     buildTypes {
         release {
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.findByName("dacko") ?: signingConfigs.getByName("debug")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(

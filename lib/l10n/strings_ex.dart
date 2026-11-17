@@ -120,6 +120,9 @@ const Map<String, String> exFa = {
   'ex.help.qs.b': 'ماموریت یه هدف مشخص با تعداد روز معینه، مثلاً ۷ روز آب خوردن. برخلاف چالش، اینجا فقط خودتی و وجدانت.\n\nبعد از «شروع»، هر روز توی میدان انجامش بده. آخرش XP و مدال می‌گیری که از یه «آفرین» خشک‌وخالی بیشتر ارزش داره.',
   'ex.help.lb.t': 'افتخارات، یعنی جدول رتبه‌ها',
   'ex.help.lb.b': 'اینجا می‌فهمی کی بیشتر از تو XP جمع کرده و بی‌دلیل هم باهات مهربون نیست. به درد غرور و حسادت می‌خوره، هر دو در دوز سالم.\n\nکاری لازم نیست بکنی؛ فقط XP جمع کن و بالا برو. جدول بقیه‌اش رو خودش خجالت‌زده می‌کنه.',
+  'vpn.title': 'فیلترشکن روشن است',
+  'vpn.body': 'برای تجربه‌ی بهتر و سریع‌تر (چت، اعلان‌ها و همگام‌سازی)، لطفاً فیلترشکن را خاموش کنید.',
+  'vpn.ok': 'متوجه شدم',
 };
 const Map<String, String> exEn = {
   'ex.challenge': 'Challenge',
@@ -242,4 +245,7 @@ const Map<String, String> exEn = {
   'ex.help.qs.b': 'A quest is a specific goal with a set number of days, like drinking water for 7 days. Unlike a challenge, it is just you and your conscience.\n\nAfter you tap "Start", do it every day in the Arena. At the end you get XP and a medal, which is worth more than a dry "well done".',
   'ex.help.lb.t': 'Honors: the ranking table',
   'ex.help.lb.b': 'Here you find out who has collected more XP than you, and is not being nice to you for no reason. It feeds pride and envy, both in healthy doses.\n\nYou do not need to do anything; just collect XP and climb. The table will embarrass everyone else on its own.',
+  'vpn.title': 'VPN is on',
+  'vpn.body': 'For a better and faster experience (chat, notifications and sync), please turn your VPN off.',
+  'vpn.ok': 'Got it',
 };

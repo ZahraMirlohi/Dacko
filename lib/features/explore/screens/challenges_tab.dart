@@ -356,6 +356,7 @@ class _NotchedChallengeCard extends StatelessWidget {
                     cornerRadius: 24,
                   ),
                   child: _buildCardContent(
+                    context: context,
                     title: title,
                     challengeDuration: challengeDuration,
                     xpReward: xpReward,
@@ -378,6 +379,7 @@ class _NotchedChallengeCard extends StatelessWidget {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(24),
                     child: _buildCardContent(
+                      context: context,
                       title: title,
                       challengeDuration: challengeDuration,
                       xpReward: xpReward,
@@ -410,6 +412,7 @@ class _NotchedChallengeCard extends StatelessWidget {
   // محتوای داخلی کارت
   // ═══════════════════════════════════════════════════════════
   Widget _buildCardContent({
+    required BuildContext context,
     required String title,
     required int challengeDuration,
     required int xpReward,
@@ -459,8 +462,8 @@ class _NotchedChallengeCard extends StatelessWidget {
                       subtleColor: subtleTextColor,
                     ),
                   const Spacer(),
-                  if (isCompleted) _buildCompletedBadge(),
-                  if (isBoss && !isCompleted) _buildBossBadge(),
+                  if (isCompleted) _buildCompletedBadge(context),
+                  if (isBoss && !isCompleted) _buildBossBadge(context),
                 ],
               ),
               const SizedBox(height: 10),
@@ -515,7 +518,7 @@ class _NotchedChallengeCard extends StatelessWidget {
             ),
             if (isActive && onLeave != null) ...[
               const SizedBox(height: 12),
-              _buildLeaveButton(onLeave!),
+              _buildLeaveButton(context, onLeave!),
             ],
           ],
         ),
@@ -689,7 +692,7 @@ class _NotchedChallengeCard extends StatelessWidget {
     );
   }
 
-  Widget _buildLeaveButton(VoidCallback onLeave) {
+  Widget _buildLeaveButton(BuildContext context, VoidCallback onLeave) {
     const Color btnColor = Color(0xFF090909);
 
     return GestureDetector(
@@ -728,7 +731,7 @@ class _NotchedChallengeCard extends StatelessWidget {
     );
   }
 
-  Widget _buildCompletedBadge() {
+  Widget _buildCompletedBadge(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
@@ -757,7 +760,7 @@ class _NotchedChallengeCard extends StatelessWidget {
     );
   }
 
-  Widget _buildBossBadge() {
+  Widget _buildBossBadge(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(

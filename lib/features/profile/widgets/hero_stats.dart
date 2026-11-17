@@ -89,7 +89,7 @@ class HeroStats extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          _buildXpBar(primaryColor, theme), // 
+          _buildXpBar(context, primaryColor, theme), // 
         ],
       ),
     );
@@ -132,7 +132,7 @@ class HeroStats extends StatelessWidget {
     );
   }
 
-  Widget _buildXpBar(Color primaryColor, ThemeProvider theme) {
+  Widget _buildXpBar(BuildContext context, Color primaryColor, ThemeProvider theme) {
     final progress = character.levelProgress;
     final xpNeeded = character.level * 100;
 

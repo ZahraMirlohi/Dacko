@@ -270,7 +270,7 @@ class GroupRichContent {
     final days = md['weekDays'] is List ? List<bool>.from(md['weekDays']) : <bool>[];
     final bg = isMe ? ChatColors.myBubble(theme) : ChatColors.otherBubble(theme);
     final fg = isMe ? ChatColors.myBubbleText(theme) : ChatColors.otherBubbleText(theme);
-    const letters = ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'];
+    final letters = context.isEnglish ? ['S', 'S', 'M', 'T', 'W', 'T', 'F'] : ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'];
     return Container(
       width: 260,
       padding: const EdgeInsets.all(14),

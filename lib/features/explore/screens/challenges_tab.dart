@@ -1,6 +1,7 @@
 // lib/features/explore/screens/challenges_tab.dart
 
 import 'package:flutter/material.dart';
+import '/l10n/app_strings.dart';
 import 'package:provider/provider.dart';
 import '/services/supabase_service.dart';
 import '/providers/theme_provider.dart';
@@ -276,7 +277,7 @@ class _NotchedChallengeCard extends StatelessWidget {
     final theme = Provider.of<ThemeProvider>(context);
     final challengeDuration = challenge['challenge_duration'] as int? ?? 7;
     final xpReward = challenge['xp_reward'] as int? ?? 50;
-    final title = challenge['title'] ?? 'بدون عنوان';
+    final title = challenge['title'] ?? context.tr('ch.k001');
     final isBoss = challenge['is_boss'] == true;
 
     // ═══════════════════════════════════════════════════════
@@ -452,7 +453,7 @@ class _NotchedChallengeCard extends StatelessWidget {
                   if (isActive || isCompleted)
                     _buildTag(
                       icon: Icons.timer_outlined,
-                      label: '$challengeDuration روز',
+                      label: context.tr('ch.k002', {'challengeDuration': '$challengeDuration'}),
                       color: isDarkBackground ? Colors.white : accentColor,
                       textColor: textColor,
                       subtleColor: subtleTextColor,
@@ -710,11 +711,11 @@ class _NotchedChallengeCard extends StatelessWidget {
             ),
           ],
         ),
-        child: const Row(
+        child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'انصراف',
+              context.tr('ch.k003'),
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
@@ -738,13 +739,13 @@ class _NotchedChallengeCard extends StatelessWidget {
         ),
         borderRadius: BorderRadius.circular(12),
       ),
-      child: const Row(
+      child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(Icons.emoji_events, size: 12, color: Colors.white),
           SizedBox(width: 3),
           Text(
-            'کامل شده',
+            context.tr('ch.k004'),
             style: TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.bold,
@@ -763,13 +764,13 @@ class _NotchedChallengeCard extends StatelessWidget {
         color: const Color(0xFF9B59B6).withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(12),
       ),
-      child: const Row(
+      child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(Icons.local_fire_department, size: 12, color: Color(0xFF9B59B6)),
           SizedBox(width: 3),
           Text(
-            'باس',
+            context.tr('ch.k005'),
             style: TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.bold,
@@ -965,7 +966,7 @@ class _ChallengesTabState extends State<ChallengesTab> {
               _buildSectionHeader(
                 icon: Icons.emoji_events_rounded,
                 tone: Tone.butter,
-                title: ' چالش‌های موفق',
+                title: context.tr('ch.k006'),
                 color: Colors.green,
                 centered: true,
               ),
@@ -995,7 +996,7 @@ class _ChallengesTabState extends State<ChallengesTab> {
               _buildSectionHeader(
                 icon: Icons.play_circle_rounded,
                 tone: Tone.sky,
-                title: ' چالش‌های فعال من',
+                title: context.tr('ch.k007'),
                 color: theme.textColor, // از 0xFF090909
                 centered: true,
               ),
@@ -1028,7 +1029,7 @@ class _ChallengesTabState extends State<ChallengesTab> {
               _buildSectionHeader(
                 icon: Icons.explore_rounded,
                 tone: Tone.lime,
-                title: ' چالش‌های جدید',
+                title: context.tr('ch.k008'),
                 color: theme.textColor, // 
                 centered: true,
               ),
@@ -1124,7 +1125,7 @@ class _ChallengesTabState extends State<ChallengesTab> {
   Widget _buildSuccessCard(Map<String, dynamic> challenge, Color primaryColor) {
     final theme = Provider.of<ThemeProvider>(context, listen: false);
     final tone = theme.tone(Tone.butter);
-    final title = challenge['title'] ?? 'چالش';
+    final title = challenge['title'] ?? context.tr('ch.k009');
     final duration = challenge['challenge_duration'] as int? ?? 7;
     const ink = Color(0xFF090909);
 
@@ -1198,7 +1199,7 @@ class _ChallengesTabState extends State<ChallengesTab> {
                 children: [
                   const Icon(Icons.verified_rounded, size: 12, color: ink),
                   const SizedBox(width: 4),
-                  Text('$duration روز قهرمانی',
+                  Text(context.tr('ch.k010', {'duration': '$duration'}),
                       style: const TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
@@ -1237,7 +1238,7 @@ class _ChallengesTabState extends State<ChallengesTab> {
           total = progressData['totalDays'] ?? totalDays;
           progress = total > 0 ? completedDays / total : 0.0;
         }
-        final title = challenge['title'] ?? 'بدون عنوان';
+        final title = challenge['title'] ?? context.tr('ch.k001');
         final xpReward = challenge['xp_reward'] as int? ?? 50;
         final pct = (progress.clamp(0.0, 1.0) * 100).toInt();
 
@@ -1261,10 +1262,10 @@ class _ChallengesTabState extends State<ChallengesTab> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _chip('$total روز',
+                  _chip(context.tr('ch.k011', {'total': '$total'}),
                       icon: Icons.timer_outlined,
                       bg: Colors.white.withValues(alpha: 0.6)),
-                  _chip('فعال',
+                  _chip(context.tr('ch.k012'),
                       icon: Icons.bolt_rounded,
                       bg: Colors.white.withValues(alpha: 0.6)),
                 ],
@@ -1292,12 +1293,12 @@ class _ChallengesTabState extends State<ChallengesTab> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('$completedDays از $total روز',
+                  Text(context.tr('ch.k013', {'completedDays': '$completedDays', 'total': '$total'}),
                       style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                           color: on)),
-                  Text('$pct٪',
+                  Text(context.tr('ch.k014', {'pct': '$pct'}),
                       style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w800,
@@ -1319,12 +1320,12 @@ class _ChallengesTabState extends State<ChallengesTab> {
                         color: const Color(0xFF090909),
                         borderRadius: BorderRadius.circular(17),
                       ),
-                      child: const Row(
+                      child: Row(
                         children: [
                           Icon(Icons.visibility_outlined,
                               size: 14, color: Colors.white),
                           SizedBox(width: 6),
-                          Text('مشاهده',
+                          Text(context.tr('ch.k015'),
                               style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
@@ -1343,12 +1344,12 @@ class _ChallengesTabState extends State<ChallengesTab> {
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(17),
                       ),
-                      child: const Row(
+                      child: Row(
                         children: [
                           Icon(Icons.delete_outline_rounded,
                               size: 14, color: Color(0xFF090909)),
                           SizedBox(width: 6),
-                          Text('حذف',
+                          Text(context.tr('ch.k016'),
                               style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
@@ -1411,23 +1412,23 @@ class _ChallengesTabState extends State<ChallengesTab> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _chip('$duration روز',
+                    _chip(context.tr('ch.k017', {'duration': '$duration'}),
                         icon: Icons.calendar_today_rounded, fg: fg),
                     if (isExpired)
-                      _chip('پایان ثبت‌نام',
+                      _chip(context.tr('ch.k018'),
                           bg: const Color(0xFFCFD3C4),
                           fg: const Color(0xFF555B4B))
                     else if (isBoss)
-                      _chip('باس',
+                      _chip(context.tr('ch.k005'),
                           icon: Icons.local_fire_department_rounded,
                           bg: const Color(0xFFE6DAF5),
                           fg: const Color(0xFF7B3FA8))
                     else
-                      _chip('داغ', icon: Icons.whatshot_rounded, fg: fg),
+                      _chip(context.tr('ch.k019'), icon: Icons.whatshot_rounded, fg: fg),
                   ],
                 ),
                 const SizedBox(height: 10),
-                Text(challenge['title'] ?? 'بدون عنوان',
+                Text(challenge['title'] ?? context.tr('ch.k001'),
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
@@ -1495,28 +1496,28 @@ class _ChallengesTabState extends State<ChallengesTab> {
       {
         'type': 'quote',
         'text':
-            'تنها محدودیتی که دارید، محدودیتی است که خودتان در ذهنتان ایجاد می‌کنید.',
-        'author': 'نپلئون هیل',
+            context.tr('ch.k020'),
+        'author': context.tr('ch.k021'),
       },
       {
         'type': 'quote',
-        'text': 'موفقیت مجموع تلاش‌های کوچکی است که روز به روز تکرار می‌شوند.',
-        'author': 'رابرت کالیر',
+        'text': context.tr('ch.k022'),
+        'author': context.tr('ch.k023'),
       },
       {
         'type': 'challenge',
-        'text': 'امروز ۱۰ دقیقه بدون گوشی وقت بگذران',
+        'text': context.tr('ch.k024'),
         'author': '',
       },
       {
         'type': 'fact',
-        'text': 'عادت‌های جدید به طور متوسط ۶۶ روز طول می‌کشند تا شکل بگیرند.',
-        'author': 'تحقیقات دانشگاه کالج لندن',
+        'text': context.tr('ch.k025'),
+        'author': context.tr('ch.k026'),
       },
       {
         'type': 'quote',
-        'text': 'با انجام کارهای کوچک هر روز، می‌توانید به نتایج بزرگ برسید.',
-        'author': 'لائوتسه',
+        'text': context.tr('ch.k027'),
+        'author': context.tr('ch.k028'),
       },
     ];
 
@@ -1568,10 +1569,10 @@ class _ChallengesTabState extends State<ChallengesTab> {
               children: [
                 Text(
                   spark['type'] == 'quote'
-                      ? 'جرقه روزانه'
+                      ? context.tr('ch.k029')
                       : spark['type'] == 'challenge'
-                          ? 'چالش روزانه'
-                          : '💡 واقعیت علمی',
+                          ? context.tr('ch.k030')
+                          : context.tr('ch.k031'),
                   style: const TextStyle(fontSize: 12, color: Colors.white70),
                 ),
                 const SizedBox(height: 4),
@@ -1621,7 +1622,7 @@ class _ChallengesTabState extends State<ChallengesTab> {
             ),
             const SizedBox(height: 16),
             Text(
-              'هنوز چالشی وجود ندارد',
+              context.tr('ch.k032'),
               style: TextStyle(
                 color: theme.textSecondaryColor, // 
                 fontSize: 16,
@@ -1630,7 +1631,7 @@ class _ChallengesTabState extends State<ChallengesTab> {
             ),
             const SizedBox(height: 8),
             Text(
-              'برای اضافه شدن چالش‌های جدید منتظر بمانید',
+              context.tr('ch.k033'),
               style: TextStyle(
                 color: theme.textSecondaryColor, // 
                 fontSize: 12,
@@ -1647,22 +1648,22 @@ class _ChallengesTabState extends State<ChallengesTab> {
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('انصراف از چالش'),
+        title: Text(context.tr('ch.k034')),
         content: Text(
-          'آیا از انصراف از چالش "${challenge['title']}" مطمئن هستید؟',
+          context.tr('ch.q1', {'t': '${challenge['title']}'}),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('انصراف'),
+            child: Text(context.tr('ch.k003')),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               widget.leaveChallenge(challenge);
             },
-            child: const Text(
-              'بله، انصراف',
+            child: Text(
+              context.tr('ch.k035'),
               style: TextStyle(color: Colors.red),
             ),
           ),

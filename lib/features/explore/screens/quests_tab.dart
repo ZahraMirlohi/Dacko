@@ -1,6 +1,7 @@
 // lib/features/explore/screens/quests_tab.dart
 
 import 'package:flutter/material.dart';
+import '/l10n/app_strings.dart';
 import 'package:provider/provider.dart';
 import '../models/quest_model.dart';
 import '../models/user_quest_model.dart';
@@ -108,7 +109,7 @@ class _QuestsTabState extends State<QuestsTab> {
               if (activeQuests.isNotEmpty) ...[
                 _buildSectionHeader(
                   icon: Icons.play_circle_rounded,
-                  title: 'ماموریت‌های در حال انجام',
+                  title: context.tr('qt.k001'),
                   theme: theme,
                   tone: Tone.sky,
                 ),
@@ -128,7 +129,7 @@ class _QuestsTabState extends State<QuestsTab> {
               if (newQuests.isNotEmpty) ...[
                 _buildSectionHeader(
                   icon: Icons.flag_rounded,
-                  title: 'ماموریت‌های جدید',
+                  title: context.tr('qt.k002'),
                   theme: theme,
                   tone: Tone.lime,
                 ),
@@ -148,7 +149,7 @@ class _QuestsTabState extends State<QuestsTab> {
               if (completedQuests.isNotEmpty) ...[
                 _buildSectionHeader(
                   icon: Icons.emoji_events_rounded,
-                  title: 'ماموریت‌های تکمیل شده',
+                  title: context.tr('qt.k003'),
                   theme: theme,
                   tone: Tone.mint,
                 ),
@@ -181,7 +182,7 @@ class _QuestsTabState extends State<QuestsTab> {
           ),
           const SizedBox(height: 16),
           Text(
-            'هنوز ماموریتی وجود ندارد',
+            context.tr('qt.k004'),
             style: TextStyle(color: theme.textSecondaryColor),
           ),
         ],
@@ -197,7 +198,7 @@ class _QuestsTabState extends State<QuestsTab> {
           Icon(Icons.error_outline, color: Colors.red.shade300, size: 48),
           const SizedBox(height: 12),
           Text(
-            'خطا در بارگذاری ماموریت‌ها',
+            context.tr('qt.k005'),
             style: TextStyle(color: theme.textSecondaryColor),
           ),
           const SizedBox(height: 8),
@@ -206,7 +207,7 @@ class _QuestsTabState extends State<QuestsTab> {
             style: ElevatedButton.styleFrom(
               backgroundColor: primaryColor,
             ),
-            child: const Text('تلاش مجدد'),
+            child: Text(context.tr('qt.k006')),
           ),
         ],
       ),
@@ -271,7 +272,7 @@ class _QuestsTabState extends State<QuestsTab> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('ماموریت "${quest.title}" شروع شد! '),
+            content: Text(context.tr('qt.k007', {'p0': '${quest.title}'})),
             backgroundColor: Colors.green,
             duration: const Duration(seconds: 2),
           ),
@@ -384,7 +385,7 @@ class _QuestsTabState extends State<QuestsTab> {
                       ),
                       const SizedBox(width: 2),
                       Text(
-                        'فعال',
+                        context.tr('qt.k008'),
                         style: TextStyle(
                           fontSize: 9,
                           fontWeight: FontWeight.w700,
@@ -423,7 +424,7 @@ class _QuestsTabState extends State<QuestsTab> {
                 Row(
                   children: [
                     Text(
-                      '$progress از ${quest.targetCount} روز',
+                      context.tr('qt.k009', {'p0': '${quest.targetCount}', 'progress': '$progress'}),
                       style: TextStyle(
                         fontSize: 9,
                         fontWeight: FontWeight.w600,
@@ -488,7 +489,7 @@ class _QuestsTabState extends State<QuestsTab> {
                       color: const Color(0xFF090909),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Row(
+                    child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
@@ -498,7 +499,7 @@ class _QuestsTabState extends State<QuestsTab> {
                         ),
                         SizedBox(width: 3),
                         Text(
-                          'مشاهده',
+                          context.tr('qt.k010'),
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.w600,
@@ -525,7 +526,7 @@ class _QuestsTabState extends State<QuestsTab> {
                         width: 1,
                       ),
                     ),
-                    child: const Row(
+                    child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
@@ -535,7 +536,7 @@ class _QuestsTabState extends State<QuestsTab> {
                         ),
                         SizedBox(width: 3),
                         Text(
-                          'غیرفعال',
+                          context.tr('qt.k011'),
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.w600,
@@ -797,7 +798,7 @@ class _QuestsTabState extends State<QuestsTab> {
             ),
             const SizedBox(width: 12),
             Text(
-              'انصراف از ماموریت',
+              context.tr('qt.k012'),
               style: TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.bold,
@@ -811,7 +812,7 @@ class _QuestsTabState extends State<QuestsTab> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'آیا از انصراف از ماموریت "${quest.title}" مطمئن هستید؟',
+              context.tr('qt.k013', {'p0': '${quest.title}'}),
               style: TextStyle(
                 fontSize: 14,
                 height: 1.5,
@@ -839,7 +840,7 @@ class _QuestsTabState extends State<QuestsTab> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'با انصراف، تمام پیشرفت شما از دست خواهد رفت و باید از اول شروع کنید.',
+                      context.tr('qt.k014'),
                       style: TextStyle(
                         fontSize: 12,
                         height: 1.5,
@@ -856,7 +857,7 @@ class _QuestsTabState extends State<QuestsTab> {
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(
-              'انصراف',
+              context.tr('qt.k015'),
               style: TextStyle(color: theme.textSecondaryColor),
             ),
           ),
@@ -872,7 +873,7 @@ class _QuestsTabState extends State<QuestsTab> {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: const Text('بله، انصراف'),
+            child: Text(context.tr('qt.k016')),
           ),
         ],
       ),
@@ -887,7 +888,7 @@ class _QuestsTabState extends State<QuestsTab> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('از ماموریت "${quest.title}" انصراف دادید'),
+            content: Text(context.tr('qt.k017', {'p0': '${quest.title}'})),
             backgroundColor: const Color(0xFF090909),
             duration: const Duration(seconds: 2),
           ),
@@ -898,7 +899,7 @@ class _QuestsTabState extends State<QuestsTab> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('خطا: ${e.toString()}'),
+            content: Text(context.tr('qt.k018', {'p0': '${e.toString()}'})),
             backgroundColor: Colors.red,
           ),
         );

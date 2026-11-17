@@ -6253,7 +6253,7 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
   }
 
   String _getWeekDayLetter(int index) {
-    const days = ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'];
+    final days = context.isEnglish ? ['S', 'S', 'M', 'T', 'W', 'T', 'F'] : ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'];
     return days[index];
   }
 
@@ -6315,7 +6315,7 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
       weekDays = _weekDays;
     }
 
-    const weekDayLetters = ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'];
+    final weekDayLetters = context.isEnglish ? ['S', 'S', 'M', 'T', 'W', 'T', 'F'] : ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'];
 
     final jalaliToday = Jalali.fromDateTime(DateTime.now());
     final todayIndex = jalaliToday.weekDay - 1;

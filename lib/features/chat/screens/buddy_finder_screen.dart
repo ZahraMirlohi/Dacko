@@ -13,6 +13,7 @@ import '/features/profile/screens/personality_screen.dart';
 import '/features/chat/models/conversation_model.dart';
 import 'buddy_chat_screen.dart';
 import 'user_profile_screen.dart';
+import '../widgets/open_buddy_chat.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -1585,6 +1586,18 @@ class _BuddyFinderScreenState extends State<BuddyFinderScreen>
                   score: score,
                 ),
               ),
+              if (isBuddy) ...[
+                const SizedBox(width: 8),
+                OutlinedButton(
+                  onPressed: () => openBuddyChat(context, userId),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    side: BorderSide(color: primaryColor.withValues(alpha: 0.3)),
+                  ),
+                  child: Icon(Icons.chat_bubble_outline, size: 20, color: primaryColor),
+                ),
+              ],
               const SizedBox(width: 8),
               OutlinedButton(
                 onPressed: () => _showUserProfile(userId, theme, primaryColor),

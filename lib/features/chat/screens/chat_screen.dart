@@ -1,3 +1,4 @@
+import 'dart:async';
 // lib/features/chat/screens/chat_screen.dart
 
 import '../widgets/avatar_viewer.dart';
@@ -45,6 +46,7 @@ class _ChatScreenState extends State<ChatScreen>
     _tabController = TabController(length: 3, vsync: this);
     ChatScreen.openRequestsSignal.addListener(_openRequests);
     _loadIncomingCount();
+    _listenConversations();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
@@ -53,8 +55,39 @@ class _ChatScreenState extends State<ChatScreen>
     });
   }
 
+  RealtimeChannel? _convsChannel;
+  Timer? _convsDebounce;
+
+  // حذف/تغییر گفتگو توسط طرف مقابل زود در لیست دیده شود
+  void _listenConversations() {
+    _convsChannel = _supabaseClient
+        .channel('chat_list_conversations')
+        .onPostgresChanges(
+          event: PostgresChangeEvent.all,
+          schema: 'public',
+          table: 'conversations',
+          callback: (p) {
+            if (!mounted) return;
+            final rec = p.eventType == PostgresChangeEvent.delete ? p.oldRecord : p.newRecord;
+            final gone = p.eventType == PostgresChangeEvent.delete || rec['is_active'] == false;
+            if (gone) {
+              setState(() => _conversations.removeWhere((x) => x.id == rec['id']));
+            }
+            // به‌روزرسانی‌های ساده (آخرین پیام) هر بار لیست را دوباره نمی‌خوانند
+            if (p.eventType == PostgresChangeEvent.update && !gone) return;
+            _convsDebounce?.cancel();
+            _convsDebounce = Timer(const Duration(milliseconds: 400), () {
+              if (mounted) _loadData();
+            });
+          },
+        )
+        .subscribe();
+  }
+
   @override
   void dispose() {
+    _convsDebounce?.cancel();
+    if (_convsChannel != null) _supabaseClient.removeChannel(_convsChannel!);
     ChatScreen.openRequestsSignal.removeListener(_openRequests);
     _tabController.dispose();
     super.dispose();
@@ -128,21 +161,43 @@ class _ChatScreenState extends State<ChatScreen>
     }
   }
 
+  bool _openingChat = false;
+
   Future<void> _openBuddyChat(String otherId) async {
+    if (_openingChat) return; // لمس تکراری تا باز شدن چت نادیده گرفته می‌شود
+    _openingChat = true;
     try {
+      // گفتگو از قبل در لیست بارگذاری‌شده هست: بدون هیچ درخواست شبکه‌ای فوری باز شود
+      for (final c in _conversations) {
+        if (c.type == ConversationType.buddy && c.memberIds.contains(otherId)) {
+          final res = await Navigator.push(context,
+              MaterialPageRoute(builder: (_) => BuddyChatScreen(conversation: c)));
+          if (res == true && mounted) {
+            setState(() => _conversations.removeWhere((x) => x.id == c.id));
+          }
+          if (mounted) _loadData();
+          return;
+        }
+      }
       final me = (await _chatService.getCurrentUser())!.id;
       final id = await _chatService.openBuddyConversation(me, otherId);
-      final convs = await _chatService.getUserConversations(me);
+      var convs = await _chatService.getUserConversations(me);
+      if (!convs.any((c) => c.id == id)) {
+        await Future.delayed(const Duration(milliseconds: 400));
+        convs = await _chatService.getUserConversations(me);
+      }
       final conv = convs.firstWhere((c) => c.id == id);
       if (!mounted) return;
       await Navigator.push(context,
           MaterialPageRoute(builder: (_) => BuddyChatScreen(conversation: conv)));
       if (mounted) _loadData();
-    } catch (_) {
+    } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(context.tr('bd.error'))));
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('${context.tr('bd.error')}: $e')));
       }
+    } finally {
+      _openingChat = false;
     }
   }
 
@@ -932,11 +987,14 @@ class _ChatScreenState extends State<ChatScreen>
 
             if (!mounted) return;
 
-            if (result == true) {
-              setState(() {
+            // نشانگر خوانده‌نشده همان لحظه پاک شود، نه بعد از بارگذاری کامل
+            setState(() {
+              if (result == true) {
                 _conversations.removeWhere((c) => c.id == conv.id);
-              });
-            }
+              } else {
+                conv.unreadCount = 0;
+              }
+            });
             await _loadData();
           } else if (conv.type == ConversationType.squad) {
             if (!mounted) return;

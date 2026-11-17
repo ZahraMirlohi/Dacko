@@ -1,5 +1,6 @@
 // lib/features/home/screens/main_screen.dart
 
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -53,6 +54,37 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     _runDailyCheck();
     _initRequests();
+    // اجازهٔ اعلان (اندروید ۱۳+) و تازه‌سازی یادآورها؛ بعد از لحظه‌ای تا باز شدن صفحه مزاحم نشود
+    Future.delayed(const Duration(seconds: 2), () async {
+      await NotificationService.instance.requestPermission();
+      await NotificationService.instance.reschedule();
+    });
+    Future.delayed(const Duration(milliseconds: 3500), _warnIfVpn);
+  }
+
+  static bool _vpnWarned = false;
+
+  // اینترفیس‌های VPN در اندروید tun/ppp/wg/ipsec نام دارند
+  Future<void> _warnIfVpn() async {
+    if (_vpnWarned || !mounted) return;
+    try {
+      final ifs = await NetworkInterface.list();
+      final vpn = ifs.any((i) => RegExp(r'^(tun|tap|ppp|wg|ipsec|utun)').hasMatch(i.name.toLowerCase()));
+      if (!vpn || !mounted) return;
+      _vpnWarned = true;
+      await showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          icon: const Icon(Icons.vpn_lock_rounded, size: 36),
+          title: Text(ctx.tr('vpn.title')),
+          content: Text(ctx.tr('vpn.body')),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx), child: Text(ctx.tr('vpn.ok'))),
+          ],
+        ),
+      );
+    } catch (_) {}
   }
 
   @override
@@ -61,6 +93,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     if (state == AppLifecycleState.resumed) {
       _popupDismissed = false;
       _refreshPending();
+      NotificationService.instance.reschedule();
     }
   }
 

@@ -443,7 +443,7 @@ class _AnalyticsDetailScreenState extends State<AnalyticsDetailScreen>
 
   List<Map<String, dynamic>> _getBestWeekDays(CalendarProvider calendar) {
     final weekDays = calendar.isJalali
-        ? [
+        ? (context.isEnglish ? ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'] : [
             'شنبه',
             'یک‌شنبه',
             'دوشنبه',
@@ -451,7 +451,7 @@ class _AnalyticsDetailScreenState extends State<AnalyticsDetailScreen>
             'چهارشنبه',
             'پنج‌شنبه',
             'جمعه'
-          ]
+          ])
         : [
             'Monday',
             'Tuesday',
@@ -2011,15 +2011,15 @@ class _AnalyticsDetailScreenState extends State<AnalyticsDetailScreen>
   List<String> _getWeekDayNamesForChart() {
     final calendar = Provider.of<CalendarProvider>(context, listen: false);
     if (calendar.isJalali) {
-      return [
-        'شنبه',
-        'یک‌شنبه',
-        'دوشنبه',
-        'سه‌شنبه',
-        'چهارشنبه',
-        'پنج‌شنبه',
-        'جمعه'
-      ];
+      return (context.isEnglish ? ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'] : [
+            'شنبه',
+            'یک‌شنبه',
+            'دوشنبه',
+            'سه‌شنبه',
+            'چهارشنبه',
+            'پنج‌شنبه',
+            'جمعه'
+          ]);
     } else {
       return [
         'Monday',

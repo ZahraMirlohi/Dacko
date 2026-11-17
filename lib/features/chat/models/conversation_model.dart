@@ -13,7 +13,7 @@ class Conversation {
   final DateTime lastMessageAt;
   final DateTime createdAt;
   final String? lastMessage;
-  final int unreadCount;
+  int unreadCount;
   final List<String> memberIds;
   final String? avatarUrl;
   final DateTime? buddyLastSeen;

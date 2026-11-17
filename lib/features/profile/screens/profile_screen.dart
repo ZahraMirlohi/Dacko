@@ -3,6 +3,7 @@
 import '/l10n/app_strings.dart';
 import '/core/app_palette.dart';
 import 'package:flutter/material.dart';
+import '../../chat/widgets/avatar_viewer.dart';
 import 'package:provider/provider.dart';
 import '/services/supabase_service.dart';
 import '../models/profile_model.dart';
@@ -165,7 +166,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       if (!localSuccess && mounted) {
         setState(() {
-          _errorMessage = 'خطا در بارگذاری اطلاعات';
+          _errorMessage = context.tr('pf.k001');
           _isLoading = false;
         });
       }
@@ -179,7 +180,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       print('Error loading profile: $e');
       if (mounted) {
         setState(() {
-          _errorMessage = 'خطا در بارگذاری: ${e.toString()}';
+          _errorMessage = context.tr('pf.k002', {'p0': '${e.toString()}'});
           _isLoading = false;
         });
       }
@@ -300,7 +301,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         print('No user logged in');
         if (mounted) {
           setState(() {
-            _errorMessage = 'لطفاً وارد حساب کاربری خود شوید';
+            _errorMessage = context.tr('pf.k003');
             _isLoading = false;
           });
         }
@@ -455,7 +456,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       if (currentUser == null) {
         if (mounted) {
           setState(() {
-            _errorMessage = 'لطفاً وارد حساب کاربری خود شوید';
+            _errorMessage = context.tr('pf.k003');
             _isLoading = false;
           });
         }
@@ -469,7 +470,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         userId: currentUser.id,
         name: currentUser.email?.split('@').first.isNotEmpty == true
             ? currentUser.email!.split('@').first
-            : 'کاربر',
+            : context.tr('pf.k004'),
         uniqueId: uniqueId, // اضافه کردن uniqueId
         email: currentUser.email,
         registeredAt: DateTime.now(),
@@ -526,7 +527,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       if (currentUser != null && _profile == null) {
         _profile = UserProfile(
           userId: currentUser.id,
-          name: currentUser.email?.split('@').first ?? 'کاربر',
+          name: currentUser.email?.split('@').first ?? context.tr('pf.k004'),
           email: currentUser.email,
           registeredAt: DateTime.now(),
           totalXp: 0,
@@ -672,8 +673,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 children: [
                   CircularProgressIndicator(color: _theme.primaryColor),
                   const SizedBox(height: 16),
-                  const Text(
-                    'در حال بارگذاری پروفایل...',
+                  Text(
+                    context.tr('pf.k005'),
                     style: TextStyle(color: Color(0xFF6B7280)),
                   ),
                 ],
@@ -717,7 +718,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ElevatedButton.icon(
             onPressed: _loadProfile,
             icon: const Icon(Icons.refresh),
-            label: const Text('تلاش مجدد'),
+            label: Text(context.tr('pf.k006')),
             style: ElevatedButton.styleFrom(
               backgroundColor: _theme.primaryColor,
               shape: RoundedRectangleBorder(
@@ -739,12 +740,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
         children: [
           Icon(Icons.person_outline, size: 80, color: Colors.grey.shade300),
           const SizedBox(height: 16),
-          const Text('پروفایل وجود ندارد'),
+          Text(context.tr('pf.k007')),
           const SizedBox(height: 16),
           ElevatedButton.icon(
             onPressed: _loadProfile,
             icon: const Icon(Icons.refresh),
-            label: const Text('بارگذاری مجدد'),
+            label: Text(context.tr('pf.k008')),
             style: ElevatedButton.styleFrom(
               backgroundColor: _theme.primaryColor,
               shape: RoundedRectangleBorder(
@@ -850,8 +851,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ).then((_) => _loadProfile());
         },
         icon: const Icon(Icons.person_outline, size: 20),
-        label: const Text(
-          'شخصیت من',
+        label: Text(
+          context.tr('pf.k009'),
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
         style: ElevatedButton.styleFrom(
@@ -964,7 +965,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             showBorder: false,
             showEditBadge: true,
             onEditTap: _showAvatarEditOptions,
-            onTap: _showAvatarEditOptions,
+            onTap: () => _openAvatar(p.avatarUrl),
           ),
           const SizedBox(height: 8),
           Text(
@@ -1147,8 +1148,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: ElevatedButton.icon(
         onPressed: _openGallery,
         icon: const Icon(Icons.photo_library, size: 20),
-        label: const Text(
-          'گالری من',
+        label: Text(
+          context.tr('pf.k010'),
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
         style: ElevatedButton.styleFrom(
@@ -1212,6 +1213,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
 // ==================== بخش آواتار ====================
 
+  // لمس عکس: نمایش بزرگ (اگر عکسی نیست، مستقیم گزینه‌های انتخاب عکس)؛ تغییر فقط با آیکون دوربین
+  void _openAvatar(String? url) {
+    if (url == null || url.trim().isEmpty) {
+      _showAvatarEditOptions();
+    } else {
+      showAvatarViewer(context, url);
+    }
+  }
+
   Widget _buildAvatarSection() {
     return Column(
       children: [
@@ -1223,7 +1233,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             showBorder: true,
             showEditBadge: true,
             onEditTap: _showAvatarEditOptions,
-            onTap: _showAvatarEditOptions,
+            onTap: () => _openAvatar(_profile?.avatarUrl),
           ),
         ),
         const SizedBox(height: 16),
@@ -1276,7 +1286,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               const SizedBox(width: 8),
               Text(
-                'انتخاب نام کاربری',
+                context.tr('pf.k011'),
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
@@ -1353,7 +1363,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'تغییر عکس پروفایل',
+                  context.tr('pf.k012'),
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -1366,7 +1376,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Expanded(
                       child: _buildSourceButton(
                         icon: Icons.camera_alt,
-                        label: 'دوربین',
+                        label: context.tr('pf.k013'),
                         onTap: () {
                           Navigator.pop(context);
                           _pickAndUploadAvatar(ImageSource.camera);
@@ -1377,7 +1387,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Expanded(
                       child: _buildSourceButton(
                         icon: Icons.photo_library,
-                        label: 'گالری',
+                        label: context.tr('pf.k014'),
                         onTap: () {
                           Navigator.pop(context);
                           _pickAndUploadAvatar(ImageSource.gallery);
@@ -1395,8 +1405,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       _removeAvatar();
                     },
                     icon: const Icon(Icons.delete_outline, color: Colors.red),
-                    label: const Text(
-                      'حذف عکس پروفایل',
+                    label: Text(
+                      context.tr('pf.k015'),
                       style: TextStyle(color: Colors.red),
                     ),
                   ),
@@ -1488,8 +1498,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('عکس پروفایل با موفقیت آپلود شد'),
+          SnackBar(
+            content: Text(context.tr('pf.k016')),
             backgroundColor: Colors.green,
           ),
         );
@@ -1498,7 +1508,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('خطا: ${e.toString()}'),
+            content: Text(context.tr('pf.k017', {'p0': '${e.toString()}'})),
             backgroundColor: Colors.red,
           ),
         );
@@ -1519,21 +1529,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
           borderRadius: BorderRadius.circular(20),
         ),
         title: Text(
-          'حذف عکس پروفایل',
+          context.tr('pf.k015'),
           style: TextStyle(color: _theme.textColor),
         ),
         content: Text(
-          'آیا مطمئن هستی؟',
+          context.tr('pf.k018'),
           style: TextStyle(color: _theme.textSecondaryColor),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('انصراف'),
+            child: Text(context.tr('pf.k019')),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('حذف', style: TextStyle(color: Colors.red)),
+            child: Text(context.tr('pf.k020'), style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -1547,8 +1557,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('عکس پروفایل حذف شد'),
+          SnackBar(
+            content: Text(context.tr('pf.k021')),
             backgroundColor: Colors.green,
           ),
         );
@@ -1557,7 +1567,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('خطا: ${e.toString()}'),
+            content: Text(context.tr('pf.k017', {'p0': '${e.toString()}'})),
             backgroundColor: Colors.red,
           ),
         );
@@ -1615,7 +1625,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'نام کاربری فعلی',
+                            context.tr('pf.k022'),
                             style: TextStyle(
                               fontSize: 11,
                               color: _theme.textSecondaryColor,
@@ -1640,8 +1650,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         );
                         Navigator.pop(dialogContext);
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('کپی شد'),
+                          SnackBar(
+                            content: Text(context.tr('pf.k023')),
                             duration: Duration(seconds: 2),
                           ),
                         );
@@ -1655,11 +1665,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ListTile(
                 leading: Icon(Icons.edit, color: _theme.primaryColor),
                 title: Text(
-                  'ویرایش نام کاربری',
+                  context.tr('pf.k024'),
                   style: TextStyle(color: _theme.textColor),
                 ),
                 subtitle: Text(
-                  'بین هر تغییر ۱ دقیقه فاصله لازم است',
+                  context.tr('pf.k025'),
                   style: TextStyle(
                     fontSize: 12,
                     color: _theme.textSecondaryColor,
@@ -1786,7 +1796,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   // نام کاربر
                   Expanded(
                     child: Text(
-                      _profile?.name ?? 'کاربر',
+                      _profile?.name ?? context.tr('pf.k004'),
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -1835,25 +1845,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         child: Column(
                           children: [
                             _buildMinimalInfoItem(
-                              label: 'نام',
+                              label: context.tr('pf.k026'),
                               value: _profile!.name,
                               icon: Icons.person_outline_rounded,
                             ),
                             const SizedBox(height: 14),
                             _buildMinimalInfoItem(
-                              label: 'ایمیل',
+                              label: context.tr('pf.k027'),
                               value: _profile?.email?.split('@').first ?? '---',
                               icon: Icons.email_outlined,
                             ),
                             const SizedBox(height: 14),
                             _buildMinimalInfoItem(
-                              label: 'شماره تماس',
+                              label: context.tr('pf.k028'),
                               value: _profile?.phone ?? '---',
                               icon: Icons.phone_outlined,
                             ),
                             const SizedBox(height: 14),
                             _buildMinimalInfoItem(
-                              label: 'تاریخ تولد',
+                              label: context.tr('pf.k029'),
                               value: _formatDateShort(
                                   _profile?.birthDate, calendar), // 
                               icon: Icons.cake_outlined,
@@ -1866,27 +1876,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         child: Column(
                           children: [
                             _buildMinimalInfoItem(
-                              label: 'سن',
+                              label: context.tr('pf.k030'),
                               value: _profile?.realAge?.toString() ?? '---',
                               icon: Icons.calendar_today_outlined,
                             ),
                             const SizedBox(height: 14),
                             _buildMinimalInfoItem(
-                              label: 'جنسیت',
+                              label: context.tr('pf.k031'),
                               value: _getGenderText(_profile?.gender),
                               icon: Icons.people_outline,
                             ),
                             const SizedBox(height: 14),
                             _buildMinimalInfoItem(
-                              label: 'عضو از',
+                              label: context.tr('pf.k032'),
                               value: _formatDateShort(
                                   _profile?.registeredAt, calendar), // 
                               icon: Icons.history_outlined,
                             ),
                             const SizedBox(height: 14),
                             _buildMinimalInfoItem(
-                              label: 'سن آواتار',
-                              value: '${_profile?.avatarAge ?? 0} روز',
+                              label: context.tr('pf.k033'),
+                              value: context.tr('pf.k034', {'p0': '${_profile?.avatarAge ?? 0}'}),
                               icon: Icons.emoji_people_outlined,
                             ),
                           ],
@@ -1903,8 +1913,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: ElevatedButton.icon(
                       onPressed: _showEditProfileDialog,
                       icon: const Icon(Icons.edit_outlined, size: 18),
-                      label: const Text(
-                        'ویرایش اطلاعات',
+                      label: Text(
+                        context.tr('pf.k035'),
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
@@ -1937,8 +1947,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('ID یکتا کپی شد'),
+        SnackBar(
+          content: Text(context.tr('pf.k036')),
           duration: Duration(seconds: 2),
           backgroundColor: Colors.green,
         ),
@@ -2022,27 +2032,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String _getGenderText(String? gender) {
     switch (gender) {
       case 'male':
-        return 'مرد';
+        return context.tr('pf.k037');
       case 'female':
-        return 'زن';
+        return context.tr('pf.k038');
       case 'other':
-        return 'سایر';
+        return context.tr('pf.k039');
       default:
-        return 'وارد نشده';
+        return context.tr('pf.k040');
     }
   }
 
   String _getGenderValue(String genderText) {
-    switch (genderText) {
-      case 'مرد':
-        return 'male';
-      case 'زن':
-        return 'female';
-      case 'سایر':
-        return 'other';
-      default:
-        return 'other';
-    }
+    if (genderText == context.tr('pf.k037')) return 'male';
+    if (genderText == context.tr('pf.k038')) return 'female';
+    return 'other';
   }
 
   // ==================== دکمه‌ها ====================
@@ -2060,8 +2063,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           );
         },
         icon: const Icon(Icons.description, size: 20),
-        label: const Text(
-          'قوانین و مقررات',
+        label: Text(
+          context.tr('pf.k041'),
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
         style: ElevatedButton.styleFrom(
@@ -2089,8 +2092,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           );
         },
         icon: const Icon(Icons.settings, size: 20),
-        label: const Text(
-          'تنظیمات',
+        label: Text(
+          context.tr('pf.k042'),
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
         style: ElevatedButton.styleFrom(
@@ -2153,7 +2156,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'ویرایش اطلاعات',
+                              context.tr('pf.k035'),
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
@@ -2168,26 +2171,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         const SizedBox(height: 16),
                         _buildEditField(
-                          label: 'نام کاربری',
+                          label: context.tr('pf.k043'),
                           controller: nameController,
                           icon: Icons.person_outline,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'لطفاً نام کاربری را وارد کنید';
+                              return context.tr('pf.k044');
                             }
                             return null;
                           },
                         ),
                         const SizedBox(height: 12),
                         _buildEditField(
-                          label: 'شماره تلفن',
+                          label: context.tr('pf.k045'),
                           controller: phoneController,
                           icon: Icons.phone_outlined,
                           keyboardType: TextInputType.phone,
                         ),
                         const SizedBox(height: 12),
                         _buildEditField(
-                          label: 'ایمیل',
+                          label: context.tr('pf.k027'),
                           controller: emailController,
                           icon: Icons.email_outlined,
                           keyboardType: TextInputType.emailAddress,
@@ -2195,7 +2198,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         const SizedBox(height: 12),
                         _buildEditField(
-                          label: 'سن',
+                          label: context.tr('pf.k030'),
                           controller: ageController,
                           icon: Icons.cake_outlined,
                           keyboardType: TextInputType.number,
@@ -2239,7 +2242,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   child: Text(
                                     selectedDate != null
                                         ? _formatDate(selectedDate!, calendar)
-                                        : 'تاریخ تولد را انتخاب کنید',
+                                        : context.tr('pf.k046'),
                                     style: TextStyle(
                                       color: selectedDate != null
                                           ? _theme.textColor
@@ -2261,7 +2264,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           style: TextStyle(color: _theme.textColor), // 
                           dropdownColor: _theme.surfaceColor, // 
                           decoration: InputDecoration(
-                            labelText: 'جنسیت',
+                            labelText: context.tr('pf.k031'),
                             labelStyle: TextStyle(
                                 color: _theme.textSecondaryColor), // 
                             prefixIcon: Icon(
@@ -2278,12 +2281,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ? const Color(0xFF2A2A2A)
                                 : Colors.grey.shade50,
                           ),
-                          items: const [
-                            DropdownMenuItem(value: 'male', child: Text('مرد')),
+                          items: [
+                            DropdownMenuItem(value: 'male', child: Text(context.tr('pf.k037'))),
                             DropdownMenuItem(
-                                value: 'female', child: Text('زن')),
+                                value: 'female', child: Text(context.tr('pf.k038'))),
                             DropdownMenuItem(
-                                value: 'other', child: Text('سایر')),
+                                value: 'other', child: Text(context.tr('pf.k039'))),
                           ],
                           onChanged: (value) {
                             setState(() {
@@ -2323,7 +2326,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ),
                             ),
                             child: Text(
-                              'ذخیره تغییرات',
+                              context.tr('pf.k047'),
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -2424,7 +2427,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('خطا: ${e.toString()}'),
+            content: Text(context.tr('pf.k017', {'p0': '${e.toString()}'})),
             backgroundColor: Colors.red,
           ),
         );
@@ -2524,11 +2527,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _updateField(String label, String value) async {
     final fields = {
-      'نام کاربری': 'name',
-      'شماره تلفن': 'phone',
-      'سن': 'real_age',
-      'تاریخ تولد': 'birth_date',
-      'جنسیت': 'gender',
+      context.tr('pf.k043'): 'name',
+      context.tr('pf.k045'): 'phone',
+      context.tr('pf.k030'): 'real_age',
+      context.tr('pf.k029'): 'birth_date',
+      context.tr('pf.k031'): 'gender',
     };
 
     final field = fields[label];
@@ -2561,7 +2564,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   String _formatDate(DateTime? date, CalendarProvider calendar) {
-    if (date == null) return 'وارد نشده';
+    if (date == null) return context.tr('pf.k040');
     return calendar.formatShort(date);
   }
 }

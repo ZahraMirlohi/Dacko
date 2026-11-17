@@ -13,7 +13,10 @@ import 'package:flutter/material.dart';
 import 'strings_ad.dart';
 import 'strings_bd.dart';
 import 'strings_ct.dart';
+import 'strings_sq.dart';
+import 'strings_bc.dart';
 import 'strings_ex.dart';
+import 'strings_tx.dart';
 import 'strings_af.dart';
 import 'strings_ah.dart';
 import 'strings_an.dart';
@@ -51,7 +54,10 @@ class AppStrings {
     ...ahFa,
     ...bdFa,
     ...ctFa,
+    ...sqFa,
+    ...bcFa,
     ...exFa,
+    ...txFa,
     // عمومی
     'app.name': 'Dacko',
     'common.cancel': 'بی‌خیال',
@@ -138,6 +144,10 @@ class AppStrings {
 
     'settings.remind_time': 'ساعت یادآور روزانه',
     'notif.channel': 'یادآور روزانه',
+    'notif.streak': 'امروز هنوز عادتی ثبت نکردی؛ استریکت داره نفس‌نفس می‌زنه.',
+    'notif.streakChannel': 'هشدار استریک',
+    'notif.habitBody': 'وقتشه! عادتت منتظره.',
+    'notif.habitChannel': 'یادآور عادت',
     'notif.title': 'Dacko',
     'notif.body1': 'عادت‌هات دلشون برات تنگ شده. یه سر بزن.',
     'notif.body2': 'استریکت بدون تو غذا نمی‌خوره. بیا نجاتش بده.',
@@ -193,7 +203,10 @@ class AppStrings {
     ...ahEn,
     ...bdEn,
     ...ctEn,
+    ...sqEn,
+    ...bcEn,
     ...exEn,
+    ...txEn,
     'app.name': 'Dacko',
     'common.cancel': 'Cancel',
     'common.ok': 'OK',
@@ -280,6 +293,10 @@ class AppStrings {
 
     'settings.remind_time': 'Daily reminder time',
     'notif.channel': 'Daily reminder',
+    'notif.streak': 'No habit logged today yet; your streak is gasping.',
+    'notif.streakChannel': 'Streak warning',
+    'notif.habitBody': 'Time to go! Your habit is waiting.',
+    'notif.habitChannel': 'Habit reminders',
     'notif.title': 'Dacko',
     'notif.body1': 'Your habits miss you. Come say hi.',
     'notif.body2': 'Your streak needs you. Do not let it down.',

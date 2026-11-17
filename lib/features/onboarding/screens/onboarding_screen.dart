@@ -41,14 +41,13 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     with SingleTickerProviderStateMixin {
   // ۰ خوش‌آمد، ۱ امکانات | ۲ پروفایل، ۳ هدف، ۴ اولین کار، ۵ شخصیت، ۶ ساعت‌ها
   static const int _introCount = 2;
-  static const int _total = 7;
+  static const int _total = 6;
   static const List<Tone> _tones = [
     Tone.lilac,
     Tone.sky,
     Tone.mint,
     Tone.butter,
     Tone.peach,
-    Tone.rose,
     Tone.lime,
   ];
 
@@ -69,13 +68,10 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   Uint8List? _avatar;
 
   // هدف و اولین کار
-  String? _goal;
+  String? _goal; // اولین انتخاب؛ برای پیشنهاد اولین کار
+  final List<String> _goalList = []; // همه‌ی انتخاب‌ها
   String? _suggestion;
   final TextEditingController _customTask = TextEditingController();
-
-  // شخصیت
-  String? _energy;
-  String? _style;
 
   // ساعت‌ها
   TimeOfDay _wake = const TimeOfDay(hour: 7, minute: 0);
@@ -141,6 +137,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     if (_page == 3) {
       // بدون هدف، اولین کار هم معنا ندارد
       _goal = null;
+      _goalList.clear();
       _suggestion = null;
     }
     if (_page == _total - 1) {
@@ -246,8 +243,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     final answers = OnboardingAnswers(
       goal: _goal,
       firstTask: _taskTitle,
-      energy: _energy,
-      style: _style,
+      goals: List.of(_goalList),
       wakeTime: _hhmm(_wake),
       remindTime: _hhmm(_remind),
       language: lang,
@@ -573,8 +569,6 @@ class _OnboardingScreenState extends State<OnboardingScreen>
         return _goalPage(theme);
       case 4:
         return _taskPage(theme);
-      case 5:
-        return _personalityPage(theme);
       default:
         return _timePage(theme);
     }
@@ -824,7 +818,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
               borderRadius: BorderRadius.circular(14),
             ),
             child: Text(
-              context.tr('ob.q_progress', {'n': '$n', 'total': '5'}),
+              context.tr('ob.q_progress', {'n': '$n', 'total': '4'}),
               style: TextStyle(
                   color: tone.fg, fontSize: 12, fontWeight: FontWeight.w700),
             ),
@@ -1003,14 +997,22 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   Widget _goalCard(ThemeProvider theme, String key) {
     final (icon, toneKey) = _goals[key]!;
     final t = theme.tone(toneKey);
-    final selected = _goal == key;
+    final selected = _goalList.contains(key);
     return _Pressable(
       onTap: () {
         SoundService.instance.play(Sfx.check);
         setState(() {
-          _goal = key;
-          _suggestion = null;
-          _customTask.clear();
+          if (_goalList.contains(key)) {
+            _goalList.remove(key);
+          } else {
+            _goalList.add(key);
+          }
+          final first = _goalList.isEmpty ? null : _goalList.first;
+          if (first != _goal) {
+            _goal = first;
+            _suggestion = null;
+            _customTask.clear();
+          }
         });
       },
       child: AnimatedScale(
@@ -1162,65 +1164,8 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     );
   }
 
-  Widget _personalityPage(ThemeProvider theme) {
-    final tone = theme.tone(_tones[5]);
-    Widget group(String titleKey, List<(String, String)> opts, String? value,
-        ValueChanged<String> onPick, int baseDelay) {
-      return _Reveal(
-        delay: Duration(milliseconds: baseDelay),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              context.tr(titleKey),
-              style: TextStyle(
-                color: theme.textColor,
-                fontSize: 15,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-            const SizedBox(height: 10),
-            for (final o in opts)
-              _option(theme, tone, context.tr(o.$2), value == o.$1,
-                  () => onPick(o.$1)),
-            const SizedBox(height: 14),
-          ],
-        ),
-      );
-    }
-
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(24, 22, 24, 12),
-      children: [
-        _header(theme, tone, 4, 'ob.person_title', 'ob.person_sub'),
-        group(
-          'ob.energy_title',
-          const [
-            ('intro', 'ob.energy_intro'),
-            ('mixed', 'ob.energy_mixed'),
-            ('extro', 'ob.energy_extro'),
-          ],
-          _energy,
-          (v) => setState(() => _energy = v),
-          100,
-        ),
-        group(
-          'ob.style_title',
-          const [
-            ('planner', 'ob.style_planner'),
-            ('mixed', 'ob.style_mixed'),
-            ('flow', 'ob.style_flow'),
-          ],
-          _style,
-          (v) => setState(() => _style = v),
-          260,
-        ),
-      ],
-    );
-  }
-
   Widget _timePage(ThemeProvider theme) {
-    final tone = theme.tone(_tones[6]);
+    final tone = theme.tone(_tones[5]);
     final loc = MaterialLocalizations.of(context);
 
     Widget row(String label, TimeOfDay t, bool wake, IconData icon, Tone tn,
@@ -1281,7 +1226,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     return ListView(
       padding: const EdgeInsets.fromLTRB(24, 22, 24, 12),
       children: [
-        _header(theme, tone, 5, 'ob.time_title', 'ob.time_sub'),
+        _header(theme, tone, 4, 'ob.time_title', 'ob.time_sub'),
         row(context.tr('ob.wake_time'), _wake, true, Icons.wb_sunny_rounded,
             Tone.butter, 100),
         row(context.tr('ob.remind_time'), _remind, false,

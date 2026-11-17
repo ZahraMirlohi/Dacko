@@ -453,7 +453,7 @@ class ChatService {
         'metadata': metadata ?? {},
         'reply_to_id': replyToId,
         'status': 'sent', // وضعیت اولیه sent
-        'created_at': DateTime.now().toIso8601String(),
+        'created_at': DateTime.now().toUtc().toIso8601String(), // سرور با تریگر (sql/14) مقدار نهایی را می‌گذارد
       };
 
       print('[CHAT_SERVICE] Sending message...');
@@ -465,7 +465,7 @@ class ChatService {
 
       await _client
           .from('conversations')
-          .update({'last_message_at': DateTime.now().toIso8601String()}).eq(
+          .update({'last_message_at': DateTime.now().toUtc().toIso8601String()}).eq(
               'id', conversationId);
     } catch (e) {
       print('[CHAT_SERVICE] Error inserting message: $e');
@@ -764,11 +764,12 @@ class ChatService {
     try {
       // فقط فرستنده پیام میتواند برای همه حذف کند
       // یا ادمین گروه (برای گروه‌ها)
-      await _client
-          .from('messages')
-          .delete()
-          .eq('id', messageId)
-          .eq('sender_id', userId);
+      await _client.from('messages').update({
+        'is_deleted': true,
+        'deleted_at': DateTime.now().toUtc().toIso8601String(),
+        'content': '',
+        'metadata': {},
+      }).eq('id', messageId).eq('sender_id', userId);
 
       print('Message deleted for everyone: $messageId');
     } catch (e) {
@@ -923,11 +924,7 @@ class ChatService {
   Future<void> deleteMessage(String messageId, String userId) async {
     try {
       // حذف کامل پیام از دیتابیس
-      await _client
-          .from('messages')
-          .delete()
-          .eq('id', messageId)
-          .eq('sender_id', userId);
+      await deleteMessageForEveryone(messageId, userId);
 
       print('Message deleted permanently: $messageId');
     } catch (e) {
@@ -1285,8 +1282,28 @@ class ChatService {
   }
 
   /// گفتگوی هم‌مسیر را (اگر پاک شده بود) دوباره می‌سازد و شناسه‌اش را برمی‌گرداند
-  Future<String> openBuddyConversation(String me, String other) =>
-      createConversation(type: 'buddy', memberIds: [me, other], createdBy: me);
+  // چند لمس پشت‌سرهم باید یک گفتگو بسازد، نه چندتا: درخواست‌های هم‌زمان یک Future را به اشتراک می‌گذارند
+  static final Map<String, Future<String>> _openingBuddy = {};
+
+  Future<String> openBuddyConversation(String me, String other) {
+    final key = ([me, other]..sort()).join('|');
+    return _openingBuddy[key] ??= _openBuddyViaRpc(me, other)
+        .whenComplete(() => _openingBuddy.remove(key));
+  }
+
+  // اول تابع سرور (sql/16)؛ اگر هنوز ساخته نشده بود، روش قدیمی
+  Future<String> _openBuddyViaRpc(String me, String other) async {
+    try {
+      final id = await _client
+          .rpc('get_or_create_buddy_conversation', params: {'other': other});
+      return id as String;
+    } catch (e) {
+      if (e.toString().contains('not buddies')) rethrow;
+      print('RPC get_or_create_buddy_conversation failed, falling back: $e');
+      return createConversation(
+          type: 'buddy', memberIds: [me, other], createdBy: me);
+    }
+  }
 
   /// پایان هم‌مسیری: درخواست‌ها و گفتگو
   Future<void> removeBuddy(String me, String other) async {

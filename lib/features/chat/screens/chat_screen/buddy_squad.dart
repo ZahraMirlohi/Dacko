@@ -407,7 +407,7 @@ extension _ChatScreenStateBuddySquad on _ChatScreenState {
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(color: tone.bg, shape: BoxShape.circle),
       child: (!isArena && url != null && url.isNotEmpty)
-          ? Image.network(
+          ? NetImage(
               url,
               fit: BoxFit.cover,
               errorBuilder: (_, __, ___) => _avatarFallback(name, tone),

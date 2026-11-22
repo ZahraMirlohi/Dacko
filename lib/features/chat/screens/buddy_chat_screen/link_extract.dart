@@ -57,7 +57,7 @@ extension _BuddyChatScreenStateLinkExtract on _BuddyChatScreenState {
                   ),
                   child: _buddyAvatar != null && _buddyAvatar!.isNotEmpty
                       ? ClipOval(
-                          child: Image.network(
+                          child: NetImage(
                             _buddyAvatar!,
                             width: 40,
                             height: 40,

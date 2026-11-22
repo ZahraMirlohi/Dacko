@@ -429,7 +429,7 @@ extension _BuddyChatScreenStateMessageImage on _BuddyChatScreenState {
           },
           child: ClipRRect(
           borderRadius: BorderRadius.circular(20),
-          child: Image.network(
+          child: NetImage(
             message.content,
             width: 200,
             height: 200,
@@ -512,7 +512,7 @@ extension _BuddyChatScreenStateMessageImage on _BuddyChatScreenState {
                 child: InteractiveViewer(
                   minScale: 0.8,
                   maxScale: 5,
-                  child: Center(child: Image.network(url)),
+                  child: Center(child: NetImage(url, full: true)),
                 ),
               ),
             ),

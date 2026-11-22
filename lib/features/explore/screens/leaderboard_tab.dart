@@ -1,5 +1,7 @@
 // lib/features/explore/screens/leaderboard_tab.dart
 
+import 'package:supabase_flutter/supabase_flutter.dart';
+import '/widgets/net_image.dart';
 import '/core/logging/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -19,6 +21,11 @@ class LeaderboardTab extends StatefulWidget {
 
 class _LeaderboardTabState extends State<LeaderboardTab> {
   final SupabaseService _supabase = SupabaseService();
+  // نمایش فوری آخرین نتیجه (stale-while-revalidate) و تازه‌سازی پس‌زمینه
+  static List<Map<String, dynamic>>? _cache;
+  static int _cacheRank = 0;
+  static String? _cacheUser;
+
   List<Map<String, dynamic>> _leaders = [];
   bool _isLoading = true;
   String _errorMessage = '';
@@ -29,6 +36,12 @@ class _LeaderboardTabState extends State<LeaderboardTab> {
   @override
   void initState() {
     super.initState();
+    final me = Supabase.instance.client.auth.currentUser?.id;
+    if (_cache != null && _cacheUser == me) {
+      _leaders = _cache!;
+      _currentUserRank = _cacheRank;
+      _isLoading = false;
+    }
     _loadLeaderboard();
   }
 
@@ -36,7 +49,7 @@ class _LeaderboardTabState extends State<LeaderboardTab> {
     if (!mounted) return;
 
     setState(() {
-      _isLoading = true;
+      _isLoading = _leaders.isEmpty;
       _errorMessage = '';
     });
 
@@ -73,6 +86,9 @@ class _LeaderboardTabState extends State<LeaderboardTab> {
         }
       }
 
+      _cache = users;
+      _cacheRank = _currentUserRank;
+      _cacheUser = _currentUserId;
       if (mounted) {
         setState(() {
           _leaders = users;
@@ -83,7 +99,10 @@ class _LeaderboardTabState extends State<LeaderboardTab> {
       Log.e('leaderboard', '_loadLeaderboard failed', error: e, stack: stk);
       if (mounted) {
         setState(() {
-          _errorMessage = context.tr('lb.k001', {'p0': '${e.toString()}'});
+          // اگر نتیجهٔ قبلی داریم همان را نشان بده؛ خطا فقط وقتی لیست خالی است
+          if (_leaders.isEmpty) {
+            _errorMessage = context.tr('lb.k001', {'p0': '${e.toString()}'});
+          }
           _isLoading = false;
         });
       }
@@ -193,7 +212,7 @@ class _LeaderboardTabState extends State<LeaderboardTab> {
       clipBehavior: Clip.antiAlias,
       decoration: const BoxDecoration(color: _ink, shape: BoxShape.circle),
       child: has
-          ? Image.network(url.trim(),
+          ? NetImage(url.trim(),
               fit: BoxFit.cover,
               errorBuilder: (c, e, s) => Icon(Icons.person_rounded,
                   size: size * 0.5, color: theme.effectivePrimary))

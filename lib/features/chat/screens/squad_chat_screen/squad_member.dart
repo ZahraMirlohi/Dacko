@@ -378,7 +378,7 @@ extension _SquadChatScreenStateSquadMember on _SquadChatScreenState {
               decoration: BoxDecoration(color: tone.bg, shape: BoxShape.circle),
               clipBehavior: Clip.antiAlias,
               child: (_settings['avatar_url'] as String?)?.isNotEmpty == true
-                  ? Image.network(_settings['avatar_url'] as String,
+                  ? NetImage(_settings['avatar_url'] as String,
                       fit: BoxFit.cover,
                       errorBuilder: (_, __, ___) =>
                           Icon(Icons.groups_rounded, color: tone.fg, size: 22))

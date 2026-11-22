@@ -1,5 +1,6 @@
 // lib/features/chat/screens/buddy_chat_screen.dart
 
+import '/widgets/net_image.dart';
 import '/core/logging/app_logger.dart';
 import '../widgets/avatar_viewer.dart';
 import '../widgets/chat_background.dart';

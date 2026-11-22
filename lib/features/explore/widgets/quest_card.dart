@@ -1,5 +1,6 @@
 // lib/features/explore/widgets/quest_card.dart
 
+import '/widgets/net_image.dart';
 import '/l10n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -226,7 +227,7 @@ class QuestCard extends StatelessWidget {
         children: [
           SizedBox(
             width: 118,
-            child: Image.network(
+            child: NetImage(
               url!.trim(),
               fit: BoxFit.cover,
               errorBuilder: (c, e, s) => const SizedBox.shrink(),

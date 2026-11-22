@@ -61,6 +61,18 @@ jobs:
         done
         exit 1
     
+    - name: APK size report
+      run: |
+        f=build/app/outputs/flutter-apk/app-release.apk
+        mb=$(( $(stat -c%s "$f") / 1048576 ))
+        echo "APK size: ${mb} MB (limit ${APK_MAX_MB} MB)" | tee -a "$GITHUB_STEP_SUMMARY"
+        if [ "$mb" -gt "$APK_MAX_MB" ]; then
+          echo "::error::APK is larger than ${APK_MAX_MB} MB: check new dependencies/assets"
+          exit 1
+        fi
+      env:
+        APK_MAX_MB: 80
+
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:

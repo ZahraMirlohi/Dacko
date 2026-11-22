@@ -208,12 +208,12 @@ extension _SquadChatScreenStateMenuItem on _SquadChatScreenState {
           builder: (_) => Dialog(
             backgroundColor: Colors.black,
             insetPadding: EdgeInsets.zero,
-            child: InteractiveViewer(child: Image.network(m.content)),
+            child: InteractiveViewer(child: NetImage(m.content, full: true)),
           ),
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(14),
-          child: Image.network(
+          child: NetImage(
             m.content,
             width: 200,
             height: 200,

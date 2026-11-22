@@ -1,5 +1,6 @@
 // lib/features/arena/screens/congratulation_screen.dart
 
+import '/widgets/net_image.dart';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -368,7 +369,7 @@ class _CongratulationScreenState extends State<CongratulationScreen>
       ),
       child: widget.avatarImageUrl != null
           ? ClipOval(
-              child: Image.network(
+              child: NetImage(
                 widget.avatarImageUrl!,
                 width: 120,
                 height: 120,

@@ -1,3 +1,4 @@
+import '/widgets/net_image.dart';
 import '/core/logging/app_logger.dart';
 import 'dart:async';
 // lib/features/chat/screens/chat_screen.dart

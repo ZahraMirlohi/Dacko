@@ -1,5 +1,6 @@
 // lib/features/chat/screens/squad_chat_screen.dart
 
+import '/widgets/net_image.dart';
 import '/core/logging/app_logger.dart';
 import '/services/sound_service.dart';
 import 'dart:async';

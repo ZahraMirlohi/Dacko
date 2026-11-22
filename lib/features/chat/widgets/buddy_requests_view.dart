@@ -2,6 +2,7 @@
 //
 // درخواست‌های هم‌مسیری: دریافتی (قبول/رد) و ارسال‌شده (لغو). هر دکمه تا پایان کار قفل می‌شود.
 
+import '/widgets/net_image.dart';
 import '/core/logging/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -188,7 +189,7 @@ class _BuddyRequestsViewState extends State<BuddyRequestsView> {
           clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(color: tc.bg, shape: BoxShape.circle),
           child: has
-              ? Image.network(url.trim(),
+              ? NetImage(url.trim(),
                   fit: BoxFit.cover,
                   errorBuilder: (c, e, s) =>
                       Icon(Icons.person_rounded, color: tc.fg))

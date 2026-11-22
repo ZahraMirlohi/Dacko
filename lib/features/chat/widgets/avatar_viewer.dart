@@ -1,3 +1,4 @@
+import '/widgets/net_image.dart';
 import 'package:flutter/material.dart';
 
 /// نمایش عکس پروفایل به‌صورت بزرگ؛ با لمس هر جا یا دکمهٔ بستن بسته می‌شود.
@@ -21,8 +22,8 @@ void showAvatarViewer(BuildContext context, String? url) {
                   minScale: 1,
                   maxScale: 4,
                   child: ClipOval(
-                    child: Image.network(
-                      url.trim(),
+                    child: NetImage(
+                      url.trim(), full: true,
                       width: MediaQuery.of(ctx).size.width * 0.86,
                       height: MediaQuery.of(ctx).size.width * 0.86,
                       fit: BoxFit.cover,

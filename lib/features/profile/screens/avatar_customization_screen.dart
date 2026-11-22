@@ -1,5 +1,6 @@
 // lib/features/profile/widgets/avatar_customization_screen.dart
 
+import '/widgets/net_image.dart';
 import '/core/logging/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -258,7 +259,7 @@ class _AvatarCustomizationScreenState extends State<AvatarCustomizationScreen> {
                     ),
                     child: ClipOval(
                       child: hasAvatar
-                          ? Image.network(
+                          ? NetImage(
                               _profile.avatarUrl!,
                               width: 138,
                               height: 138,

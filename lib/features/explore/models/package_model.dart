@@ -1,3 +1,4 @@
+import '/core/logging/app_logger.dart';
 import 'package_habit_model.dart';
 
 class Package {
@@ -36,7 +37,8 @@ class Package {
     try {
       final habitsData = map['habits'] as List? ?? [];
       habitList = habitsData.map((h) => PackageHabit.fromMap(h)).toList();
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('package_model', 'Package failed', error: e, stack: stk);
       // خطا در parsing
     }
 

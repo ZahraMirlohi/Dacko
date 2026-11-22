@@ -1,5 +1,6 @@
 // lib/features/chat/widgets/file_message_widget.dart
 
+import '/core/logging/app_logger.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -222,7 +223,8 @@ class _FileMessageWidgetState extends State<FileMessageWidget> {
       } else {
         _showMessage('مسیر فایل موجود نیست');
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('file_message', '_openFile failed', error: e, stack: stk);
       _showMessage('خطا در باز کردن فایل: ${e.toString()}');
     }
   }

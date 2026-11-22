@@ -1,3 +1,4 @@
+import '/core/logging/app_logger.dart';
 import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
@@ -17,7 +18,8 @@ class ChatBackground {
       if (p == null) return null;
       if (p.startsWith('color:')) return p;
       return File(p).existsSync() ? p : null;
-    } catch (_) {
+    } catch (err, stk) {
+      Log.w('chat_background', 'load ignored error', error: err, stack: stk);
       return null;
     }
   }
@@ -36,7 +38,8 @@ class ChatBackground {
       await FileImage(File(dest)).evict();
       await (await SharedPreferences.getInstance()).setString(_key(convId), dest);
       return dest;
-    } catch (_) {
+    } catch (err, stk) {
+      Log.w('chat_background', 'pick ignored error', error: err, stack: stk);
       return null;
     }
   }
@@ -49,7 +52,7 @@ class ChatBackground {
       if (p != null && !p.startsWith('color:') && File(p).existsSync()) {
         await File(p).delete();
       }
-    } catch (_) {}
+    } catch (err, stk) { Log.w('chat_background', 'clear ignored error', error: err, stack: stk); }
   }
 
   /// رنگ یکدست؛ عکس قبلی (اگر بود) پاک می‌شود
@@ -58,7 +61,7 @@ class ChatBackground {
     final v = 'color:${c.toARGB32()}';
     try {
       await (await SharedPreferences.getInstance()).setString(_key(convId), v);
-    } catch (_) {}
+    } catch (err, stk) { Log.w('chat_background', 'setColor ignored error', error: err, stack: stk); }
     return v;
   }
 }

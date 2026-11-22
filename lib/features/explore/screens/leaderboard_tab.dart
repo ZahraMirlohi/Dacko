@@ -1,5 +1,6 @@
 // lib/features/explore/screens/leaderboard_tab.dart
 
+import '/core/logging/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '/services/supabase_service.dart';
@@ -78,7 +79,8 @@ class _LeaderboardTabState extends State<LeaderboardTab> {
           _isLoading = false;
         });
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('leaderboard', '_loadLeaderboard failed', error: e, stack: stk);
       if (mounted) {
         setState(() {
           _errorMessage = context.tr('lb.k001', {'p0': '${e.toString()}'});
@@ -114,8 +116,8 @@ class _LeaderboardTabState extends State<LeaderboardTab> {
             }
         ];
       }
-    } catch (e) {
-      print('Error getting from user_progress: $e');
+    } catch (e, stk) {
+      Log.e('leaderboard', 'Error getting from user_progress: $e', error: e, stack: stk);
     }
 
     try {
@@ -128,8 +130,8 @@ class _LeaderboardTabState extends State<LeaderboardTab> {
       if (response.isNotEmpty) {
         return List<Map<String, dynamic>>.from(response);
       }
-    } catch (e) {
-      print('Error getting from profiles: $e');
+    } catch (e, stk) {
+      Log.e('leaderboard', 'Error getting from profiles: $e', error: e, stack: stk);
     }
 
     return []; // بدون داده‌ی ساختگی؛ حالت خالی نمایش داده می‌شود
@@ -149,7 +151,7 @@ class _LeaderboardTabState extends State<LeaderboardTab> {
       for (final r in rows) {
         out.putIfAbsent(r['user_id'] as String, () => []).add(r);
       }
-    } catch (_) {}
+    } catch (err, stk) { Log.w('leaderboard', '_getBadgesFor ignored error', error: err, stack: stk); }
     return out;
   }
 
@@ -238,7 +240,8 @@ class _LeaderboardTabState extends State<LeaderboardTab> {
           .eq('user_id', otherId)
           .maybeSingle();
       return r?['allow_buddy_requests'] != false;
-    } catch (_) {
+    } catch (err, stk) {
+      Log.w('leaderboard', '_acceptsRequests ignored error', error: err, stack: stk);
       return true; // ستون هنوز ساخته نشده
     }
   }
@@ -321,7 +324,8 @@ class _LeaderboardTabState extends State<LeaderboardTab> {
                                       content: Text(context.tr('lb.k008'))));
                                 }
                                 nav.pop();
-                              } catch (_) {
+                              } catch (err, stk) {
+                                Log.w('leaderboard', '_showUser ignored error', error: err, stack: stk);
                                 messenger.showSnackBar(SnackBar(
                                     content:
                                         Text(context.tr('lb.k009'))));

@@ -1,5 +1,6 @@
 // lib/features/explore/widgets/daily_spark.dart
 
+import '/core/logging/app_logger.dart';
 import '/l10n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -33,7 +34,8 @@ class _DailySparkState extends State<DailySpark> {
           _isLoading = false;
         });
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('daily_spark', '_loadDailySpark failed', error: e, stack: stk);
       if (mounted) {
         setState(() => _isLoading = false);
       }

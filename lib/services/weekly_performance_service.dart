@@ -1,5 +1,6 @@
 // lib/services/weekly_performance_service.dart
 
+import '/core/logging/app_logger.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import '../features/arena/models/habit_model.dart';
@@ -107,8 +108,8 @@ class WeeklyPerformanceService {
         completedHabits: completedHabits,
         successRate: successRate,
       );
-    } catch (e) {
-      print('Error getting weekly performance: $e');
+    } catch (e, stk) {
+      Log.e('weekly_performance', 'Error getting weekly performance: $e', error: e, stack: stk);
       return null;
     }
   }

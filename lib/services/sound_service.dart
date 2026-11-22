@@ -5,6 +5,7 @@
 //
 // استفاده:  SoundService.instance.play(Sfx.check);
 
+import '/core/logging/app_logger.dart';
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
@@ -49,7 +50,8 @@ class SoundService {
       }
       await player.seek(Duration.zero);
       unawaited(player.play());
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('sound', '_sound failed', error: e, stack: stk);
       _failed.add(sfx); // اگه فایل نبود یا پلتفرم پشتیبانی نکرد، دیگه تلاش نمی‌کنیم
       if (kDebugMode) debugPrint('SoundService: $sfx failed: $e');
     }
@@ -76,7 +78,7 @@ class SoundService {
           await HapticFeedback.vibrate();
           break;
       }
-    } catch (_) {}
+    } catch (err, stk) { Log.w('sound', '_haptic ignored error', error: err, stack: stk); }
   }
 
   Future<void> dispose() async {

@@ -1,5 +1,6 @@
 // lib/features/chat/screens/arena_chat_screen.dart
 
+import '/core/logging/app_logger.dart';
 import '/l10n/app_strings.dart';
 import '/services/sound_service.dart';
 import 'dart:async';
@@ -153,7 +154,7 @@ class _ArenaChatScreenState extends State<ArenaChatScreen>
             .eq('user_id', user.id)
             .maybeSingle();
         _myName = (me?['name'] as String?) ?? (mounted ? context.tr('sq.user') : '');
-      } catch (_) {}
+      } catch (err, stk) { Log.w('arena_chat', '_loadData ignored error', error: err, stack: stk); }
       _challengeInfo = await _getChallengeInfo(widget.conversation.challengeId);
       _participants = await _getChallengeParticipants(
         widget.conversation.challengeId,
@@ -324,7 +325,8 @@ class _ArenaChatScreenState extends State<ArenaChatScreen>
         metadata: metadata,
         senderName: _myName,
       );
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('arena_chat', '_sendMessage failed', error: e, stack: stk);
       if (mounted) {
         setState(() => _messages.removeWhere((m) => m.id == temp.id));
         ScaffoldMessenger.of(context).showSnackBar(
@@ -386,7 +388,8 @@ class _ArenaChatScreenState extends State<ArenaChatScreen>
           duration: const Duration(seconds: 1),
         ),
       );
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('arena_chat', '_createPost failed', error: e, stack: stk);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

@@ -1,5 +1,6 @@
 // lib/features/profile/screens/personality_screen.dart
 
+import '/core/logging/app_logger.dart';
 import '/widgets/bottom_safe.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -184,7 +185,8 @@ class _PersonalityScreenState extends State<PersonalityScreen> {
         );
         Navigator.pop(context, true);
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('personality', '_savePersonality failed', error: e, stack: stk);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

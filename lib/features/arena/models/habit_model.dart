@@ -1,3 +1,4 @@
+import '/core/logging/app_logger.dart';
 import 'dart:convert';
 import 'package:shamsi_date/shamsi_date.dart';
 import 'timer_setting.dart'; // یا مسیر درست
@@ -253,8 +254,8 @@ class Habit {
     if (map['timer_setting'] != null) {
       try {
         timerSetting = TimerSetting.fromMap(map['timer_setting']);
-      } catch (e) {
-        print('⚠️ Error parsing timer_setting: $e');
+      } catch (e, stk) {
+        Log.e('habit_model', '⚠️ Error parsing timer_setting: $e', error: e, stack: stk);
       }
     }
 
@@ -262,7 +263,8 @@ class Habit {
       if (dateStr == null || dateStr.isEmpty) return DateTime.now();
       try {
         return DateTime.parse(dateStr);
-      } catch (e) {
+      } catch (e, stk) {
+        Log.e('habit_model', 'toMap failed', error: e, stack: stk);
         print('⚠️ Error parsing date: $dateStr');
         return DateTime.now();
       }
@@ -296,7 +298,8 @@ class Habit {
             if (r is String) {
               try {
                 return Reminder.fromMap(jsonDecode(r) as Map<String, dynamic>);
-              } catch (e) {
+              } catch (e, stk) {
+                Log.e('habit_model', 'toMap failed', error: e, stack: stk);
                 return Reminder(
                   id: DateTime.now().millisecondsSinceEpoch.toString(),
                   hour: 8,

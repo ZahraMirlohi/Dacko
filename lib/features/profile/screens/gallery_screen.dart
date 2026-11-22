@@ -1,5 +1,6 @@
 // lib/features/profile/screens/gallery_screen.dart
 
+import '/core/logging/app_logger.dart';
 import '/widgets/bottom_safe.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -232,7 +233,8 @@ class _GalleryScreenState extends State<GalleryScreen> {
           _snack(context.tr('pm.gl.uploaded'));
         }
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('gallery', '_pickAndUpload failed', error: e, stack: stk);
       if (mounted) {
         _snack(context.tr('pm.gl.error', {'n': e.toString()}), error: true);
       }
@@ -619,8 +621,8 @@ class _GalleryScreenState extends State<GalleryScreen> {
           bucket: 'user_gallery',
           storagePath: photo.storagePath,
         );
-      } catch (e) {
-        debugPrint('Storage delete error (ignored): $e');
+      } catch (e, stk) {
+        Log.e('gallery', 'Storage delete error (ignored): $e', error: e, stack: stk);
       }
 
       // حذف از DB
@@ -633,7 +635,8 @@ class _GalleryScreenState extends State<GalleryScreen> {
         _snack(context.tr('pm.gl.deleted'));
         await _loadPhotos();
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('gallery', '_deletePhoto failed', error: e, stack: stk);
       if (mounted) {
         _snack(context.tr('pm.gl.error', {'n': e.toString()}), error: true);
       }
@@ -1200,7 +1203,8 @@ class _GalleryScreenState extends State<GalleryScreen> {
           caption: result,
         );
         await _loadPhotos();
-      } catch (e) {
+      } catch (e, stk) {
+        Log.e('gallery', '_showEditCaptionDialog failed', error: e, stack: stk);
         if (mounted) {
           _snack(context.tr('pm.gl.error', {'n': e.toString()}), error: true);
         }
@@ -1231,7 +1235,8 @@ class _GalleryScreenState extends State<GalleryScreen> {
       }
 
       await _loadPhotos();
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('gallery', '_togglePrimary failed', error: e, stack: stk);
       if (mounted) {
         _snack(context.tr('pm.gl.error', {'n': e.toString()}), error: true);
       }

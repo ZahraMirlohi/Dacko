@@ -1,5 +1,6 @@
 // lib/features/explore/screens/challenges_tab.dart
 
+import '/core/logging/app_logger.dart';
 import 'package:flutter/material.dart';
 import '/l10n/app_strings.dart';
 import 'package:provider/provider.dart';
@@ -878,7 +879,8 @@ class _ChallengesTabState extends State<ChallengesTab> {
       );
 
       return result;
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('challenges', '_getCachedProgress failed', error: e, stack: stk);
       return {'completedDays': 0, 'totalDays': 0};
     } finally {
       _isLoadingProgress[challengeId] = false;
@@ -904,7 +906,8 @@ class _ChallengesTabState extends State<ChallengesTab> {
         timestamp: DateTime.now(),
       );
       return count;
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('challenges', '_getCachedParticipants failed', error: e, stack: stk);
       return 0;
     }
   }

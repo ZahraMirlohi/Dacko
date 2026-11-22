@@ -4,6 +4,7 @@
 // دریافت درخواست (profiles.allow_buddy_requests) و نمایش در پیشنهادها
 // (user_personalities.is_looking_for_buddy).
 
+import '/core/logging/app_logger.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class PrivacyService {
@@ -23,7 +24,8 @@ class PrivacyService {
           .eq('user_id', me)
           .maybeSingle();
       return r?['allow_buddy_requests'] != false;
-    } catch (_) {
+    } catch (err, stk) {
+      Log.w('privacy', 'allowRequests ignored error', error: err, stack: stk);
       return true; // ستون هنوز ساخته نشده
     }
   }
@@ -38,7 +40,8 @@ class PrivacyService {
           .eq('user_id', me)
           .maybeSingle();
       return r?['is_looking_for_buddy'] != false;
-    } catch (_) {
+    } catch (err, stk) {
+      Log.w('privacy', 'discoverable ignored error', error: err, stack: stk);
       return true;
     }
   }

@@ -1,5 +1,6 @@
 // lib/services/challenge_invite_service.dart
 
+import '/core/logging/app_logger.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../features/chat/models/challenge_invite.dart';
 import 'supabase_service.dart';
@@ -53,8 +54,8 @@ class ChallengeInviteService {
       await _client.from('challenge_invites').insert(challenge.toMap());
 
       return challenge;
-    } catch (e) {
-      print('Error creating challenge: $e');
+    } catch (e, stk) {
+      Log.e('challenge_invite', 'Error creating challenge: $e', error: e, stack: stk);
       return null;
     }
   }
@@ -70,8 +71,8 @@ class ChallengeInviteService {
           .order('created_at', ascending: false);
 
       return response.map((data) => ChallengeInvite.fromMap(data)).toList();
-    } catch (e) {
-      print('Error getting user challenges: $e');
+    } catch (e, stk) {
+      Log.e('challenge_invite', 'Error getting user challenges: $e', error: e, stack: stk);
       return [];
     }
   }
@@ -86,8 +87,8 @@ class ChallengeInviteService {
 
       if (response == null) return null;
       return ChallengeInvite.fromMap(response);
-    } catch (e) {
-      print('Error getting challenge: $e');
+    } catch (e, stk) {
+      Log.e('challenge_invite', 'Error getting challenge: $e', error: e, stack: stk);
       return null;
     }
   }
@@ -115,8 +116,8 @@ class ChallengeInviteService {
       }
 
       return true;
-    } catch (e) {
-      print('Error responding to challenge: $e');
+    } catch (e, stk) {
+      Log.e('challenge_invite', 'Error responding to challenge: $e', error: e, stack: stk);
       return false;
     }
   }
@@ -191,8 +192,8 @@ class ChallengeInviteService {
       await _checkChallengeCompletion(challengeId);
 
       return true;
-    } catch (e) {
-      print('Error completing habit today: $e');
+    } catch (e, stk) {
+      Log.e('challenge_invite', 'Error completing habit today: $e', error: e, stack: stk);
       return false;
     }
   }
@@ -257,8 +258,8 @@ class ChallengeInviteService {
           .eq('id', challengeId);
 
       return true;
-    } catch (e) {
-      print('Error uncompleting habit today: $e');
+    } catch (e, stk) {
+      Log.e('challenge_invite', 'Error uncompleting habit today: $e', error: e, stack: stk);
       return false;
     }
   }
@@ -301,8 +302,8 @@ class ChallengeInviteService {
           await _supabase.addXP(challenge.opponentId, challenge.xpReward);
         }
       }
-    } catch (e) {
-      print('Error checking challenge completion: $e');
+    } catch (e, stk) {
+      Log.e('challenge_invite', 'Error checking challenge completion: $e', error: e, stack: stk);
     }
   }
 
@@ -330,8 +331,8 @@ class ChallengeInviteService {
           .eq('id', challengeId);
 
       return true;
-    } catch (e) {
-      print('Error cancelling challenge: $e');
+    } catch (e, stk) {
+      Log.e('challenge_invite', 'Error cancelling challenge: $e', error: e, stack: stk);
       return false;
     }
   }

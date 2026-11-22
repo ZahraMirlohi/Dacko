@@ -1,5 +1,6 @@
 // lib/features/chat/screens/buddy_finder_screen.dart
 
+import '/core/logging/app_logger.dart';
 import '/l10n/app_strings.dart';
 import '/widgets/bottom_safe.dart';
 import 'package:flutter/material.dart';
@@ -113,7 +114,8 @@ class _BuddyFinderScreenState extends State<BuddyFinderScreen>
           _searchResult = result;
         });
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('buddy_finder', '_performSearch failed', error: e, stack: stk);
       if (!mounted) return;
       setState(() {
         _isSearching = false;
@@ -151,7 +153,8 @@ class _BuddyFinderScreenState extends State<BuddyFinderScreen>
         message,
         subject: context.tr('ct.bf.shareSubj', {'app': appName}),
       );
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('buddy_finder', '_shareInvitationLink failed', error: e, stack: stk);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -178,7 +181,8 @@ class _BuddyFinderScreenState extends State<BuddyFinderScreen>
         message,
         subject: context.tr('ct.bf.shareSubj', {'app': appName}),
       );
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('buddy_finder', '_shareUserNotFoundInvitation failed', error: e, stack: stk);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -221,8 +225,8 @@ class _BuddyFinderScreenState extends State<BuddyFinderScreen>
           _myUsername = myProfile['username'] as String?;
         });
       }
-    } catch (e) {
-      print('Error loading my username: $e');
+    } catch (e, stk) {
+      Log.e('buddy_finder', 'Error loading my username: $e', error: e, stack: stk);
     }
 
     try {
@@ -244,8 +248,8 @@ class _BuddyFinderScreenState extends State<BuddyFinderScreen>
       });
 
       _applyFilters();
-    } catch (e) {
-      print('Error loading data: $e');
+    } catch (e, stk) {
+      Log.e('buddy_finder', 'Error loading data: $e', error: e, stack: stk);
       if (!mounted) return; // بعد از catch هم چک کن
       setState(() => _isLoading = false);
     }
@@ -352,8 +356,8 @@ class _BuddyFinderScreenState extends State<BuddyFinderScreen>
       _searchResults = _searchResults
           .where((m) => !needed.contains(m['user_id']))
           .toList();
-    } catch (e) {
-      print('merge requests/buddies error: $e');
+    } catch (e, stk) {
+      Log.e('buddy_finder', 'merge requests/buddies error: $e', error: e, stack: stk);
     }
   }
 
@@ -488,7 +492,8 @@ class _BuddyFinderScreenState extends State<BuddyFinderScreen>
           ),
         );
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('buddy_finder', '_sendRequestImpl failed', error: e, stack: stk);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -574,7 +579,8 @@ class _BuddyFinderScreenState extends State<BuddyFinderScreen>
           ),
         );
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('buddy_finder', '_cancelRequest failed', error: e, stack: stk);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -692,7 +698,8 @@ class _BuddyFinderScreenState extends State<BuddyFinderScreen>
           ),
         );
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('buddy_finder', '_respondToRequestImpl failed', error: e, stack: stk);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -733,8 +740,8 @@ class _BuddyFinderScreenState extends State<BuddyFinderScreen>
           _allMatches[allIndex] = updated;
         }
       });
-    } catch (e) {
-      print('Error fetching conversation ID: $e');
+    } catch (e, stk) {
+      Log.e('buddy_finder', 'Error fetching conversation ID: $e', error: e, stack: stk);
     }
   }
 
@@ -774,8 +781,8 @@ class _BuddyFinderScreenState extends State<BuddyFinderScreen>
           _searchResults.insert(0, updated);
         }
       });
-    } catch (e) {
-      print('Error reloading user: $e');
+    } catch (e, stk) {
+      Log.e('buddy_finder', 'Error reloading user: $e', error: e, stack: stk);
     }
   }
 

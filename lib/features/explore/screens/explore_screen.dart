@@ -1,5 +1,6 @@
 // lib/features/explore/screens/explore_screen.dart
 
+import '/core/logging/app_logger.dart';
 import '/l10n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -177,8 +178,8 @@ class _ExploreScreenState extends State<ExploreScreen>
           _isLoadingInProgress = false;
         });
       }
-    } catch (e) {
-      print('_loadData: Error - $e');
+    } catch (e, stk) {
+      Log.e('explore', '_loadData: Error - $e', error: e, stack: stk);
       if (mounted) {
         setState(() {
           _errorMessage = 'ex.err.db';
@@ -234,8 +235,8 @@ class _ExploreScreenState extends State<ExploreScreen>
 
       _completedQuests =
           _quests.where((q) => completedQuestIds.contains(q.id)).toList();
-    } catch (e) {
-      print('Background sync error: $e');
+    } catch (e, stk) {
+      Log.e('explore', 'Background sync error: $e', error: e, stack: stk);
     }
   }
 
@@ -338,7 +339,8 @@ class _ExploreScreenState extends State<ExploreScreen>
           );
         }
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('explore', '_joinChallenge failed', error: e, stack: stk);
       if (mounted) {
         ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context).showSnackBar(
@@ -424,7 +426,8 @@ class _ExploreScreenState extends State<ExploreScreen>
           );
         }
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('explore', '_leaveChallenge failed', error: e, stack: stk);
       if (mounted) {
         ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context).showSnackBar(
@@ -469,8 +472,8 @@ class _ExploreScreenState extends State<ExploreScreen>
           final habits = await _supabase.getHabits(currentUser.id);
           final localStorage = LocalStorageService();
           await localStorage.saveHabits(habits);
-        } catch (e2) {
-          print('Error updating LocalStorage: $e2');
+        } catch (e2, stk) {
+          Log.e('explore', 'Error updating LocalStorage: $e2', error: e2, stack: stk);
         }
       }
 
@@ -487,8 +490,8 @@ class _ExploreScreenState extends State<ExploreScreen>
           ),
         );
       }
-    } catch (e) {
-      print('Error in _startQuest: $e');
+    } catch (e, stk) {
+      Log.e('explore', 'Error in _startQuest: $e', error: e, stack: stk);
       if (mounted) {
         String message = e.toString().replaceFirst('Exception: ', '');
         ScaffoldMessenger.of(context).showSnackBar(
@@ -521,8 +524,8 @@ class _ExploreScreenState extends State<ExploreScreen>
           final updatedHabits =
               habits.where((h) => h.questId != quest.id).toList();
           await localStorage.saveHabits(updatedHabits);
-        } catch (e) {
-          print('Error updating LocalStorage: $e');
+        } catch (e, stk) {
+          Log.e('explore', 'Error updating LocalStorage: $e', error: e, stack: stk);
         }
 
         _isInitialized = false;
@@ -543,7 +546,8 @@ class _ExploreScreenState extends State<ExploreScreen>
           );
         }
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('explore', '_cancelQuest failed', error: e, stack: stk);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -617,8 +621,8 @@ class _ExploreScreenState extends State<ExploreScreen>
       }
 
       _showChallengeDetailsDialogWithData(challenge, cacheData);
-    } catch (e) {
-      print('Error showing challenge details: $e');
+    } catch (e, stk) {
+      Log.e('explore', 'Error showing challenge details: $e', error: e, stack: stk);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -739,8 +743,8 @@ class _ExploreScreenState extends State<ExploreScreen>
           }
         },
       );
-    } catch (e) {
-      print('Error showing challenge details: $e');
+    } catch (e, stk) {
+      Log.e('explore', 'Error showing challenge details: $e', error: e, stack: stk);
     }
   }
 
@@ -1176,8 +1180,8 @@ class _ExploreScreenState extends State<ExploreScreen>
           }
         },
       );
-    } catch (e) {
-      print('Error showing quest details: $e');
+    } catch (e, stk) {
+      Log.e('explore', 'Error showing quest details: $e', error: e, stack: stk);
     }
   }
 
@@ -1238,7 +1242,8 @@ class _ExploreScreenState extends State<ExploreScreen>
         return Color(int.parse('FF${colorStr.substring(1)}', radix: 16));
       }
       return const Color(0xFF4A90E2);
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('explore', '_parseColor failed', error: e, stack: stk);
       return const Color(0xFF4A90E2);
     }
   }

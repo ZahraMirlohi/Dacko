@@ -3,6 +3,7 @@
 // یادآور روزانهٔ عادت‌ها (اعلان محلی). با تنظیمات «اعلان‌ها» و «یادآوری عادت‌ها» کنترل می‌شود
 // و ساعتش را کاربر تعیین می‌کند. روی وب کاری نمی‌کند (بدون خطا).
 
+import '/core/logging/app_logger.dart';
 import 'dart:async';
 import 'dart:math';
 
@@ -38,7 +39,8 @@ class NotificationService {
       try {
         final name = await FlutterTimezone.getLocalTimezone();
         tz.setLocalLocation(tz.getLocation(name));
-      } catch (_) {
+      } catch (err, stk) {
+        Log.w('notification', 'init ignored error', error: err, stack: stk);
         tz.setLocalLocation(tz.getLocation('Asia/Tehran'));
       }
       const android = AndroidInitializationSettings('@mipmap/ic_launcher');
@@ -51,8 +53,8 @@ class NotificationService {
         const InitializationSettings(android: android, iOS: ios),
       );
       _ready = true;
-    } catch (e) {
-      if (kDebugMode) debugPrint('NotificationService init failed: $e');
+    } catch (e, stk) {
+      Log.e('notification', 'NotificationService init failed: $e', error: e, stack: stk);
     }
   }
 
@@ -60,7 +62,8 @@ class NotificationService {
     try {
       final p = await SharedPreferences.getInstance();
       return TimeOfDayLite(p.getInt(_kHour) ?? 20, p.getInt(_kMinute) ?? 0);
-    } catch (_) {
+    } catch (err, stk) {
+      Log.w('notification', 'reminderTime ignored error', error: err, stack: stk);
       return const TimeOfDayLite(20, 0);
     }
   }
@@ -70,7 +73,7 @@ class NotificationService {
       final p = await SharedPreferences.getInstance();
       await p.setInt(_kHour, hour);
       await p.setInt(_kMinute, minute);
-    } catch (_) {}
+    } catch (err, stk) { Log.w('notification', 'setReminderTime ignored error', error: err, stack: stk); }
     await reschedule();
   }
 
@@ -86,7 +89,8 @@ class NotificationService {
       final a = await android?.requestNotificationsPermission();
       final i = await ios?.requestPermissions(alert: true, sound: true);
       return (a ?? i ?? true);
-    } catch (_) {
+    } catch (err, stk) {
+      Log.w('notification', 'requestPermission ignored error', error: err, stack: stk);
       return false;
     }
   }
@@ -155,8 +159,8 @@ class NotificationService {
           matchDateTimeComponents: DateTimeComponents.time,
         );
       }
-    } catch (e) {
-      if (kDebugMode) debugPrint('NotificationService schedule failed: $e');
+    } catch (e, stk) {
+      Log.e('notification', 'NotificationService schedule failed: $e', error: e, stack: stk);
     }
   }
 
@@ -201,7 +205,7 @@ class NotificationService {
     if (!_ready) return;
     try {
       await _plugin.show(id, title, body, _details(channel, channelName));
-    } catch (_) {}
+    } catch (err, stk) { Log.w('notification', 'showNow ignored error', error: err, stack: stk); }
   }
 
   /// اعلان یک‌بارهٔ زمان‌دار (پایان تایمر، هشدار استریک)
@@ -218,21 +222,21 @@ class NotificationService {
           androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
           uiLocalNotificationDateInterpretation:
               UILocalNotificationDateInterpretation.absoluteTime);
-    } catch (_) {}
+    } catch (err, stk) { Log.w('notification', 'scheduleOnce ignored error', error: err, stack: stk); }
   }
 
   Future<void> cancel(int id) async {
     if (!_supported || !_ready) return;
     try {
       await _plugin.cancel(id);
-    } catch (_) {}
+    } catch (err, stk) { Log.w('notification', 'cancel ignored error', error: err, stack: stk); }
   }
 
   Future<void> cancelAll() async {
     if (!_supported || !_ready) return;
     try {
       await _plugin.cancelAll();
-    } catch (_) {}
+    } catch (err, stk) { Log.w('notification', 'cancelAll ignored error', error: err, stack: stk); }
   }
 }
 

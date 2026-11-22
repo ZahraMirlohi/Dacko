@@ -1,3 +1,4 @@
+import '/core/logging/app_logger.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -202,7 +203,8 @@ class _HabitTimerWidgetState extends State<HabitTimerWidget> {
           }
         });
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('habit_timer', '_saveTime failed', error: e, stack: stk);
       if (mounted) {
         setState(() {
           _isSaved = false;

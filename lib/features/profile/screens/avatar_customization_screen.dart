@@ -1,5 +1,6 @@
 // lib/features/profile/widgets/avatar_customization_screen.dart
 
+import '/core/logging/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '/services/supabase_service.dart';
@@ -544,7 +545,8 @@ class _AvatarCustomizationScreenState extends State<AvatarCustomizationScreen> {
           ),
         );
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('avatar_customization', '_pickAndUploadAvatar failed', error: e, stack: stk);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -647,7 +649,8 @@ class _AvatarCustomizationScreenState extends State<AvatarCustomizationScreen> {
           ),
         );
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('avatar_customization', '_removeAvatar failed', error: e, stack: stk);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -810,7 +813,8 @@ class _AvatarCustomizationScreenState extends State<AvatarCustomizationScreen> {
         );
         Navigator.pop(context, true);
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('avatar_customization', '_saveAvatar failed', error: e, stack: stk);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

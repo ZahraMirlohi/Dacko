@@ -1,5 +1,6 @@
 // lib/features/chat/screens/location_picker_screen.dart
 
+import '/core/logging/app_logger.dart';
 import '/widgets/bottom_safe.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -88,7 +89,8 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
           _isLoading = false;
         });
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('location_picker', '_initializeLocation failed', error: e, stack: stk);
       setState(() {
         _errorMessage = 'خطا در دریافت موقعیت: ${e.toString()}';
         _isLoading = false;
@@ -114,7 +116,8 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
           _address = 'آدرس نامشخص';
         });
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('location_picker', '_getAddress failed', error: e, stack: stk);
       setState(() {
         _address = 'آدرس نامشخص';
       });

@@ -3,6 +3,7 @@
 // بعد از ثبت‌نام: لینک تایید به ایمیل رفته. با باز شدن لینک، رویداد signedIn
 // کاربر را وارد می‌کند و این صفحه خودش بسته می‌شود.
 
+import '/core/logging/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -31,7 +32,8 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
           _error = null;
         });
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('verify_email', '_resend failed', error: e, stack: stk);
       if (mounted) setState(() => _error = authErrorText(context, e));
     }
   }

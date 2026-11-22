@@ -1,5 +1,6 @@
 // lib/features/arena/screens/add_task_screen.dart
 
+import '/core/logging/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:inner_hero_app/providers/sync_provider.dart';
 import 'package:provider/provider.dart';
@@ -123,7 +124,8 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
           Navigator.pop(context, true);
         }
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('add_task', '_saveTask failed', error: e, stack: stk);
       if (mounted) {
         showArenaSnack(
           context,

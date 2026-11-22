@@ -1,5 +1,6 @@
 // lib/features/chat/screens/buddy_chat_screen.dart
 
+import '/core/logging/app_logger.dart';
 import '../widgets/avatar_viewer.dart';
 import '../widgets/chat_background.dart';
 import '/l10n/app_strings.dart';
@@ -273,12 +274,12 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
           if (challenge != null) {
             _challengeCache[id] = challenge;
           }
-        } catch (e) {
-          print('⚠️ Error loading challenge $id: $e');
+        } catch (e, stk) {
+          Log.e('buddy_chat', '⚠️ Error loading challenge $id: $e', error: e, stack: stk);
         }
       }
-    } catch (e) {
-      print('⚠️ Error in _loadChallengesFromMessages: $e');
+    } catch (e, stk) {
+      Log.e('buddy_chat', '⚠️ Error in _loadChallengesFromMessages: $e', error: e, stack: stk);
     }
   }
 
@@ -301,8 +302,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
         try {
           await _loadMessages();
           _scrollToBottom();
-        } catch (e) {
-          print('❌ Error in _loadMessages: $e');
+        } catch (e, stk) {
+          Log.e('buddy_chat', '❌ Error in _loadMessages: $e', error: e, stack: stk);
           if (mounted) setState(() => _isLoading = false);
         }
       }();
@@ -320,7 +321,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
             _myName = myProfile['name'] as String? ?? context.tr('bc.k001');
           });
         }
-      } catch (e) {
+      } catch (e, stk) {
+        Log.e('buddy_chat', '_initChat failed', error: e, stack: stk);
         if (mounted) {
           setState(() {
             _myName = context.tr('bc.k001');
@@ -351,8 +353,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
               break;
             }
           }
-        } catch (e) {
-          debugPrint('❌ Error fetching members: $e');
+        } catch (e, stk) {
+          Log.e('buddy_chat', '❌ Error fetching members: $e', error: e, stack: stk);
         }
       }
 
@@ -378,8 +380,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
               await _getBuddyStatus(buddyId);
             }
           }
-        } catch (e) {
-          debugPrint('❌ Error getting buddy profile: $e');
+        } catch (e, stk) {
+          Log.e('buddy_chat', '❌ Error getting buddy profile: $e', error: e, stack: stk);
           if (mounted) {
             setState(() {
               _isBuddyOnline = false;
@@ -415,7 +417,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
               _messages = shown.reversed.toList();
               try {
                 _pinnedMessage = _messages.firstWhere((m) => m.isPinned);
-              } catch (e) {
+              } catch (e, stk) {
+                Log.e('buddy_chat', '_initChat failed', error: e, stack: stk);
                 _pinnedMessage = null;
               }
             });
@@ -434,16 +437,16 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
           }
           // واکنش‌ها بعداً و بدون معطل کردن نمایش پیام
           _refreshReactions();
-        } catch (e) {
-          print('❌ Error in realtime update: $e');
+        } catch (e, stk) {
+          Log.e('buddy_chat', '❌ Error in realtime update: $e', error: e, stack: stk);
         }
       });
 
       _listenActivity();
       _listenReactions();
       _listenConversationGone();
-    } catch (e) {
-      print('❌ Critical error in _initChat: $e');
+    } catch (e, stk) {
+      Log.e('buddy_chat', '❌ Critical error in _initChat: $e', error: e, stack: stk);
       if (mounted) {
         setState(() {
           _isLoading = false;
@@ -513,8 +516,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
       }
 
       return challenge;
-    } catch (e) {
-      print('❌ Error getting challenge: $e');
+    } catch (e, stk) {
+      Log.e('buddy_chat', '❌ Error getting challenge: $e', error: e, stack: stk);
       return null;
     } finally {
       _loadingChallenges.remove(challengeId);
@@ -876,7 +879,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
 
         _sendMessage(text: contactText, type: MessageType.text);
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('buddy_chat', '_sendContact failed', error: e, stack: stk);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -1055,8 +1059,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
         try {
           final File fileObj = File(file.path!);
           fileBytes = await fileObj.readAsBytes();
-        } catch (e) {
-          print('❌ Error reading file from path: $e');
+        } catch (e, stk) {
+          Log.e('buddy_chat', '❌ Error reading file from path: $e', error: e, stack: stk);
         }
       } else if (kIsWeb) {
         if (file.path != null) {
@@ -1167,8 +1171,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
       }
     
       }
-    } catch (e) {
-      print('❌ Error in _sendFile: $e');
+    } catch (e, stk) {
+      Log.e('buddy_chat', '❌ Error in _sendFile: $e', error: e, stack: stk);
       setState(() {
         _isSending = false;
       });
@@ -1226,8 +1230,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
         try {
           final File fileObj = File(file.path!);
           fileBytes = await fileObj.readAsBytes();
-        } catch (e) {
-          print('❌ Error reading file from path: $e');
+        } catch (e, stk) {
+          Log.e('buddy_chat', '❌ Error reading file from path: $e', error: e, stack: stk);
         }
       } else if (kIsWeb && file.path != null) {
         try {
@@ -1235,8 +1239,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
           if (response.statusCode == 200) {
             fileBytes = response.bodyBytes;
           }
-        } catch (e) {
-          print('❌ Error downloading music from URL: $e');
+        } catch (e, stk) {
+          Log.e('buddy_chat', '❌ Error downloading music from URL: $e', error: e, stack: stk);
         }
       }
 
@@ -1377,8 +1381,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
             ),
           );
         }
-      } catch (e) {
-        print('❌ Error sending music message: $e');
+      } catch (e, stk) {
+        Log.e('buddy_chat', '❌ Error sending music message: $e', error: e, stack: stk);
         setState(() {
           final index = _messages.indexWhere((msg) => msg.id == tempMessageId);
           if (index != -1) {
@@ -1404,8 +1408,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
         });
       }
       }
-    } catch (e) {
-      print('❌ Error in _sendMusic: $e');
+    } catch (e, stk) {
+      Log.e('buddy_chat', '❌ Error in _sendMusic: $e', error: e, stack: stk);
 
       setState(() {
         final index = _messages.indexWhere(
@@ -1523,8 +1527,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
           ),
         );
       }
-    } catch (e) {
-      print('❌ Error sending weekly performance: $e');
+    } catch (e, stk) {
+      Log.e('buddy_chat', '❌ Error sending weekly performance: $e', error: e, stack: stk);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -1615,8 +1619,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
           ),
         );
       }
-    } catch (e) {
-      print('❌ Error sending today habits list: $e');
+    } catch (e, stk) {
+      Log.e('buddy_chat', '❌ Error sending today habits list: $e', error: e, stack: stk);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -1706,8 +1710,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
           );
         }
       }
-    } catch (e) {
-      print('❌ Error sending challenge: $e');
+    } catch (e, stk) {
+      Log.e('buddy_chat', '❌ Error sending challenge: $e', error: e, stack: stk);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -1736,8 +1740,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
 
         _loadMessages();
       }
-    } catch (e) {
-      print('❌ Error responding to challenge: $e');
+    } catch (e, stk) {
+      Log.e('buddy_chat', '❌ Error responding to challenge: $e', error: e, stack: stk);
     }
   }
 
@@ -1786,8 +1790,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
           _supabase.client.storage.from('chat_files').getPublicUrl(path);
 
       return publicUrl;
-    } catch (e) {
-      print('❌ Upload error: $e');
+    } catch (e, stk) {
+      Log.e('buddy_chat', '❌ Upload error: $e', error: e, stack: stk);
       _showSnackBar(context.tr('bc.k048', {'p0': '${e.toString()}'}));
       return '';
     }
@@ -1863,8 +1867,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
         _showSnackBar(context.tr('bc.k048', {'p0': '${response.statusCode}'}));
         return '';
       }
-    } catch (e) {
-      print('❌ Upload error (HTTP): $e');
+    } catch (e, stk) {
+      Log.e('buddy_chat', '❌ Upload error (HTTP): $e', error: e, stack: stk);
       _showSnackBar(context.tr('bc.k048', {'p0': '${e.toString()}'}));
       return '';
     }
@@ -1968,8 +1972,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
           'timestamp': DateTime.now().millisecondsSinceEpoch,
         },
       );
-    } catch (e) {
-      print('❌ Error getting today stats: $e');
+    } catch (e, stk) {
+      Log.e('buddy_chat', '❌ Error getting today stats: $e', error: e, stack: stk);
     }
   }
 
@@ -1998,8 +2002,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
       }
 
       return weekDays;
-    } catch (e) {
-      print('❌ Error getting week days status: $e');
+    } catch (e, stk) {
+      Log.e('buddy_chat', '❌ Error getting week days status: $e', error: e, stack: stk);
       return weekDays;
     }
   }
@@ -2080,8 +2084,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
           ),
         );
       }
-    } catch (e) {
-      print('❌ Error sending XP gift: $e');
+    } catch (e, stk) {
+      Log.e('buddy_chat', '❌ Error sending XP gift: $e', error: e, stack: stk);
       _showSnackBar(context.tr('bc.k053', {'p0': '${e.toString()}'}));
     }
   }
@@ -2599,7 +2603,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
           ),
         );
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('buddy_chat', '_clearChatHistory failed', error: e, stack: stk);
       _isClearingHistory = false;
       setState(() {
         _isLoading = false;
@@ -2672,7 +2677,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
 
       // ✅ برگشت با true
       Navigator.pop(context, true);
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('buddy_chat', '_deleteConversation failed', error: e, stack: stk);
       if (mounted) {
         setState(() {
           _isDeleting = false;
@@ -2737,8 +2743,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
           }
         }
       });
-    } catch (e) {
-      print('❌ Error marking messages as read: $e');
+    } catch (e, stk) {
+      Log.e('buddy_chat', '❌ Error marking messages as read: $e', error: e, stack: stk);
       setState(() {
         for (var msg in unreadMessages) {
           final index = _messages.indexWhere((m) => m.id == msg.id);
@@ -2763,7 +2769,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
             _isBuddyOnline = isOnline;
           });
         }
-      } catch (e) {
+      } catch (e, stk) {
+        Log.e('buddy_chat', '_checkOnlineStatus failed', error: e, stack: stk);
         if (mounted) {
           setState(() {
             _isBuddyOnline = false;
@@ -3134,8 +3141,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
           duration: Duration(seconds: 2),
         ),
       );
-    } catch (e) {
-      print('❌ Error pinning message: $e');
+    } catch (e, stk) {
+      Log.e('buddy_chat', '❌ Error pinning message: $e', error: e, stack: stk);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(context.tr('bc.k030', {'p0': '${e.toString()}'})),
@@ -3187,8 +3194,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
           duration: Duration(seconds: 2),
         ),
       );
-    } catch (e) {
-      print('❌ Error unpinning message: $e');
+    } catch (e, stk) {
+      Log.e('buddy_chat', '❌ Error unpinning message: $e', error: e, stack: stk);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(context.tr('bc.k030', {'p0': '${e.toString()}'})),
@@ -3398,8 +3405,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
           });
         }
       }
-    } catch (e) {
-      print('❌ Error getting buddy status: $e');
+    } catch (e, stk) {
+      Log.e('buddy_chat', '❌ Error getting buddy status: $e', error: e, stack: stk);
       if (mounted) {
         setState(() {
           _isBuddyOnline = false;
@@ -3411,7 +3418,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
   ChatMessage? _findPinnedMessage(List<ChatMessage> messages) {
     try {
       return messages.firstWhere((m) => m.isPinned);
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('buddy_chat', '_findPinnedMessage failed', error: e, stack: stk);
       return null;
     }
   }
@@ -3438,7 +3446,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
 
           try {
             _pinnedMessage = _messages.firstWhere((m) => m.isPinned);
-          } catch (e) {
+          } catch (e, stk) {
+            Log.e('buddy_chat', '_loadMessages failed', error: e, stack: stk);
             _pinnedMessage = null;
           }
         });
@@ -3447,8 +3456,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
       }
 
       _scrollToBottom();
-    } catch (e) {
-      print('❌ Error loading messages: $e');
+    } catch (e, stk) {
+      Log.e('buddy_chat', '❌ Error loading messages: $e', error: e, stack: stk);
       if (mounted) {
         setState(() {
           _isLoading = false;
@@ -3499,7 +3508,7 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
       if (!mounted) return;
       _reactionCache = all;
       setState(() => _messages = _applyReactions(_messages, all));
-    } catch (_) {}
+    } catch (err, stk) { Log.w('buddy_chat', '_refreshReactions ignored error', error: err, stack: stk); }
   }
 
   Future<List<ChatMessage>> _loadReactionsForMessages(
@@ -3513,8 +3522,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
       );
       _reactionCache = allReactions;
       return _applyReactions(messages, allReactions);
-    } catch (e) {
-      print('❌ Error loading reactions: $e');
+    } catch (e, stk) {
+      Log.e('buddy_chat', '❌ Error loading reactions: $e', error: e, stack: stk);
       return messages;
     }
   }
@@ -3542,8 +3551,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
           duration: const Duration(milliseconds: 200),
           curve: Curves.easeOut,
         );
-      } catch (e2) {
-        print('⚠️ Scroll to bottom error: $e2');
+      } catch (e2, stk) {
+        Log.e('buddy_chat', '⚠️ Scroll to bottom error: $e2', error: e2, stack: stk);
       }
     }
   }
@@ -3712,8 +3721,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
 
       await _updateLastSeen(_userId!);
       _scrollToBottom();
-    } catch (e) {
-      print('❌ Error sending message: $e');
+    } catch (e, stk) {
+      Log.e('buddy_chat', '❌ Error sending message: $e', error: e, stack: stk);
 
       setState(() {
         final index = _messages.indexWhere((msg) => msg.id == tempMessage.id);
@@ -3745,8 +3754,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
       await _chatService.client
           .from('profiles')
           .update({'last_seen_at': now}).eq('user_id', userId);
-    } catch (e) {
-      print('⚠️ Error updating last_seen: $e');
+    } catch (e, stk) {
+      Log.e('buddy_chat', '⚠️ Error updating last_seen: $e', error: e, stack: stk);
     }
   }
 
@@ -3862,8 +3871,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
       }
     
       }
-    } catch (e) {
-      print('❌ Error in _sendImage: $e');
+    } catch (e, stk) {
+      Log.e('buddy_chat', '❌ Error in _sendImage: $e', error: e, stack: stk);
       setState(() {
         _isSending = false;
       });
@@ -3891,8 +3900,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
       );
 
       return fileUrl;
-    } catch (e) {
-      print('❌ Error uploading image: $e');
+    } catch (e, stk) {
+      Log.e('buddy_chat', '❌ Error uploading image: $e', error: e, stack: stk);
       return '';
     }
   }
@@ -3911,7 +3920,7 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
     _lastActAt = now;
     try {
       ch.sendBroadcastMessage(event: 'act', payload: {'u': _userId, 'a': act});
-    } catch (_) {}
+    } catch (err, stk) { Log.w('buddy_chat', '_broadcastActivity ignored error', error: err, stack: stk); }
   }
 
   void _onComposeChanged(String v) {
@@ -4060,8 +4069,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
           );
         }
       });
-    } catch (e) {
-      print('❌ Error toggling reaction: $e');
+    } catch (e, stk) {
+      Log.e('buddy_chat', '❌ Error toggling reaction: $e', error: e, stack: stk);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -4158,7 +4167,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
             ),
           );
         }
-      } catch (e) {
+      } catch (e, stk) {
+        Log.e('buddy_chat', '_deleteSelectedMessages failed', error: e, stack: stk);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -4271,8 +4281,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
           ),
         );
       }
-    } catch (e) {
-      print('❌ Error sharing message: $e');
+    } catch (e, stk) {
+      Log.e('buddy_chat', '❌ Error sharing message: $e', error: e, stack: stk);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -4320,7 +4330,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
             ),
           );
         }
-      } catch (e) {
+      } catch (e, stk) {
+        Log.e('buddy_chat', '_deleteMessageForMe failed', error: e, stack: stk);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -4372,7 +4383,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
             ),
           );
         }
-      } catch (e) {
+      } catch (e, stk) {
+        Log.e('buddy_chat', '_deleteMessageForEveryone failed', error: e, stack: stk);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -4854,7 +4866,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
                             }
 
                             _showMessageActionsPopup(message, position);
-                          } catch (e) {
+                          } catch (e, stk) {
+                            Log.e('buddy_chat', '_buildMessageBubbleCore failed', error: e, stack: stk);
                             _showMessageActionsPopup(
                                 message, const Offset(100, 200));
                           }
@@ -5342,7 +5355,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
           ),
         );
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('buddy_chat', '_resendFailedMessage failed', error: e, stack: stk);
       setState(() {
         final index = _messages.indexWhere((msg) => msg.id == message.id);
         if (index != -1) {
@@ -5465,8 +5479,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
           _pinnedMessage = pinned;
         });
       }
-    } catch (e) {
-      print('❌ Error loading pinned message: $e');
+    } catch (e, stk) {
+      Log.e('buddy_chat', '❌ Error loading pinned message: $e', error: e, stack: stk);
       if (mounted) {
         setState(() {
           _pinnedMessage = null;
@@ -5606,8 +5620,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
             _loadMessages();
           },
         );
-      } catch (e) {
-        print('❌ Error building XP gift card: $e');
+      } catch (e, stk) {
+        Log.e('buddy_chat', '❌ Error building XP gift card: $e', error: e, stack: stk);
         return Text(
           message.content,
           style: TextStyle(
@@ -5734,8 +5748,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
             }
           },
         );
-      } catch (e) {
-        print('❌ Error building challenge: $e');
+      } catch (e, stk) {
+        Log.e('buddy_chat', '❌ Error building challenge: $e', error: e, stack: stk);
         return Text(
           message.content,
           style: TextStyle(
@@ -5756,8 +5770,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
           data: data,
           isMe: isMe, // ← ✅ این خط حیاتی است
         );
-      } catch (e) {
-        print('❌ Error building today list widget: $e');
+      } catch (e, stk) {
+        Log.e('buddy_chat', '❌ Error building today list widget: $e', error: e, stack: stk);
         return Text(
           message.content,
           style: TextStyle(
@@ -5780,8 +5794,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
           data: performance,
           isMe: isMe,
         );
-      } catch (e) {
-        print('❌ Error building performance widget: $e');
+      } catch (e, stk) {
+        Log.e('buddy_chat', '❌ Error building performance widget: $e', error: e, stack: stk);
         return Text(
           message.content,
           style: TextStyle(
@@ -5834,7 +5848,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
                   );
                 }
                 _showMessageActionsPopup(message, position);
-              } catch (e) {
+              } catch (e, stk) {
+                Log.e('buddy_chat', '_buildMessageContent failed', error: e, stack: stk);
                 _showMessageActionsPopup(message, const Offset(100, 200));
               }
             }
@@ -6203,7 +6218,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
                       displayName: name,
                       phones: [Phone(phone)],
                     ));
-                  } catch (e) {
+                  } catch (e, stk) {
+                    Log.e('buddy_chat', '_showPhoneActions failed', error: e, stack: stk);
                     _showSnackBar(context.tr('bc.k136'));
                   }
                 },
@@ -6228,8 +6244,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
           _challengeCache[challengeId] = challenge;
           setState(() {});
         }
-      } catch (e) {
-        print('❌ Error loading challenge in background: $e');
+      } catch (e, stk) {
+        Log.e('buddy_chat', '❌ Error loading challenge in background: $e', error: e, stack: stk);
       } finally {
         _loadingChallenges.remove(challengeId);
       }
@@ -6537,8 +6553,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
           duration: const Duration(milliseconds: 500),
           curve: Curves.easeInOutCubic,
         );
-      } catch (e) {
-        print('❌ Fallback scroll error: $e');
+      } catch (e, stk) {
+        Log.e('buddy_chat', '❌ Fallback scroll error: $e', error: e, stack: stk);
       }
     });
   }
@@ -7261,7 +7277,7 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
         final names = {for (final r in rows) r['user_id'] as String: (r['name'] as String?) ?? context.tr('bc.k001')};
         others.forEach((cid, uid) => targets.add((convId: cid, name: names[uid] ?? context.tr('bc.k001'))));
       }
-    } catch (_) {}
+    } catch (err, stk) { Log.w('buddy_chat', '_forwardSelected ignored error', error: err, stack: stk); }
     if (!mounted) return;
     if (targets.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -7308,7 +7324,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
           SnackBar(content: Text(context.tr('bc.k154', {'p0': '${target.name}'}))),
         );
       }
-    } catch (_) {
+    } catch (err, stk) {
+      Log.w('buddy_chat', '_forwardSelected ignored error', error: err, stack: stk);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(context.tr('bc.k155')), backgroundColor: Colors.red),
@@ -7484,7 +7501,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
         return fileName;
       }
       return context.tr('bc.k159');
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('buddy_chat', '_extractFileName failed', error: e, stack: stk);
       return context.tr('bc.k159');
     }
   }
@@ -7556,7 +7574,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
       final ok = await launchUrl(Uri.parse(url),
           mode: LaunchMode.externalApplication);
       if (!ok && mounted) _showSnackBar(context.tr('bc.k162'));
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('buddy_chat', '_launchUrl failed', error: e, stack: stk);
       if (mounted) _showSnackBar(context.tr('bc.k163'));
     }
   }
@@ -7596,7 +7615,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
       }
 
       return null;
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('buddy_chat', '_extractLatLngFromUrl failed', error: e, stack: stk);
       return null;
     }
   }
@@ -7621,7 +7641,8 @@ class _BuddyChatScreenState extends State<BuddyChatScreen>
 📱 ارسال شده از اپلیکیشن Dacko
 ''';
       await Share.share(shareText);
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('buddy_chat', '_shareLink failed', error: e, stack: stk);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(context.tr('bc.k030', {'p0': '${e.toString()}'})),

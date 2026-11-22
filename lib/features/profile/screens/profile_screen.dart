@@ -1,5 +1,6 @@
 // lib/features/profile/screens/profile_screen.dart
 
+import '/core/logging/app_logger.dart';
 import '/l10n/app_strings.dart';
 import '/core/app_palette.dart';
 import 'package:flutter/material.dart';
@@ -176,8 +177,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _isLoading = false;
         });
       }
-    } catch (e) {
-      print('Error loading profile: $e');
+    } catch (e, stk) {
+      Log.e('profile', 'Error loading profile: $e', error: e, stack: stk);
       if (mounted) {
         setState(() {
           _errorMessage = context.tr('pf.k002', {'p0': '${e.toString()}'});
@@ -242,8 +243,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           );
         });
       }
-    } catch (e) {
-      debugPrint('Error recalculating weekly streak: $e');
+    } catch (e, stk) {
+      Log.e('profile', 'Error recalculating weekly streak: $e', error: e, stack: stk);
     }
   }
   // ==================== بارگذاری از LocalStorage ====================
@@ -284,8 +285,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       print('No profile found in LOCAL storage');
       return false;
-    } catch (e) {
-      print('Error loading from local: $e');
+    } catch (e, stk) {
+      Log.e('profile', 'Error loading from local: $e', error: e, stack: stk);
       return false;
     }
   }
@@ -351,8 +352,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               print('Profile XP updated to match user_progress: $totalXP');
             }
           }
-        } catch (e) {
-          print('Error getting user_progress: $e');
+        } catch (e, stk) {
+          Log.e('profile', 'Error getting user_progress: $e', error: e, stack: stk);
         }
 
         // ساخت پروفایل با XP صحیح
@@ -395,8 +396,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       print('No profile found, creating new...');
       await _createNewProfile();
       return true;
-    } catch (e) {
-      print('Error loading from Supabase: $e');
+    } catch (e, stk) {
+      Log.e('profile', 'Error loading from Supabase: $e', error: e, stack: stk);
       return false;
     }
   }
@@ -440,8 +441,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       }
 
       return weekDays;
-    } catch (e) {
-      debugPrint('Error calculating weekDays: $e');
+    } catch (e, stk) {
+      Log.e('profile', 'Error calculating weekDays: $e', error: e, stack: stk);
       return weekDays;
     }
   }
@@ -514,8 +515,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _isLoading = false;
         });
       }
-    } catch (e) {
-      print('Error creating profile: $e');
+    } catch (e, stk) {
+      Log.e('profile', 'Error creating profile: $e', error: e, stack: stk);
       await _createFallbackProfile();
     }
   }
@@ -553,8 +554,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           });
         }
       }
-    } catch (e) {
-      print('Error creating fallback profile: $e');
+    } catch (e, stk) {
+      Log.e('profile', 'Error creating fallback profile: $e', error: e, stack: stk);
     }
   }
 
@@ -582,8 +583,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       await syncProvider.saveProfileToLocal(profileMap);
 
       print('Profile saved to Supabase and LocalStorage');
-    } catch (e) {
-      print('Error saving profile: $e');
+    } catch (e, stk) {
+      Log.e('profile', 'Error saving profile: $e', error: e, stack: stk);
     }
   }
 
@@ -625,7 +626,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           if (isActive) {
             streak++;
           }
-        } catch (e) {
+        } catch (e, stk) {
+          Log.e('profile', '_calculateWeeklyStreak failed', error: e, stack: stk);
           // اگر جدول وجود نداشت، از داده‌های موجود استفاده کن
           break;
         }
@@ -642,8 +644,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           setState(() {});
         }
       }
-    } catch (e) {
-      print('Error calculating weekly streak: $e');
+    } catch (e, stk) {
+      Log.e('profile', 'Error calculating weekly streak: $e', error: e, stack: stk);
     }
   }
 
@@ -1203,8 +1205,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       print('Generated weekDays: $weekDays');
       return weekDays;
-    } catch (e) {
-      print('Error getting weekDays: $e');
+    } catch (e, stk) {
+      Log.e('profile', 'Error getting weekDays: $e', error: e, stack: stk);
       return weekDays;
     }
   }
@@ -1504,7 +1506,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         );
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('profile', '_pickAndUploadAvatar failed', error: e, stack: stk);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -1563,7 +1566,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         );
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('profile', '_removeAvatar failed', error: e, stack: stk);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -2423,7 +2427,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         );
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('profile', '_updateProfile failed', error: e, stack: stk);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -2558,8 +2563,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final profileMap = _profile!.toMap();
       profileMap['user_id'] = _profile!.userId;
       await syncProvider.saveProfileToLocal(profileMap);
-    } catch (e) {
-      print('Error updating field: $e');
+    } catch (e, stk) {
+      Log.e('profile', 'Error updating field: $e', error: e, stack: stk);
     }
   }
 

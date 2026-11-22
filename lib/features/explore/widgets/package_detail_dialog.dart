@@ -1,3 +1,4 @@
+import '/core/logging/app_logger.dart';
 import '/l10n/app_strings.dart';
 import 'package:flutter/material.dart';
 import '../models/package_model.dart';
@@ -304,7 +305,8 @@ class _PackageDetailDialogState extends State<PackageDetailDialog> {
         Navigator.pop(context, true);
         // ریفرش صفحه توسط onChanged در PackageCard انجام میشه
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('package_detail_dialog', '_togglePackage failed', error: e, stack: stk);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -324,7 +326,8 @@ class _PackageDetailDialogState extends State<PackageDetailDialog> {
         return Color(int.parse('FF${colorStr.substring(1)}', radix: 16));
       }
       return const Color(0xFF4A90E2);
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('package_detail_dialog', '_parseColor failed', error: e, stack: stk);
       return const Color(0xFF4A90E2);
     }
   }

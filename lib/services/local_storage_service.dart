@@ -1,5 +1,6 @@
 // lib/services/local_storage_service.dart
 
+import '/core/logging/app_logger.dart';
 import 'package:flutter/foundation.dart';
 import 'notification_service.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -49,25 +50,25 @@ class LocalStorageService {
       // ثبت Adapterها
       try {
         Hive.registerAdapter(HabitAdapter());
-      } catch (e) {}
+      } catch (e, stk) { Log.e('local_storage', 'init failed', error: e, stack: stk); }
       try {
         Hive.registerAdapter(TaskAdapter());
-      } catch (e) {}
+      } catch (e, stk) { Log.e('local_storage', 'init failed', error: e, stack: stk); }
       try {
         Hive.registerAdapter(QuestAdapter());
-      } catch (e) {}
+      } catch (e, stk) { Log.e('local_storage', 'init failed', error: e, stack: stk); }
       try {
         Hive.registerAdapter(PackageAdapter());
-      } catch (e) {}
+      } catch (e, stk) { Log.e('local_storage', 'init failed', error: e, stack: stk); }
       try {
         Hive.registerAdapter(PackageHabitAdapter());
-      } catch (e) {}
+      } catch (e, stk) { Log.e('local_storage', 'init failed', error: e, stack: stk); }
       try {
         Hive.registerAdapter(ReminderAdapter());
-      } catch (e) {}
+      } catch (e, stk) { Log.e('local_storage', 'init failed', error: e, stack: stk); }
       try {
         Hive.registerAdapter(OfflineOperationAdapter());
-      } catch (e) {}
+      } catch (e, stk) { Log.e('local_storage', 'init failed', error: e, stack: stk); }
 
       // متد کمکی برای باز کردن Box با مدیریت خطا
       _habitsBox = await _openBoxWithFallback(_habitsBoxName);
@@ -100,7 +101,7 @@ class LocalStorageService {
         // صف آفلاین کار ذخیره‌نشدهٔ کاربر است؛ یک بار دیگر بدون حذف تلاش می‌کنیم
         try {
           return await Hive.openBox(boxName, crashRecovery: true);
-        } catch (_) {}
+        } catch (err, stk) { Log.w('local_storage', '_openBoxWithFallback ignored error', error: err, stack: stk); }
       }
       print(
         'Error opening $boxName box, attempting to delete and recreate...',
@@ -112,13 +113,13 @@ class LocalStorageService {
           try {
             await Hive.deleteBoxFromDisk(boxName);
             print('Deleted $boxName box successfully');
-          } catch (deleteError) {
+          } catch (deleteError, stk) {
             // اگر فایل وجود نداشت، خطا رو نادیده بگیر
-            print('Could not delete $boxName (may not exist): $deleteError');
+            Log.e('local_storage', 'Could not delete $boxName (may not exist): $deleteError', error: deleteError, stack: stk);
           }
         }
-      } catch (e) {
-        print('Error checking/deleting $boxName: $e');
+      } catch (e, stk) {
+        Log.e('local_storage', 'Error checking/deleting $boxName: $e', error: e, stack: stk);
       }
       return await Hive.openBox(boxName);
     }
@@ -130,7 +131,8 @@ class LocalStorageService {
       final dir = await getApplicationDocumentsDirectory();
       final path = '${dir.path}/$boxName.lock';
       return path;
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('local_storage', '_getBoxPath failed', error: e, stack: stk);
       return null;
     }
   }
@@ -144,7 +146,8 @@ class LocalStorageService {
     if (dateStr == null || dateStr.isEmpty) return null;
     try {
       return DateTime.parse(dateStr);
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('local_storage', '_safeParseDate failed', error: e, stack: stk);
       print('Error parsing date: $dateStr');
       return null;
     }
@@ -155,7 +158,8 @@ class LocalStorageService {
     if (dateStr == null || dateStr.isEmpty) return defaultValue;
     try {
       return DateTime.parse(dateStr);
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('local_storage', '_safeParseDateWithDefault failed', error: e, stack: stk);
       print('Error parsing date: $dateStr, using default');
       return defaultValue;
     }
@@ -179,8 +183,8 @@ class LocalStorageService {
       final data = _habitsBox.get('user_habits');
       if (data == null) return [];
       return (data as List).cast<Habit>();
-    } catch (e) {
-      print('Error getting habits: $e');
+    } catch (e, stk) {
+      Log.e('local_storage', 'Error getting habits: $e', error: e, stack: stk);
       return [];
     }
   }
@@ -229,8 +233,8 @@ class LocalStorageService {
       final data = _tasksBox.get('user_tasks');
       if (data == null) return [];
       return (data as List).cast<Task>();
-    } catch (e) {
-      print('Error getting tasks: $e');
+    } catch (e, stk) {
+      Log.e('local_storage', 'Error getting tasks: $e', error: e, stack: stk);
       return [];
     }
   }
@@ -279,8 +283,8 @@ class LocalStorageService {
       final data = _questsBox.get('available_quests');
       if (data == null) return [];
       return (data as List).cast<Quest>();
-    } catch (e) {
-      print('Error getting quests: $e');
+    } catch (e, stk) {
+      Log.e('local_storage', 'Error getting quests: $e', error: e, stack: stk);
       return [];
     }
   }
@@ -302,8 +306,8 @@ class LocalStorageService {
       final data = _packagesBox.get('available_packages');
       if (data == null) return [];
       return (data as List).cast<Package>();
-    } catch (e) {
-      print('Error getting packages: $e');
+    } catch (e, stk) {
+      Log.e('local_storage', 'Error getting packages: $e', error: e, stack: stk);
       return [];
     }
   }
@@ -323,8 +327,8 @@ class LocalStorageService {
     try {
       if (!_isInitialized) return null;
       return _userProfileBox.get('profile');
-    } catch (e) {
-      print('Error getting profile: $e');
+    } catch (e, stk) {
+      Log.e('local_storage', 'Error getting profile: $e', error: e, stack: stk);
       return null;
     }
   }
@@ -355,8 +359,8 @@ class LocalStorageService {
       final data = _challengesBox.get('challenges');
       if (data == null) return [];
       return List<Map<String, dynamic>>.from(data);
-    } catch (e) {
-      print('Error getting challenges: $e');
+    } catch (e, stk) {
+      Log.e('local_storage', 'Error getting challenges: $e', error: e, stack: stk);
       return [];
     }
   }
@@ -378,8 +382,8 @@ class LocalStorageService {
       final data = _userChallengesBox.get('user_challenges');
       if (data == null) return [];
       return List<Map<String, dynamic>>.from(data);
-    } catch (e) {
-      print('Error getting user challenges: $e');
+    } catch (e, stk) {
+      Log.e('local_storage', 'Error getting user challenges: $e', error: e, stack: stk);
       return [];
     }
   }
@@ -423,14 +427,14 @@ class LocalStorageService {
         if (data != null) {
           try {
             operations.add(OfflineOperation.fromMap(data));
-          } catch (e) {
-            print('Error parsing offline operation: $e');
+          } catch (e, stk) {
+            Log.e('local_storage', 'Error parsing offline operation: $e', error: e, stack: stk);
           }
         }
       }
       return operations;
-    } catch (e) {
-      print('Error getting offline operations: $e');
+    } catch (e, stk) {
+      Log.e('local_storage', 'Error getting offline operations: $e', error: e, stack: stk);
       return [];
     }
   }
@@ -484,7 +488,8 @@ class LocalStorageService {
     try {
       if (!_isInitialized) return 0;
       return _offlineBox.length;
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('local_storage', 'removeOfflineOperationsByType failed', error: e, stack: stk);
       return 0;
     }
   }
@@ -508,8 +513,8 @@ class LocalStorageService {
     try {
       if (!_isInitialized) return defaultValue;
       return _settingsBox.get(key, defaultValue: defaultValue);
-    } catch (e) {
-      print('Error getting setting: $e');
+    } catch (e, stk) {
+      Log.e('local_storage', 'Error getting setting: $e', error: e, stack: stk);
       return defaultValue;
     }
   }
@@ -563,9 +568,9 @@ class LocalStorageService {
         await prefs.setInt(_schemaVersionKey, version);
         debugPrint('Hive migrated to schema v$version');
       }
-    } catch (e) {
+    } catch (e, stk) {
       // مهاجرت نباید جلوی بالا آمدن برنامه را بگیرد؛ داده‌ها از سرور دوباره همگام می‌شوند
-      debugPrint('Hive migration error: $e');
+      Log.e('local_storage', 'Hive migration error: $e', error: e, stack: stk);
     }
   }
 
@@ -649,8 +654,8 @@ class LocalStorageService {
       await Hive.deleteBoxFromDisk(_challengesBoxName);
       await Hive.deleteBoxFromDisk(_userChallengesBoxName);
       print('Database reset successfully');
-    } catch (e) {
-      print('Error resetting database: $e');
+    } catch (e, stk) {
+      Log.e('local_storage', 'Error resetting database: $e', error: e, stack: stk);
     }
   }
 
@@ -684,7 +689,8 @@ class HabitAdapter extends TypeAdapter<Habit> {
       try {
         if (dateStr.isEmpty) return DateTime.now();
         return DateTime.parse(dateStr);
-      } catch (e) {
+      } catch (e, stk) {
+        Log.e('local_storage', 'read failed', error: e, stack: stk);
         return DateTime.now();
       }
     }
@@ -738,8 +744,8 @@ class HabitAdapter extends TypeAdapter<Habit> {
         });
         timerSetting = TimerSetting.fromMap(convertedMap);
       }
-    } catch (e) {
-      print('Error reading timer_setting: $e');
+    } catch (e, stk) {
+      Log.e('local_storage', 'Error reading timer_setting: $e', error: e, stack: stk);
     }
 
     return Habit(

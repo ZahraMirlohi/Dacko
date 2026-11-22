@@ -1,5 +1,6 @@
 // lib/features/profile/screens/settings_screen.dart
 
+import '/core/logging/app_logger.dart';
 import 'package:flutter/material.dart';
 import '/core/logging/log_viewer_screen.dart';
 import 'package:provider/provider.dart';
@@ -47,7 +48,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     setState(() => apply(v));
     try {
       await save(v);
-    } catch (_) {
+    } catch (err, stk) {
+      Log.w('settings', '_togglePrivacy ignored error', error: err, stack: stk);
       if (!mounted) return;
       setState(() => apply(old));
       ScaffoldMessenger.of(context).showSnackBar(
@@ -776,7 +778,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       sync.clear();
       await storage.clearAllUserData();
       await auth.forceLogout();
-    } catch (_) {
+    } catch (err, stk) {
+      Log.w('settings', '_logout ignored error', error: err, stack: stk);
       _snack(errorText);
     }
   }
@@ -888,7 +891,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       messenger
         ..hideCurrentSnackBar()
         ..showSnackBar(SnackBar(content: Text(doneText)));
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('settings', '_deleteAccount failed', error: e, stack: stk);
       navigator.pop();
       if (!mounted) return;
       _snack(context.tr('settings.delete_error', {'error': '$e'}));

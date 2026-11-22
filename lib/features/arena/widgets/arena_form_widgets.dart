@@ -3,6 +3,7 @@
 // قطعه‌های مشترک فرم‌های عادت و تسک (افزودن/ویرایش) و دیالوگ انتخاب تاریخ،
 // مطابق آرت‌بوردهای AddHabit / AddTask / EditHabit / EditTask / DateDialog.
 
+import '/core/logging/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shamsi_date/shamsi_date.dart';
@@ -1094,7 +1095,8 @@ class _ArenaDateDialogState extends State<_ArenaDateDialog> {
                       try {
                         final d = _current();
                         Navigator.pop(context, DateTime(d.year, d.month, d.day));
-                      } catch (_) {
+                      } catch (err, stk) {
+                        Log.w('arena_form', 'build ignored error', error: err, stack: stk);
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(context.tr('af.date.invalid')),

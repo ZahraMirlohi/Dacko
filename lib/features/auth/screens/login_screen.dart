@@ -1,5 +1,6 @@
 // lib/features/auth/screens/login_screen.dart
 
+import '/core/logging/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -46,7 +47,8 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       await auth.signInWithEmail(_email.text, _password.text);
       // صفحهٔ اصلی خودکار باز می‌شود (HeroApp به وضعیت ورود گوش می‌دهد)
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('login', '_login failed', error: e, stack: stk);
       SoundService.instance.play(Sfx.error);
       if (mounted) setState(() => _error = authErrorText(context, e));
     } finally {
@@ -62,7 +64,8 @@ class _LoginScreenState extends State<LoginScreen> {
     final auth = context.read<AuthProvider>();
     try {
       await auth.signInWithGoogle();
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('login', '_google failed', error: e, stack: stk);
       if (mounted) setState(() => _error = context.tr('auth.err_google'));
     } finally {
       if (mounted) setState(() => _googleLoading = false);

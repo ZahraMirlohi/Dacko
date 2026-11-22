@@ -1,5 +1,6 @@
 // lib/features/explore/screens/quests_tab.dart
 
+import '/core/logging/app_logger.dart';
 import 'package:flutter/material.dart';
 import '/l10n/app_strings.dart';
 import 'package:provider/provider.dart';
@@ -278,8 +279,8 @@ class _QuestsTabState extends State<QuestsTab> {
           ),
         );
       }
-    } catch (e) {
-      print('Error starting quest: $e');
+    } catch (e, stk) {
+      Log.e('quests', 'Error starting quest: $e', error: e, stack: stk);
       if (mounted) {
         String message = e.toString().replaceFirst('Exception: ', '');
         ScaffoldMessenger.of(context).showSnackBar(
@@ -894,8 +895,8 @@ class _QuestsTabState extends State<QuestsTab> {
           ),
         );
       }
-    } catch (e) {
-      print('Error cancelling quest: $e');
+    } catch (e, stk) {
+      Log.e('quests', 'Error cancelling quest: $e', error: e, stack: stk);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

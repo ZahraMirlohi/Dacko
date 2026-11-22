@@ -1,5 +1,6 @@
 // lib/providers/calendar_provider.dart
 
+import '/core/logging/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shamsi_date/shamsi_date.dart';
@@ -31,7 +32,8 @@ class CalendarProvider extends ChangeNotifier {
       }
       _isInitialized = true;
       notifyListeners();
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('calendar', '_loadSavedValue failed', error: e, stack: stk);
       _isInitialized = true;
       notifyListeners();
     }
@@ -48,8 +50,8 @@ class CalendarProvider extends ChangeNotifier {
         _calendarTypeKey,
         type == CalendarType.jalali ? 'jalali' : 'gregorian',
       );
-    } catch (e) {
-      debugPrint('Error saving calendar type: $e');
+    } catch (e, stk) {
+      Log.e('calendar', 'Error saving calendar type: $e', error: e, stack: stk);
     }
   }
 
@@ -306,7 +308,8 @@ class CalendarProvider extends ChangeNotifier {
             int.parse(parts[2]),
           );
           return j.toDateTime();
-        } catch (e) {
+        } catch (e, stk) {
+          Log.e('calendar', 'parse failed', error: e, stack: stk);
           return null;
         }
       }

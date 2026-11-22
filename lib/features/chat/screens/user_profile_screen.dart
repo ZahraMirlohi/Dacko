@@ -1,5 +1,6 @@
 // lib/features/chat/screens/user_profile_screen.dart
 
+import '/core/logging/app_logger.dart';
 import '/l10n/app_strings.dart';
 import '../widgets/avatar_viewer.dart';
 import '/widgets/bottom_safe.dart';
@@ -82,7 +83,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           _isLoading = false;
         });
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('user_profile', '_loadUserData failed', error: e, stack: stk);
       if (!mounted) return;
       setState(() {
         _errorMessage = context.tr('ct.up.loadErr', {'e': e.toString()});
@@ -109,7 +111,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         _photos = photos;
         _isLoadingPhotos = false;
       });
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('user_profile', '_loadUserPhotos failed', error: e, stack: stk);
       if (!mounted) return;
       setState(() => _isLoadingPhotos = false);
     }

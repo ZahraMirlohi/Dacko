@@ -161,7 +161,8 @@ class ChatService {
         DateTime createdAt;
         try {
           createdAt = DateTime.parse(convData['created_at'] as String);
-        } catch (e) {
+        } catch (e, stk) {
+          Log.e('chat', 'getUserConversations failed', error: e, stack: stk);
           createdAt = DateTime.now();
         }
 
@@ -198,8 +199,8 @@ class ChatService {
       }
 
       return conversations;
-    } catch (e) {
-      print('Error getting conversations: $e');
+    } catch (e, stk) {
+      Log.e('chat', 'Error getting conversations: $e', error: e, stack: stk);
       return [];
     }
   }
@@ -212,9 +213,9 @@ class ChatService {
         out[r['conversation_id'] as String] = Map<String, dynamic>.from(r);
       }
       return out;
-    } catch (e) {
+    } catch (e, stk) {
       // sql/11 اجرا نشده: روش قدیمی ولی محدود
-      print('chat_last_messages rpc unavailable: $e');
+      Log.e('chat', 'chat_last_messages rpc unavailable: $e', error: e, stack: stk);
       final rows = await _client
           .from('messages')
           .select('conversation_id, content, created_at, sender_id, type')
@@ -250,7 +251,7 @@ class ChatService {
           final id = r['conversation_id'] as String;
           out[id] = (out[id] ?? 0) + 1;
         }
-      } catch (_) {}
+      } catch (err, stk) { Log.w('chat', '_unreadCounts ignored error', error: err, stack: stk); }
     }
     return out;
   }
@@ -339,8 +340,8 @@ class ChatService {
             }
           }
         }
-      } catch (e) {
-        print('Error checking existing conversations: $e');
+      } catch (e, stk) {
+        Log.e('chat', 'Error checking existing conversations: $e', error: e, stack: stk);
       }
 
       // 3. ایجاد گفتگو
@@ -527,7 +528,8 @@ class ChatService {
           .maybeSingle();
 
       return response?['conversation_id'] as String? ?? '';
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('chat', '_getConversationIdByMessage failed', error: e, stack: stk);
       return '';
     }
   }
@@ -544,8 +546,8 @@ class ChatService {
 
       if (response == null) return null;
       return ChatMessage.fromMap(response);
-    } catch (e) {
-      print('Error getting pinned message: $e');
+    } catch (e, stk) {
+      Log.e('chat', 'Error getting pinned message: $e', error: e, stack: stk);
       return null;
     }
   }
@@ -584,8 +586,8 @@ class ChatService {
       }
 
       return messages;
-    } catch (e) {
-      print('Error getting messages history: $e');
+    } catch (e, stk) {
+      Log.e('chat', 'Error getting messages history: $e', error: e, stack: stk);
       return [];
     }
   }
@@ -618,8 +620,8 @@ class ChatService {
         print('Realtime stream error: $error');
         return <ChatMessage>[];
       });
-    } catch (e) {
-      print('Error getting messages stream: $e');
+    } catch (e, stk) {
+      Log.e('chat', 'Error getting messages stream: $e', error: e, stack: stk);
       return Stream.value([]);
     }
   }
@@ -728,7 +730,8 @@ class ChatService {
       await _client
           .from('profiles')
           .update({'last_seen_at': now}).eq('user_id', userId);
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('chat', 'updateLastSeen failed', error: e, stack: stk);
       // خطا را نادیده بگیر
     }
   }
@@ -810,7 +813,8 @@ class ChatService {
           for (var profile in profiles) {
             userNames[profile['user_id']] = profile['name'] ?? 'کاربر';
           }
-        } catch (e) {
+        } catch (e, stk) {
+          Log.e('chat', 'getMessageReactions failed', error: e, stack: stk);
           for (var id in userIds) {
             userNames[id] = 'کاربر';
           }
@@ -826,8 +830,8 @@ class ChatService {
           createdAt: DateTime.parse(item['created_at']),
         );
       }).toList();
-    } catch (e) {
-      print('Error getting message reactions: $e');
+    } catch (e, stk) {
+      Log.e('chat', 'Error getting message reactions: $e', error: e, stack: stk);
       return [];
     }
   }
@@ -844,7 +848,8 @@ class ChatService {
             .from('message_reactions')
             .select('*, messages!inner(conversation_id)')
             .eq('messages.conversation_id', conversationId));
-      } catch (_) {
+      } catch (err, stk) {
+        Log.w('chat', 'getConversationReactions ignored error', error: err, stack: stk);
         final messages = await _client
             .from('messages')
             .select('id')
@@ -858,8 +863,8 @@ class ChatService {
         return _groupReactionRows(List<Map<String, dynamic>>.from(r));
       }
       return _groupReactionRows(response);
-    } catch (e) {
-      print('Error getting conversation reactions: $e');
+    } catch (e, stk) {
+      Log.e('chat', 'Error getting conversation reactions: $e', error: e, stack: stk);
       return {};
     }
   }
@@ -885,7 +890,8 @@ class ChatService {
           for (var profile in profiles) {
             userNames[profile['user_id']] = profile['name'] ?? 'کاربر';
           }
-        } catch (e) {
+        } catch (e, stk) {
+          Log.e('chat', '_groupReactionRows failed', error: e, stack: stk);
           // اگر خطا در دریافت پروفایل بود، فقط از userId استفاده کن
           for (var id in userIds) {
             userNames[id] = 'کاربر';
@@ -913,8 +919,8 @@ class ChatService {
         );
       }
       return result;
-    } catch (e) {
-      print('Error getting conversation reactions: $e');
+    } catch (e, stk) {
+      Log.e('chat', 'Error getting conversation reactions: $e', error: e, stack: stk);
       return {};
     }
   }
@@ -976,8 +982,8 @@ class ChatService {
       }, onConflict: 'conversation_id, user_id');
 
       print('Typing status updated: $isTyping for user $userId');
-    } catch (e) {
-      print('Typing status error: $e');
+    } catch (e, stk) {
+      Log.e('chat', 'Typing status error: $e', error: e, stack: stk);
     }
   }
 
@@ -998,8 +1004,8 @@ class ChatService {
           .neq('sender_id', userId); // فقط پیام‌هایی که خود کاربر نفرستاده
 
       print('Message $messageId marked as read by $userId');
-    } catch (e) {
-      print('Error marking message as read: $e');
+    } catch (e, stk) {
+      Log.e('chat', 'Error marking message as read: $e', error: e, stack: stk);
     }
   }
 
@@ -1030,8 +1036,8 @@ class ChatService {
         print('All messages in conversation $conversationId marked as read');
         print('Update completed successfully (no detailed count)');
       }
-    } catch (e) {
-      print('Error marking all messages as read: $e');
+    } catch (e, stk) {
+      Log.e('chat', 'Error marking all messages as read: $e', error: e, stack: stk);
       // خطا را نادیده بگیر و ادامه بده
       // چون ممکن است جدول messages خالی باشد یا محدودیت‌های RLS مانع شود
     }
@@ -1060,8 +1066,8 @@ class ChatService {
 
       print('$count messages marked as read via RPC');
       return count;
-    } catch (e) {
-      print('Error marking messages as read via RPC: $e');
+    } catch (e, stk) {
+      Log.e('chat', 'Error marking messages as read via RPC: $e', error: e, stack: stk);
       return 0;
     }
   }
@@ -1105,8 +1111,8 @@ class ChatService {
               .update({'status': 'seen', 'read_at': now2}).eq('id', msg['id']);
         }
         print('${unread.length} messages marked as read individually');
-      } catch (e2) {
-        print('Error marking messages individually: $e2');
+      } catch (e2, stk) {
+        Log.e('chat', 'Error marking messages individually: $e2', error: e2, stack: stk);
       }
     }
   }
@@ -1138,8 +1144,8 @@ class ChatService {
         print('Typing status stream error: $error');
         return <String, bool>{};
       });
-    } catch (e) {
-      print('Error getting typing status: $e');
+    } catch (e, stk) {
+      Log.e('chat', 'Error getting typing status: $e', error: e, stack: stk);
       return Stream.value({});
     }
   }
@@ -1164,8 +1170,8 @@ class ChatService {
       );
 
       return response.map((item) => ChatMessage.fromMap(item)).toList();
-    } catch (e) {
-      print('Error getting messages before date: $e');
+    } catch (e, stk) {
+      Log.e('chat', 'Error getting messages before date: $e', error: e, stack: stk);
       return [];
     }
   }
@@ -1228,8 +1234,8 @@ class ChatService {
           .eq('status', 'pending');
 
       return response;
-    } catch (e) {
-      print('Error getting buddy requests: $e');
+    } catch (e, stk) {
+      Log.e('chat', 'Error getting buddy requests: $e', error: e, stack: stk);
       return [];
     }
   }
@@ -1342,8 +1348,8 @@ class ChatService {
               'and(from_user_id.eq.${memberIds[0]},to_user_id.eq.${memberIds[1]}),'
               'and(from_user_id.eq.${memberIds[1]},to_user_id.eq.${memberIds[0]})');
           print('Removed buddy requests between members');
-        } catch (e) {
-          print('Error removing buddy requests: $e');
+        } catch (e, stk) {
+          Log.e('chat', 'Error removing buddy requests: $e', error: e, stack: stk);
         }
       }
 
@@ -1353,8 +1359,8 @@ class ChatService {
             .from('typing_status')
             .delete()
             .eq('conversation_id', conversationId);
-      } catch (e) {
-        print('Error deleting typing status: $e');
+      } catch (e, stk) {
+        Log.e('chat', 'Error deleting typing status: $e', error: e, stack: stk);
       }
 
       // 4. حذف واکنش‌ها
@@ -1371,8 +1377,8 @@ class ChatService {
               .delete()
               .inFilter('message_id', messageIds);
         }
-      } catch (e) {
-        print('Error deleting reactions: $e');
+      } catch (e, stk) {
+        Log.e('chat', 'Error deleting reactions: $e', error: e, stack: stk);
       }
 
       // 5. حذف پیام‌ها
@@ -1382,8 +1388,8 @@ class ChatService {
             .delete()
             .eq('conversation_id', conversationId);
         print('Messages deleted');
-      } catch (e) {
-        print('Error deleting messages: $e');
+      } catch (e, stk) {
+        Log.e('chat', 'Error deleting messages: $e', error: e, stack: stk);
       }
 
       // 6. حذف خود گفتگو
@@ -1401,8 +1407,8 @@ class ChatService {
         } else {
           print('Conversation NOT deleted (RLS issue)');
         }
-      } catch (e) {
-        print('Error deleting conversation: $e');
+      } catch (e, stk) {
+        Log.e('chat', 'Error deleting conversation: $e', error: e, stack: stk);
       }
 
       // 7. اگر حذف نشد، غیرفعال کن
@@ -1412,8 +1418,8 @@ class ChatService {
               .from('conversations')
               .update({'is_active': false}).eq('id', conversationId);
           print('ℹConversation marked as inactive');
-        } catch (e) {
-          print('Error marking inactive: $e');
+        } catch (e, stk) {
+          Log.e('chat', 'Error marking inactive: $e', error: e, stack: stk);
         }
       }
 
@@ -1424,8 +1430,8 @@ class ChatService {
             .delete()
             .eq('conversation_id', conversationId);
         print('Members deleted');
-      } catch (e) {
-        print('Error deleting members: $e');
+      } catch (e, stk) {
+        Log.e('chat', 'Error deleting members: $e', error: e, stack: stk);
       }
     } catch (e) {
       print('Error deleting conversation: $e');
@@ -1438,7 +1444,8 @@ class ChatService {
   Future<User?> getCurrentUser() async {
     try {
       return _client.auth.currentUser;
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('chat', 'getCurrentUser failed', error: e, stack: stk);
       return null;
     }
   }
@@ -1480,8 +1487,8 @@ class ChatService {
         return publicUrl;
       }
       return null;
-    } catch (e) {
-      print('Error uploading image: $e');
+    } catch (e, stk) {
+      Log.e('chat', 'Error uploading image: $e', error: e, stack: stk);
       return null;
     }
   }

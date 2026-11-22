@@ -1,3 +1,4 @@
+import '/core/logging/app_logger.dart';
 import 'package:uuid/uuid.dart';
 // lib/services/supabase_service.dart
 
@@ -43,7 +44,8 @@ class SupabaseService {
       }
       final result = await InternetConnectionChecker().hasConnection;
       return result;
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('supabase', 'isOnline failed', error: e, stack: stk);
       return true;
     }
   }
@@ -63,8 +65,8 @@ class SupabaseService {
 
       print('[SESSION] No session after 5 retries');
       return false;
-    } catch (e) {
-      print('[SESSION] Error: $e');
+    } catch (e, stk) {
+      Log.e('supabase', '[SESSION] Error: $e', error: e, stack: stk);
       return false;
     }
   }
@@ -148,8 +150,8 @@ class SupabaseService {
 
       print('Habit found: ${response['title']}');
       return response;
-    } catch (e) {
-      print('Error getting habit: $e');
+    } catch (e, stk) {
+      Log.e('supabase', 'Error getting habit: $e', error: e, stack: stk);
       return null;
     }
   }
@@ -177,8 +179,8 @@ class SupabaseService {
         return response['total_seconds'] as int;
       }
       return null;
-    } catch (e) {
-      print('Error getting habit time: $e');
+    } catch (e, stk) {
+      Log.e('supabase', 'Error getting habit time: $e', error: e, stack: stk);
       return null;
     }
   }
@@ -205,14 +207,14 @@ class SupabaseService {
         try {
           final habit = await getHabit(habitId);
           xpReward = (habit?['xp_reward'] as int?) ?? 10;
-        } catch (_) {}
+        } catch (err, stk) { Log.w('supabase', 'uncompleteHabitAndRefundXp ignored error', error: err, stack: stk); }
         // تیک ساده (بدون سطح) یعنی کامل
         final raw = prev['completion_level'];
         final lv = CompletionLevelExtension.fromString(
             (raw == null ? 'full' : raw.toString()));
         refund = (xpReward * lv.xpMultiplier / 100).round();
       }
-    } catch (_) {}
+    } catch (err, stk) { Log.w('supabase', 'uncompleteHabitAndRefundXp ignored error', error: err, stack: stk); }
 
     await markHabitCompletedOnDate(habitId, userId, date, false);
     if (refund > 0) await removeXP(userId, refund);
@@ -237,8 +239,8 @@ class SupabaseService {
         if (habit != null) {
           xpReward = habit['xp_reward'] as int? ?? 10;
         }
-      } catch (e) {
-        print('Could not get habit, using default XP: $e');
+      } catch (e, stk) {
+        Log.e('supabase', 'Could not get habit, using default XP: $e', error: e, stack: stk);
       }
 
       final xpEarned = (xpReward * level.xpMultiplier / 100).round();
@@ -258,7 +260,7 @@ class SupabaseService {
               (prev['completion_level'] ?? 'full').toString());
           previousXp = (xpReward * lv.xpMultiplier / 100).round();
         }
-      } catch (_) {}
+      } catch (err, stk) { Log.w('supabase', 'markHabitCompletedWithLevel ignored error', error: err, stack: stk); }
       final xpDelta = xpEarned - previousXp;
 
       // 2. حذف رکورد قبلی
@@ -323,8 +325,8 @@ class SupabaseService {
       final response = await query.order('date', ascending: true);
 
       return response.map((data) => HabitCompletion.fromMap(data)).toList();
-    } catch (e) {
-      print('Error getting habit completions with level: $e');
+    } catch (e, stk) {
+      Log.e('supabase', 'Error getting habit completions with level: $e', error: e, stack: stk);
       return [];
     }
   }
@@ -395,8 +397,8 @@ class SupabaseService {
 
       print('Chart data built with ${chartData.length} days');
       return chartData;
-    } catch (e) {
-      print('Error getting chart data: $e');
+    } catch (e, stk) {
+      Log.e('supabase', 'Error getting chart data: $e', error: e, stack: stk);
       return [];
     }
   }
@@ -418,7 +420,8 @@ class SupabaseService {
       return response
           .map((data) => Habit.fromMap(data['id'], _convertKeys(data)))
           .toList();
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('supabase', 'getHabits failed', error: e, stack: stk);
       return [];
     }
   }
@@ -481,7 +484,8 @@ class SupabaseService {
       return response
           .map((data) => Task.fromMap(data['id'], _convertKeys(data)))
           .toList();
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('supabase', 'getTasks failed', error: e, stack: stk);
       return [];
     }
   }
@@ -520,7 +524,8 @@ class SupabaseService {
           .eq('user_id', userId)
           .eq('date', _getDateString(date));
       return rows.map<String>((r) => r['habit_id'].toString()).toSet();
-    } catch (_) {
+    } catch (err, stk) {
+      Log.w('supabase', 'getCompletedHabitIdsOnDate ignored error', error: err, stack: stk);
       return null;
     }
   }
@@ -540,7 +545,8 @@ class SupabaseService {
         if (sec is int && sec > 0) out[r['habit_id'].toString()] = sec;
       }
       return out;
-    } catch (_) {
+    } catch (err, stk) {
+      Log.w('supabase', 'getHabitTimesOnDate ignored error', error: err, stack: stk);
       return {};
     }
   }
@@ -560,7 +566,8 @@ class SupabaseService {
           .eq('date', dateStr);
 
       return response.isNotEmpty;
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('supabase', 'isHabitCompletedOnDate failed', error: e, stack: stk);
       return false;
     }
   }
@@ -656,8 +663,8 @@ class SupabaseService {
           .eq('challenge_id', challengeId);
 
       print('Challenge progress updated: $completedDays / $totalDays');
-    } catch (e) {
-      print('Error updating challenge progress: $e');
+    } catch (e, stk) {
+      Log.e('supabase', 'Error updating challenge progress: $e', error: e, stack: stk);
     }
   }
 
@@ -687,7 +694,8 @@ class SupabaseService {
       }
 
       await updateChallengeProgress(userId, challengeId);
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('supabase', '_updateChallengeProgressForHabit failed', error: e, stack: stk);
       // ignore
     }
   }
@@ -700,7 +708,8 @@ class SupabaseService {
     try {
       await client.rpc('adjust_xp', params: {'p_user_id': userId, 'p_delta': delta});
       return true;
-    } catch (_) {
+    } catch (err, stk) {
+      Log.w('supabase', '_adjustXpRpc ignored error', error: err, stack: stk);
       return false;
     }
   }
@@ -743,7 +752,8 @@ class SupabaseService {
             'total_xp': amount,
           });
         }
-      } catch (e) {
+      } catch (e, stk) {
+        Log.e('supabase', 'addXP failed', error: e, stack: stk);
         // ignore
       }
     } catch (e) {
@@ -772,7 +782,8 @@ class SupabaseService {
       }
 
       return 0;
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('supabase', 'getUserXP failed', error: e, stack: stk);
       return 0;
     }
   }
@@ -823,8 +834,8 @@ class SupabaseService {
               .from('profiles')
               .update({'total_xp': newXP}).eq('user_id', userId);
         }
-      } catch (e) {
-        print('Error updating profile XP: $e');
+      } catch (e, stk) {
+        Log.e('supabase', 'Error updating profile XP: $e', error: e, stack: stk);
       }
 
       print('XP removed successfully');
@@ -851,7 +862,8 @@ class SupabaseService {
           .order('created_at', ascending: false);
 
       return response;
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('supabase', 'getChallenges failed', error: e, stack: stk);
       return [];
     }
   }
@@ -867,7 +879,8 @@ class SupabaseService {
           .order('created_at', ascending: false);
 
       return response;
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('supabase', 'getExpiredChallenges failed', error: e, stack: stk);
       return [];
     }
   }
@@ -881,7 +894,8 @@ class SupabaseService {
           .single();
 
       return response;
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('supabase', 'getChallengeById failed', error: e, stack: stk);
       return null;
     }
   }
@@ -896,7 +910,8 @@ class SupabaseService {
           .eq('challenge_id', challengeId);
 
       return response;
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('supabase', 'getChallengeHabits failed', error: e, stack: stk);
       return [];
     }
   }
@@ -1091,8 +1106,8 @@ class SupabaseService {
       // این متد باید چالش‌هایی که این عادت در آنها وجود دارد را پیدا کند
       // بستگی به ساختار دیتابیس شما دارد
       return [];
-    } catch (e) {
-      print('Error getting active challenges for habit: $e');
+    } catch (e, stk) {
+      Log.e('supabase', 'Error getting active challenges for habit: $e', error: e, stack: stk);
       return [];
     }
   }
@@ -1173,8 +1188,8 @@ class SupabaseService {
         await localStorage.saveUserChallenges(updatedUserChallenges);
 
         print('Removed from LocalStorage');
-      } catch (e) {
-        print('Error removing from LocalStorage: $e');
+      } catch (e, stk) {
+        Log.e('supabase', 'Error removing from LocalStorage: $e', error: e, stack: stk);
       }
 
       print('User left challenge completely: $challengeId');
@@ -1231,7 +1246,8 @@ class SupabaseService {
           .eq('challenge_id', challengeId);
 
       return response.length;
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('supabase', 'getRealParticipantsCount failed', error: e, stack: stk);
       return 0;
     }
   }
@@ -1269,8 +1285,8 @@ class SupabaseService {
 
       print('Found ${result.length} user challenges');
       return result;
-    } catch (e) {
-      print('Error getting user challenges: $e');
+    } catch (e, stk) {
+      Log.e('supabase', 'Error getting user challenges: $e', error: e, stack: stk);
       return [];
     }
   }
@@ -1379,8 +1395,8 @@ class SupabaseService {
           '📅 Total completions: ${completions.length}, Unique: ${uniqueDates.length}');
 
       return {'completedDays': completedDays, 'totalDays': totalDays};
-    } catch (e) {
-      print('Error getting challenge progress: $e');
+    } catch (e, stk) {
+      Log.e('supabase', 'Error getting challenge progress: $e', error: e, stack: stk);
       return {'completedDays': 0, 'totalDays': 0};
     }
   }
@@ -1449,8 +1465,8 @@ class SupabaseService {
           print('Challenge ended without completion: ${challenge['title']}');
         }
       }
-    } catch (e) {
-      print('Error checking expired challenges: $e');
+    } catch (e, stk) {
+      Log.e('supabase', 'Error checking expired challenges: $e', error: e, stack: stk);
     }
   }
   // lib/services/supabase_service.dart
@@ -1501,8 +1517,8 @@ class SupabaseService {
       }).eq('id', userChallenge['id']);
 
       print('Challenge day removed: $challengeId - Now $completedDays days');
-    } catch (e) {
-      print('Error removing challenge day: $e');
+    } catch (e, stk) {
+      Log.e('supabase', 'Error removing challenge day: $e', error: e, stack: stk);
     }
   }
 
@@ -1597,8 +1613,8 @@ class SupabaseService {
       if (needRefresh) {
         await _refreshUserChallenges(userId);
       }
-    } catch (e) {
-      print('Error checking user challenges: $e');
+    } catch (e, stk) {
+      Log.e('supabase', 'Error checking user challenges: $e', error: e, stack: stk);
     }
   }
 
@@ -1620,7 +1636,8 @@ class SupabaseService {
         return DateTime.parse(completions.first['date'] as String);
       }
       return null;
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('supabase', '_getLastCompletedDate failed', error: e, stack: stk);
       return null;
     }
   }
@@ -1638,7 +1655,8 @@ class SupabaseService {
           .eq('challenge_id', challengeId);
 
       return completions.length;
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('supabase', '_getUserCompletedDaysForChallenge failed', error: e, stack: stk);
       return 0;
     }
   }
@@ -1688,8 +1706,8 @@ class SupabaseService {
             .eq('user_id', userId)
             .inFilter('id', habitIds);
       }
-    } catch (e) {
-      print('Error removing challenge habits: $e');
+    } catch (e, stk) {
+      Log.e('supabase', 'Error removing challenge habits: $e', error: e, stack: stk);
     }
 
     // 4. حذف از LocalStorage
@@ -1705,8 +1723,8 @@ class SupabaseService {
       final updatedUserChallenges =
           userChallenges.where((c) => c['id'] != challengeId).toList();
       await localStorage.saveUserChallenges(updatedUserChallenges);
-    } catch (e) {
-      print('Error removing from local storage: $e');
+    } catch (e, stk) {
+      Log.e('supabase', 'Error removing from local storage: $e', error: e, stack: stk);
     }
 
     print('Challenge failed and removed: ${challenge['title']}');
@@ -1774,8 +1792,8 @@ class SupabaseService {
           }
         }
       }
-    } catch (e) {
-      print('Error checking user challenge streak: $e');
+    } catch (e, stk) {
+      Log.e('supabase', 'Error checking user challenge streak: $e', error: e, stack: stk);
     }
   }
 
@@ -1815,8 +1833,8 @@ class SupabaseService {
           }
         }
       }
-    } catch (e) {
-      print('Error checking failed habits: $e');
+    } catch (e, stk) {
+      Log.e('supabase', 'Error checking failed habits: $e', error: e, stack: stk);
     }
   }
 
@@ -1833,8 +1851,8 @@ class SupabaseService {
       await updateUserStreak(userId);
 
       print('Daily check completed for user: $userId');
-    } catch (e) {
-      print('Error in daily check: $e');
+    } catch (e, stk) {
+      Log.e('supabase', 'Error in daily check: $e', error: e, stack: stk);
     }
   }
 
@@ -1870,8 +1888,8 @@ class SupabaseService {
             .eq('challenge_id', challengeId);
 
         print('Cleaned up previous records for challenge: $challengeId');
-      } catch (e) {
-        print('Cleanup error (may not have existing records): $e');
+      } catch (e, stk) {
+        Log.e('supabase', 'Cleanup error (may not have existing records): $e', error: e, stack: stk);
       }
 
       // دریافت اطلاعات چالش
@@ -1921,8 +1939,8 @@ class SupabaseService {
               .inFilter('id', habitIds);
           print('Removed ${habitIds.length} existing challenge habits');
         }
-      } catch (e) {
-        print('Error removing existing habits: $e');
+      } catch (e, stk) {
+        Log.e('supabase', 'Error removing existing habits: $e', error: e, stack: stk);
       }
 
       // اضافه کردن عادت‌های چالش به کاربر
@@ -1975,8 +1993,8 @@ class SupabaseService {
       });
 
       print('Challenge badge earned: $badgeName');
-    } catch (e) {
-      print('Error adding challenge badge: $e');
+    } catch (e, stk) {
+      Log.e('supabase', 'Error adding challenge badge: $e', error: e, stack: stk);
     }
   }
 
@@ -2059,8 +2077,8 @@ class SupabaseService {
         final updatedUserChallenges =
             userChallenges.where((c) => c['id'] != challengeId).toList();
         await localStorage.saveUserChallenges(updatedUserChallenges);
-      } catch (e) {
-        print('Error removing from local storage: $e');
+      } catch (e, stk) {
+        Log.e('supabase', 'Error removing from local storage: $e', error: e, stack: stk);
       }
 
       print('Challenge completed successfully: ${challenge['title']}');
@@ -2091,8 +2109,8 @@ class SupabaseService {
           .eq('challenge_id', challengeId);
 
       print('User left challenge: $challengeId');
-    } catch (e) {
-      print('Error leaving challenge: $e');
+    } catch (e, stk) {
+      Log.e('supabase', 'Error leaving challenge: $e', error: e, stack: stk);
     }
   }
 
@@ -2105,8 +2123,8 @@ class SupabaseService {
           .eq('user_id', userId);
 
       print('User challenges refreshed: ${userChallenges.length}');
-    } catch (e) {
-      print('Error refreshing user challenges: $e');
+    } catch (e, stk) {
+      Log.e('supabase', 'Error refreshing user challenges: $e', error: e, stack: stk);
     }
   }
 
@@ -2131,7 +2149,8 @@ class SupabaseService {
       return response.map((data) {
         return Package.fromMap(data, data['id']);
       }).toList();
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('supabase', 'getPackages failed', error: e, stack: stk);
       return [];
     }
   }
@@ -2147,7 +2166,8 @@ class SupabaseService {
       return response
           .map((data) => UserPackage.fromMap(data, data['id']))
           .toList();
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('supabase', 'getUserPackages failed', error: e, stack: stk);
       return [];
     }
   }
@@ -2202,8 +2222,8 @@ class SupabaseService {
         final localStorage = LocalStorageService();
         final habits = await getHabits(userId);
         await localStorage.saveHabits(habits);
-      } catch (e) {
-        print('Error saving to local storage: $e');
+      } catch (e, stk) {
+        Log.e('supabase', 'Error saving to local storage: $e', error: e, stack: stk);
       }
 
       print('Package activated: $packageId');
@@ -2255,8 +2275,8 @@ class SupabaseService {
             .where((h) => !_isHabitOfPackage(h, packageId, package))
             .toList();
         await localStorage.saveHabits(updatedHabits);
-      } catch (e) {
-        print('Error removing from local storage: $e');
+      } catch (e, stk) {
+        Log.e('supabase', 'Error removing from local storage: $e', error: e, stack: stk);
       }
 
       print('Package deactivated: $packageId');
@@ -2276,7 +2296,8 @@ class SupabaseService {
           .eq('is_active', true);
 
       return response.isNotEmpty;
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('supabase', 'isPackageActiveForUser failed', error: e, stack: stk);
       return false;
     }
   }
@@ -2301,7 +2322,8 @@ class SupabaseService {
       }
 
       return packages;
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('supabase', 'getActivePackagesForUser failed', error: e, stack: stk);
       return [];
     }
   }
@@ -2334,7 +2356,8 @@ class SupabaseService {
             'total_xp': 0,
           });
         }
-      } catch (e2) {
+      } catch (e2, stk) {
+        Log.e('supabase', 'createUserProgress failed', error: e2, stack: stk);
         // ignore
       }
     }
@@ -2355,7 +2378,8 @@ class SupabaseService {
           .order('created_at', ascending: false);
 
       return response.map((data) => Quest.fromMap(data, data['id'])).toList();
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('supabase', 'getQuests failed', error: e, stack: stk);
       return [];
     }
   }
@@ -2380,8 +2404,8 @@ class SupabaseService {
       }
 
       return result;
-    } catch (e) {
-      print('Error getting user quests: $e');
+    } catch (e, stk) {
+      Log.e('supabase', 'Error getting user quests: $e', error: e, stack: stk);
       return [];
     }
   }
@@ -2458,8 +2482,8 @@ class SupabaseService {
         final localStorage = LocalStorageService();
         await localStorage.saveHabit(habit);
         print('Habit saved to local storage');
-      } catch (e) {
-        print('Error saving habit to local storage: $e');
+      } catch (e, stk) {
+        Log.e('supabase', 'Error saving habit to local storage: $e', error: e, stack: stk);
       }
 
       // 5. ثبت در user_quests
@@ -2501,7 +2525,8 @@ class SupabaseService {
         return int.parse('FF${colorStr.substring(1)}', radix: 16);
       }
       return 0xFF4A90E2;
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('supabase', '_parseColor failed', error: e, stack: stk);
       return 0xFF4A90E2;
     }
   }
@@ -2649,15 +2674,15 @@ class SupabaseService {
             await localStorage.saveHabit(updatedHabit);
             print('LocalStorage updated');
           }
-        } catch (e) {
-          print('Error updating local habit title: $e');
+        } catch (e, stk) {
+          Log.e('supabase', 'Error updating local habit title: $e', error: e, stack: stk);
         }
 
         print('Quest progress updated: $newProgress/$targetCount');
         return null;
       }
-    } catch (e) {
-      print('Error updating quest progress: $e');
+    } catch (e, stk) {
+      Log.e('supabase', 'Error updating quest progress: $e', error: e, stack: stk);
       return null;
     }
   }
@@ -2740,11 +2765,11 @@ class SupabaseService {
           await localStorage.saveHabit(updatedHabit);
           print('Habit title updated in local storage');
         }
-      } catch (e) {
-        print('Error updating local habit title: $e');
+      } catch (e, stk) {
+        Log.e('supabase', 'Error updating local habit title: $e', error: e, stack: stk);
       }
-    } catch (e) {
-      print('Error updating quest habit title: $e');
+    } catch (e, stk) {
+      Log.e('supabase', 'Error updating quest habit title: $e', error: e, stack: stk);
     }
   }
 
@@ -2775,7 +2800,8 @@ class SupabaseService {
       try {
         final localStorage = LocalStorageService();
         await localStorage.deleteHabit(habitId);
-      } catch (e) {
+      } catch (e, stk) {
+        Log.e('supabase', '_completeQuest failed', error: e, stack: stk);
         // خطا را نادیده بگیر
       }
 
@@ -2834,7 +2860,8 @@ class SupabaseService {
         );
         await localStorage.saveHabit(updatedHabit);
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('supabase', '_updateLocalHabitTitle failed', error: e, stack: stk);
       // ignore
     }
   }
@@ -2867,7 +2894,8 @@ class SupabaseService {
         'earned_at': DateTime.now().toIso8601String(),
         'is_active': true,
       });
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('supabase', '_addBadgeToUser failed', error: e, stack: stk);
       // اگر جدول وجود نداشت، خطا را نادیده بگیر
     }
   }
@@ -2929,8 +2957,8 @@ class SupabaseService {
             localHabits.where((h) => h.questId != questId).toList();
         await localStorage.saveHabits(updatedHabits);
         print('All quest habits removed from LocalStorage');
-      } catch (e) {
-        print('Error removing from LocalStorage: $e');
+      } catch (e, stk) {
+        Log.e('supabase', 'Error removing from LocalStorage: $e', error: e, stack: stk);
       }
 
       print('Quest cancelled successfully: $questId');
@@ -2948,7 +2976,8 @@ class SupabaseService {
           await client.from('daily_spark').select().eq('is_active', true);
 
       return response;
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('supabase', 'getDailySpark failed', error: e, stack: stk);
       return [];
     }
   }
@@ -3015,8 +3044,8 @@ class SupabaseService {
       unawaited(_removeChallengeHabits(userId, challengeId));
 
       return challenge;
-    } catch (e) {
-      print('Error checking challenge: $e');
+    } catch (e, stk) {
+      Log.e('supabase', 'Error checking challenge: $e', error: e, stack: stk);
       return null;
     }
   }
@@ -3055,8 +3084,8 @@ class SupabaseService {
       await localStorage.saveHabits(updatedHabits);
 
       print('Removed ${habitIds.length} challenge habits');
-    } catch (e) {
-      print('Error removing challenge habits: $e');
+    } catch (e, stk) {
+      Log.e('supabase', 'Error removing challenge habits: $e', error: e, stack: stk);
     }
   }
 
@@ -3074,8 +3103,8 @@ class SupabaseService {
         final packageId = packageData['id'] as String;
         return Package.fromMap(packageData, packageId);
       }).toList();
-    } catch (e) {
-      print('Error getting user active packages: $e');
+    } catch (e, stk) {
+      Log.e('supabase', 'Error getting user active packages: $e', error: e, stack: stk);
       return [];
     }
   }
@@ -3173,7 +3202,8 @@ class SupabaseService {
         'last_streak_date': todayStr,
         'weekly_streak': weeklyStreak,
       }).eq('user_id', userId);
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('supabase', 'updateUserStreak failed', error: e, stack: stk);
       // ignore
     }
   }
@@ -3259,7 +3289,8 @@ class SupabaseService {
           .maybeSingle();
 
       return response != null && response['is_active'] == true;
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('supabase', 'hasUserActivityToday failed', error: e, stack: stk);
       return false;
     }
   }
@@ -3421,8 +3452,8 @@ class SupabaseService {
 
       print('is_username_available($normalized) = $result');
       return result as bool;
-    } catch (e) {
-      print('Error checking username: $e');
+    } catch (e, stk) {
+      Log.e('supabase', 'Error checking username: $e', error: e, stack: stk);
       return false;
     }
   }
@@ -3462,8 +3493,8 @@ class SupabaseService {
       final secondsSince = DateTime.now().difference(updatedAt).inSeconds;
 
       return secondsSince >= 60;
-    } catch (e) {
-      print('Error checking username change eligibility: $e');
+    } catch (e, stk) {
+      Log.e('supabase', 'Error checking username change eligibility: $e', error: e, stack: stk);
       return false;
     }
   }
@@ -3487,8 +3518,8 @@ class SupabaseService {
 
       if (secondsSince >= 60) return 0;
       return 60 - secondsSince;
-    } catch (e) {
-      print('Error getting seconds until change: $e');
+    } catch (e, stk) {
+      Log.e('supabase', 'Error getting seconds until change: $e', error: e, stack: stk);
       return 0;
     }
   }
@@ -3532,8 +3563,8 @@ class SupabaseService {
       return (response as List)
           .map((map) => UserPhoto.fromMap(map, map['id']))
           .toList();
-    } catch (e) {
-      print('Error getting user photos: $e');
+    } catch (e, stk) {
+      Log.e('supabase', 'Error getting user photos: $e', error: e, stack: stk);
       return [];
     }
   }
@@ -3545,8 +3576,8 @@ class SupabaseService {
           await _client.from('user_photos').select('id').eq('user_id', userId);
 
       return (response as List).length;
-    } catch (e) {
-      print('Error counting photos: $e');
+    } catch (e, stk) {
+      Log.e('supabase', 'Error counting photos: $e', error: e, stack: stk);
       return 0;
     }
   }
@@ -3659,8 +3690,8 @@ class SupabaseService {
           .maybeSingle();
 
       return response != null;
-    } catch (e) {
-      print('Error checking like: $e');
+    } catch (e, stk) {
+      Log.e('supabase', 'Error checking like: $e', error: e, stack: stk);
       return false;
     }
   }

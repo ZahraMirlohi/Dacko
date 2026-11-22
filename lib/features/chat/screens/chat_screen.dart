@@ -1,3 +1,4 @@
+import '/core/logging/app_logger.dart';
 import 'dart:async';
 // lib/features/chat/screens/chat_screen.dart
 
@@ -112,7 +113,7 @@ class _ChatScreenState extends State<ChatScreen>
           .eq('to_user_id', me)
           .eq('status', 'pending');
       if (mounted) setState(() => _incomingCount = rows.length);
-    } catch (_) {}
+    } catch (err, stk) { Log.w('chat', '_loadIncomingCount ignored error', error: err, stack: stk); }
   }
 
   Future<void> _loadData() async {
@@ -139,8 +140,8 @@ class _ChatScreenState extends State<ChatScreen>
         _conversations = conversations;
         _isLoading = false;
       });
-    } catch (e) {
-      print('Error loading conversations: $e');
+    } catch (e, stk) {
+      Log.e('chat', 'Error loading conversations: $e', error: e, stack: stk);
       if (mounted) {
         setState(() {
           _conversations = [];
@@ -156,7 +157,8 @@ class _ChatScreenState extends State<ChatScreen>
           .from('profiles')
           .update({'last_seen_at': DateTime.now().toIso8601String()}).eq(
               'user_id', userId);
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('chat', '_updateLastSeen failed', error: e, stack: stk);
       // خطا را نادیده بگیر
     }
   }
@@ -191,7 +193,8 @@ class _ChatScreenState extends State<ChatScreen>
       await Navigator.push(context,
           MaterialPageRoute(builder: (_) => BuddyChatScreen(conversation: conv)));
       if (mounted) _loadData();
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('chat', '_openBuddyChat failed', error: e, stack: stk);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('${context.tr('bd.error')}: $e')));
@@ -274,8 +277,8 @@ class _ChatScreenState extends State<ChatScreen>
           ),
         );
       }
-    } catch (e) {
-      print('Error removing buddy: $e');
+    } catch (e, stk) {
+      Log.e('chat', 'Error removing buddy: $e', error: e, stack: stk);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -347,8 +350,8 @@ class _ChatScreenState extends State<ChatScreen>
         await _supabaseClient.from('buddy_requests').delete().or(
             'and(from_user_id.eq.${currentUser.id},to_user_id.eq.$otherUserId),'
             'and(from_user_id.eq.$otherUserId,to_user_id.eq.${currentUser.id})');
-      } catch (e) {
-        print('Error removing buddy requests: $e');
+      } catch (e, stk) {
+        Log.e('chat', 'Error removing buddy requests: $e', error: e, stack: stk);
       }
 
       await _chatService.deleteConversationForBoth(conv.id);
@@ -370,8 +373,8 @@ class _ChatScreenState extends State<ChatScreen>
           ),
         );
       }
-    } catch (e) {
-      print('Error blocking user: $e');
+    } catch (e, stk) {
+      Log.e('chat', 'Error blocking user: $e', error: e, stack: stk);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -1457,7 +1460,8 @@ class _ChatScreenState extends State<ChatScreen>
                   );
                   _msg(context.tr('ct.chat.created'));
                   _loadData();
-                } catch (e) {
+                } catch (e, stk) {
+                  Log.e('chat', '_showCreateSquadDialog failed', error: e, stack: stk);
                   _msg(_chatService.groupErrorText(e), error: true);
                 }
               },
@@ -1496,7 +1500,8 @@ class _ChatScreenState extends State<ChatScreen>
                 await _chatService.joinGroupByCode(c);
                 _msg(context.tr('ct.chat.joined'));
                 _loadData();
-              } catch (e) {
+              } catch (e, stk) {
+                Log.e('chat', '_showJoinSquadDialog failed', error: e, stack: stk);
                 _msg(_chatService.groupErrorText(e), error: true);
               }
             },

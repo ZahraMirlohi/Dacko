@@ -1,5 +1,6 @@
 // lib/features/profile/widgets/weekly_streak_widget.dart
 
+import '/core/logging/app_logger.dart';
 import 'package:flutter/material.dart';
 import '/l10n/app_strings.dart';
 import 'package:shamsi_date/shamsi_date.dart';
@@ -61,7 +62,8 @@ class _WeeklyStreakWidgetState extends State<WeeklyStreakWidget> {
           _isLoading = false;
         });
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('weekly_streak', '_loadWeekDays failed', error: e, stack: stk);
       if (mounted) {
         setState(() {
           _isLoading = false;

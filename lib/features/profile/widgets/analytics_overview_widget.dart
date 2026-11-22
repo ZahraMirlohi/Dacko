@@ -1,5 +1,6 @@
 // lib/features/profile/widgets/analytics_overview_widget.dart
 
+import '/core/logging/app_logger.dart';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -297,8 +298,8 @@ class AnalyticsOverviewWidgetState extends State<AnalyticsOverviewWidget>
           _isLoading = false;
         });
       }
-    } catch (e) {
-      debugPrint('Error loading stats: $e');
+    } catch (e, stk) {
+      Log.e('analytics_overview', 'Error loading stats: $e', error: e, stack: stk);
       if (mounted) {
         // چک کن
         setState(() {

@@ -1,3 +1,4 @@
+import '/core/logging/app_logger.dart';
 class Task {
   String id;
   String userId;
@@ -61,7 +62,8 @@ class Task {
       if (dateStr == null || dateStr.isEmpty) return DateTime.now();
       try {
         return DateTime.parse(dateStr);
-      } catch (e) {
+      } catch (e, stk) {
+        Log.e('task_model', 'toMap failed', error: e, stack: stk);
         print('⚠️ Error parsing date: $dateStr');
         return DateTime.now();
       }

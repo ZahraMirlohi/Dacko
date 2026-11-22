@@ -1,5 +1,6 @@
 // lib/features/chat/screens/squad_chat_screen.dart
 
+import '/core/logging/app_logger.dart';
 import '/services/sound_service.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
@@ -140,8 +141,8 @@ class _SquadChatScreenState extends State<SquadChatScreen>
           'کاربر';
       try {
         _settings = await _chatService.getGroupSettings(widget.conversation.id);
-      } catch (e) {
-        print('group settings error: $e');
+      } catch (e, stk) {
+        Log.e('squad_chat', 'group settings error: $e', error: e, stack: stk);
       }
       _squadInfo = await _getSquadInfo(widget.conversation.squadId);
 
@@ -216,8 +217,8 @@ class _SquadChatScreenState extends State<SquadChatScreen>
             };
           }(),
       ];
-    } catch (e) {
-      print('members load error: $e');
+    } catch (e, stk) {
+      Log.e('squad_chat', 'members load error: $e', error: e, stack: stk);
       return [];
     }
   }
@@ -343,7 +344,8 @@ class _SquadChatScreenState extends State<SquadChatScreen>
         replyToId: replyTo?.id,
         senderName: _myName,
       );
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('squad_chat', '_sendMessage failed', error: e, stack: stk);
       if (mounted) {
         setState(() => _messages.removeWhere((m) => m.id == temp.id));
         _snack(_chatService.groupErrorText(e), error: true);
@@ -451,7 +453,8 @@ class _SquadChatScreenState extends State<SquadChatScreen>
       await _chatService.updateGroup(widget.conversation.id, avatarUrl: url);
       if (mounted) setState(() => _settings = {..._settings, 'avatar_url': url});
       _snack(context.tr('sq.photoChanged'));
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('squad_chat', '_changeGroupPhoto failed', error: e, stack: stk);
       _snack(_chatService.groupErrorText(e), error: true);
     }
   }
@@ -470,7 +473,8 @@ class _SquadChatScreenState extends State<SquadChatScreen>
         return;
       }
       await _sendMessage(text: p.text, type: p.type, metadata: p.meta);
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('squad_chat', '_sendRich failed', error: e, stack: stk);
       _snack(context.tr('sq.sendFail'), error: true);
     }
   }
@@ -501,9 +505,9 @@ class _SquadChatScreenState extends State<SquadChatScreen>
                   'type': kind == AttachKind.music ? 'music' : 'file',
                 },
         );
-      } catch (e) {
+      } catch (e, stk) {
         failed++;
-        print('attachment send error: $e');
+        Log.e('squad_chat', 'attachment send error: $e', error: e, stack: stk);
       }
     }
     if (mounted) setState(() => _isSending = false);
@@ -1802,7 +1806,8 @@ class _SquadChatScreenState extends State<SquadChatScreen>
     List<Map<String, dynamic>> buddies;
     try {
       buddies = await _chatService.getMyBuddies();
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('squad_chat', '_addFromBuddies failed', error: e, stack: stk);
       _snack(context.tr('sq.buddiesFail'), error: true);
       return;
     }
@@ -2256,7 +2261,7 @@ class _SquadChatScreenState extends State<SquadChatScreen>
     final members = await _getSquadMembers(widget.conversation.id);
     try {
       _settings = await _chatService.getGroupSettings(widget.conversation.id);
-    } catch (_) {}
+    } catch (err, stk) { Log.w('squad_chat', '_reloadGroup ignored error', error: err, stack: stk); }
     _members = members;
     final info = await _getSquadInfo(widget.conversation.squadId);
     if (!mounted) return;
@@ -2273,7 +2278,8 @@ class _SquadChatScreenState extends State<SquadChatScreen>
       await action();
       await _reloadGroup();
       if (ok != null) _snack(ok);
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('squad_chat', '_run failed', error: e, stack: stk);
       _snack(_chatService.groupErrorText(e), error: true);
     }
   }
@@ -2449,7 +2455,8 @@ class _SquadChatScreenState extends State<SquadChatScreen>
                         await _chatService.setGroupMuted(
                             widget.conversation.id, true);
                         _snack(context.tr('sq.muted'));
-                      } catch (e) {
+                      } catch (e, stk) {
+                        Log.e('squad_chat', '_showSquadTools failed', error: e, stack: stk);
                         _snack(_chatService.groupErrorText(e), error: true);
                       }
                     },
@@ -2545,7 +2552,8 @@ class _SquadChatScreenState extends State<SquadChatScreen>
       try {
         code = await _chatService.regenerateInviteCode(widget.conversation.id);
         _settings['invite_code'] = code;
-      } catch (e) {
+      } catch (e, stk) {
+        Log.e('squad_chat', '_showInviteDialog failed', error: e, stack: stk);
         _snack(_chatService.groupErrorText(e), error: true);
         return;
       }
@@ -2595,7 +2603,8 @@ class _SquadChatScreenState extends State<SquadChatScreen>
                       .regenerateInviteCode(widget.conversation.id);
                   _settings['invite_code'] = c;
                   setD(() => code = c);
-                } catch (e) {
+                } catch (e, stk) {
+                  Log.e('squad_chat', '_showInviteDialog failed', error: e, stack: stk);
                   _snack(_chatService.groupErrorText(e), error: true);
                 }
               },
@@ -2754,7 +2763,8 @@ class _SquadChatScreenState extends State<SquadChatScreen>
       await _chatService.reportMember(widget.conversation.id, userId, reason,
           details: detailsC.text.trim().isEmpty ? null : detailsC.text.trim());
       _snack(context.tr('sq.reported'));
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('squad_chat', '_reportMember failed', error: e, stack: stk);
       _snack(_chatService.groupErrorText(e), error: true);
     }
   }
@@ -2767,7 +2777,8 @@ class _SquadChatScreenState extends State<SquadChatScreen>
     try {
       await _chatService.leaveGroup(widget.conversation.id);
       if (mounted) Navigator.pop(context, true);
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('squad_chat', '_leaveSquad failed', error: e, stack: stk);
       _snack(_chatService.groupErrorText(e), error: true);
     }
   }
@@ -2783,7 +2794,8 @@ class _SquadChatScreenState extends State<SquadChatScreen>
     try {
       await _chatService.deleteGroup(widget.conversation.id);
       if (mounted) Navigator.pop(context, true);
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('squad_chat', '_deleteSquad failed', error: e, stack: stk);
       _snack(_chatService.groupErrorText(e), error: true);
     }
   }

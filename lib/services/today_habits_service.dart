@@ -1,5 +1,6 @@
 // lib/services/today_habits_service.dart
 
+import '/core/logging/app_logger.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../features/arena/models/habit_model.dart';
 import '../features/arena/models/task_model.dart';
@@ -81,8 +82,8 @@ class TodayHabitsService {
             );
           }
         }
-      } catch (e) {
-        print('Error loading challenges: $e');
+      } catch (e, stk) {
+        Log.e('today_habits', 'Error loading challenges: $e', error: e, stack: stk);
         // ادامه بده، خطا نادیده گرفته بشه
       }
 
@@ -122,8 +123,8 @@ class TodayHabitsService {
             );
           }
         }
-      } catch (e) {
-        print('Error loading quests: $e');
+      } catch (e, stk) {
+        Log.e('today_habits', 'Error loading quests: $e', error: e, stack: stk);
         // ادامه بده، خطا نادیده گرفته بشه
       }
 
@@ -193,8 +194,8 @@ class TodayHabitsService {
         totalItems: totalItems,
         completedItems: completedItems,
       );
-    } catch (e) {
-      print('Error getting today habits: $e');
+    } catch (e, stk) {
+      Log.e('today_habits', 'Error getting today habits: $e', error: e, stack: stk);
       return null;
     }
   }

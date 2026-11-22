@@ -2,7 +2,7 @@
 //
 // سیستم لاگ مرکزی Dacko.
 //  - سطح‌ها: verbose < debug < info < warn < error < fatal
-//  - مقصدها (sink): کنسول (فقط دیباگ)، حافظه (حلقه‌ای)، فایل چرخشی JSONL، سرور (Supabase، فقط warn به بالا)
+//  - مقصدها (sink): کنسول (فقط دیباگ)، حافظه (حلقه‌ای)، فایل چرخشی JSONL، سرور (Supabase، فقط error به بالا)
 //  - خودکار: خطاهای فلاتر، خطاهای async، همهٔ print های قدیمی، چرخهٔ حیات برنامه، کاربر/صفحهٔ جاری
 //  - حریم خصوصی: ایمیل، توکن/JWT، شماره تلفن و کلیدهای حساس قبل از ثبت پاک می‌شوند
 //    (متن پیام‌های چت را هرگز لاگ نکنید؛ فقط شناسه‌ها).
@@ -272,7 +272,7 @@ class _FileSink implements _Sink {
   }
 }
 
-/// ارسال دسته‌ای warn/error/fatal به جدول app_logs (فقط کاربر واردشده).
+/// ارسال دسته‌ای error/fatal به جدول app_logs (فقط کاربر واردشده).
 /// شکست شبکه بی‌صدا نگه داشته می‌شود و با عقب‌نشینی نمایی دوباره تلاش می‌شود.
 class _RemoteSink implements _Sink {
   bool enabled = true;
@@ -282,14 +282,16 @@ class _RemoteSink implements _Sink {
   int _fails = 0;
 
   @override
-  LogLevel get min => enabled ? LogLevel.warn : LogLevel.fatal;
+  LogLevel get min => enabled ? LogLevel.error : LogLevel.fatal;
+  DateTime _last = DateTime.fromMillisecondsSinceEpoch(0);
 
   @override
   void add(LogRecord r) {
-    if (!enabled || r.level.index < LogLevel.warn.index) return;
+    if (!enabled || r.level.index < LogLevel.error.index) return;
     _q.add(r.toRemote());
     if (_q.length > 200) _q.removeAt(0);
-    if (r.level.index >= LogLevel.error.index) {
+    // فوری فقط برای fatal و حداکثر هر ۵ ثانیه؛ بقیه دسته‌ای (۳۰ ثانیه)
+    if (r.level == LogLevel.fatal && _fails == 0 && DateTime.now().difference(_last).inSeconds >= 5) {
       flush();
     } else {
       _timer ??= Timer(const Duration(seconds: 30), flush);
@@ -312,6 +314,7 @@ class _RemoteSink implements _Sink {
       return;
     }
     _busy = true;
+    _last = DateTime.now();
     final batch = _q.take(50).toList();
     try {
       await client.from('app_logs').insert(batch);
@@ -354,7 +357,7 @@ class Log {
   static ValueListenable<int> get version => _memory.version;
   static List<LogRecord> get recent => _memory.all;
 
-  /// ارسال لاگ‌های warn+ به سرور را روشن/خاموش کنید (مثلاً از تنظیمات حریم خصوصی)
+  /// ارسال لاگ‌های error+ به سرور را روشن/خاموش کنید (مثلاً از تنظیمات حریم خصوصی)
   static set remoteEnabled(bool v) => _remote.enabled = v;
   static bool get remoteEnabled => _remote.enabled;
 

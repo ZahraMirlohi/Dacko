@@ -157,8 +157,8 @@ class AuthProvider extends ChangeNotifier {
         _needsPasswordReset = true;
       }
       await _loadForUser(user);
-    } catch (e) {
-      if (kDebugMode) debugPrint('checkLoginStatus error: $e');
+    } catch (e, stk) {
+      Log.e('auth', 'checkLoginStatus error: $e', error: e, stack: stk);
       _isLoading = false;
       notifyListeners();
     }
@@ -235,8 +235,8 @@ class AuthProvider extends ChangeNotifier {
         // پروفایل هنوز ساخته نشده (مثلاً تریگر SQL اجرا نشده): بعد از ثبت‌نام می‌سازیمش
         await _ensureProfile(uid, _userEmail ?? '', _userName ?? '');
       }
-    } catch (e) {
-      if (kDebugMode) debugPrint('profile refresh skipped: $e');
+    } catch (e, stk) {
+      Log.e('auth', 'profile refresh skipped: $e', error: e, stack: stk);
     }
 
     try {
@@ -261,9 +261,9 @@ class AuthProvider extends ChangeNotifier {
           changed = true;
         }
       }
-    } catch (e) {
+    } catch (e, stk) {
       // جدول هنوز ساخته نشده یا آفلاین: اگر کاربر تازه ثبت‌نام نکرده، مزاحمش نمی‌شویم
-      if (kDebugMode) debugPrint('onboarding refresh skipped: $e');
+      Log.e('auth', 'onboarding refresh skipped: $e', error: e, stack: stk);
     }
 
     // پاسخ‌هایی که قبلاً به‌خاطر آفلاین بودن ارسال نشده بودند
@@ -336,7 +336,7 @@ class AuthProvider extends ChangeNotifier {
     _holdSignIn = false;
     try {
       await _client.auth.signOut();
-    } catch (_) {}
+    } catch (err, stk) { Log.w('auth', 'cancelRecovery ignored error', error: err, stack: stk); }
   }
 
   Future<SignUpResult> signUpWithEmail({
@@ -389,8 +389,8 @@ class AuthProvider extends ChangeNotifier {
         await service.createProfile(uid, email, name.isEmpty ? email.split('@').first : name);
       }
       await service.createUserProgress(uid);
-    } catch (e) {
-      if (kDebugMode) debugPrint('ensureProfile skipped: $e');
+    } catch (e, stk) {
+      Log.e('auth', 'ensureProfile skipped: $e', error: e, stack: stk);
     }
   }
 
@@ -412,13 +412,13 @@ class AuthProvider extends ChangeNotifier {
     try {
       (await SharedPreferences.getInstance())
           .setInt(_recoveryKey, DateTime.now().millisecondsSinceEpoch);
-    } catch (_) {}
+    } catch (err, stk) { Log.w('auth', 'sendPasswordReset ignored error', error: err, stack: stk); }
   }
 
   Future<void> _clearRecoveryMark() async {
     try {
       (await SharedPreferences.getInstance()).remove(_recoveryKey);
-    } catch (_) {}
+    } catch (err, stk) { Log.w('auth', '_clearRecoveryMark ignored error', error: err, stack: stk); }
   }
 
   /// آیا این ورود تازه از لینک بازیابی آمده؟ (درخواست در ۲ ساعت اخیر + نشست در چند دقیقهٔ اخیر ساخته شده)
@@ -433,7 +433,8 @@ class AuthProvider extends ChangeNotifier {
       }
       final last = DateTime.tryParse(user.lastSignInAt ?? '');
       return last != null && now.difference(last.toLocal()).abs() < const Duration(minutes: 3);
-    } catch (_) {
+    } catch (err, stk) {
+      Log.w('auth', '_looksLikeRecoveryLogin ignored error', error: err, stack: stk);
       return false;
     }
   }
@@ -502,8 +503,8 @@ class AuthProvider extends ChangeNotifier {
 
       await prefs.remove('onboarding_pending_$uid');
       return true;
-    } catch (e) {
-      if (kDebugMode) debugPrint('onboarding upload postponed: $e');
+    } catch (e, stk) {
+      Log.e('auth', 'onboarding upload postponed: $e', error: e, stack: stk);
       return false;
     }
   }
@@ -516,13 +517,13 @@ class AuthProvider extends ChangeNotifier {
 
     try {
       await _client.auth.signOut();
-    } catch (e) {
-      if (kDebugMode) debugPrint('signOut error: $e');
+    } catch (e, stk) {
+      Log.e('auth', 'signOut error: $e', error: e, stack: stk);
     }
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove('user_id');
-    } catch (_) {}
+    } catch (err, stk) { Log.w('auth', 'forceLogout ignored error', error: err, stack: stk); }
   }
 
   void setHasUsername(bool value) {

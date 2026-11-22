@@ -85,7 +85,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
           ],
         ),
       );
-    } catch (_) {}
+    } catch (err, stk) { Log.w('main', '_warnIfVpn ignored error', error: err, stack: stk); }
   }
 
   @override
@@ -133,8 +133,8 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
             },
           )
           .subscribe();
-    } catch (e) {
-      debugPrint('request listener failed: $e');
+    } catch (e, stk) {
+      Log.e('main', 'request listener failed: $e', error: e, stack: stk);
     }
   }
 
@@ -148,7 +148,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
           .eq('to_user_id', id)
           .eq('status', 'pending');
       if (mounted) setState(() => _pendingRequests = (rows as List).length);
-    } catch (_) {}
+    } catch (err, stk) { Log.w('main', '_refreshPending ignored error', error: err, stack: stk); }
   }
 
   void _openRequests() {
@@ -277,8 +277,8 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       if (user != null) {
         await supabase.runDailyCheck(user.id);
       }
-    } catch (e) {
-      print('Error in daily check: $e');
+    } catch (e, stk) {
+      Log.e('main', 'Error in daily check: $e', error: e, stack: stk);
     }
   }
 }

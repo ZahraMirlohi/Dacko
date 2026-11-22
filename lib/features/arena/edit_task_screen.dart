@@ -1,5 +1,6 @@
 // lib/features/arena/screens/edit_task_screen.dart
 
+import '/core/logging/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '/services/supabase_service.dart';
@@ -149,7 +150,8 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
         showArenaSnack(context, context.tr('af.task.updated'));
         Navigator.pop(context, true);
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('edit_task', '_updateTask failed', error: e, stack: stk);
       if (mounted) {
         showArenaSnack(
           context,

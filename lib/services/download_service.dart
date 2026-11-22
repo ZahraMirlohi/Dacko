@@ -1,5 +1,6 @@
 // lib/services/download_service.dart
 
+import '/core/logging/app_logger.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -95,7 +96,8 @@ class DownloadService extends ChangeNotifier {
         notifyListeners();
         onError?.call();
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('download', 'downloadFile failed', error: e, stack: stk);
       task.isDownloading = false;
       task.progress = 0.0;
       task.errorMessage = e.toString();
@@ -123,8 +125,8 @@ class DownloadService extends ChangeNotifier {
       );
       notifyListeners();
       onComplete?.call();
-    } catch (e) {
-      print('Web download error: $e');
+    } catch (e, stk) {
+      Log.e('download', 'Web download error: $e', error: e, stack: stk);
       onError?.call();
     }
   }
@@ -134,7 +136,7 @@ class DownloadService extends ChangeNotifier {
     Directory? base;
     try {
       if (Platform.isAndroid) base = await getExternalStorageDirectory();
-    } catch (_) {}
+    } catch (err, stk) { Log.w('download', '_getDownloadsPath ignored error', error: err, stack: stk); }
     base ??= await getApplicationDocumentsDirectory();
     final dir = Directory('${base.path}/chat_files');
     if (!await dir.exists()) await dir.create(recursive: true);
@@ -169,7 +171,8 @@ class DownloadService extends ChangeNotifier {
         notifyListeners();
         return true;
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('download', 'checkIfDownloaded failed', error: e, stack: stk);
       // ignore
     }
     return false;

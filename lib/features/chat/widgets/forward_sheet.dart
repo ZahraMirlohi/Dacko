@@ -1,3 +1,4 @@
+import '/core/logging/app_logger.dart';
 import 'package:flutter/material.dart';
 import '/l10n/app_strings.dart';
 import '/services/chat_service.dart';
@@ -36,7 +37,7 @@ Future<void> forwardMessages(
       final names = {for (final r in rows) r['user_id'] as String: r['name'] as String?};
       buddyOther.forEach((cid, uid) => targets.add((convId: cid, name: names[uid] ?? '')));
     }
-  } catch (_) {}
+  } catch (err, stk) { Log.w('forward_sheet', 'block ignored error', error: err, stack: stk); }
   if (!context.mounted) return;
   if (targets.isEmpty) {
     ScaffoldMessenger.of(context)
@@ -80,7 +81,8 @@ Future<void> forwardMessages(
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(context.tr('bc.k154', {'p0': target.name}))));
     }
-  } catch (_) {
+  } catch (err, stk) {
+    Log.w('forward_sheet', 'block ignored error', error: err, stack: stk);
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(context.tr('bc.k155')), backgroundColor: Colors.red));

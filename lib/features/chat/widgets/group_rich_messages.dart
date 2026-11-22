@@ -1,5 +1,6 @@
 // پیام‌های غنی (گزارش، لیست امروز، پیشرفت، مخاطب، لوکیشن) برای چت گروه
 // منطق ارسال/نمایش مشابه چت هم‌مسیر است.
+import '/core/logging/app_logger.dart';
 import '/l10n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -107,7 +108,7 @@ class GroupRichSender {
         final i = dates.indexOf(r['activity_date'].toString().split('T').first);
         if (i != -1) weekDays[i] = r['is_active'] == true;
       }
-    } catch (_) {}
+    } catch (err, stk) { Log.w('group_rich_messages', 'progress ignored error', error: err, stack: stk); }
 
     return RichPayload(
       '📊 کارت پیشرفت روزانه\n✅ انجام شده: $done\n⏳ باقیمانده: ${total - done}\n🔥 استریک: $streak روز',
@@ -251,7 +252,8 @@ class GroupRichContent {
         return WeeklyPerformanceWidget(
             key: ValueKey('weekly_${m.id}'), data: WeeklyHabitPerformance.fromMetadata(md), isMe: isMe);
       }
-    } catch (_) {
+    } catch (err, stk) {
+      Log.w('group_rich_messages', 'build ignored error', error: err, stack: stk);
       return fallback;
     }
     if (md != null && md['is_progress_card'] == true || m.type == MessageType.progress) {
@@ -418,7 +420,7 @@ class GroupRichContent {
               try {
                 await FlutterContacts.openExternalInsert(
                     Contact(displayName: name, phones: [Phone(phone)]));
-              } catch (_) {}
+              } catch (err, stk) { Log.w('group_rich_messages', 'showPhoneActions ignored error', error: err, stack: stk); }
             },
           ),
           const SizedBox(height: 8),

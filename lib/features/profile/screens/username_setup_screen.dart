@@ -1,5 +1,6 @@
 // lib/features/profile/screens/username_setup_screen.dart
 
+import '/core/logging/app_logger.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -184,7 +185,8 @@ class _UsernameSetupScreenState extends State<UsernameSetupScreen> {
           Navigator.pop(context, true);
         }
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('username_setup', '_save failed', error: e, stack: stk);
       if (mounted) {
         _showError(context.tr('pm.un.error', {'e': e.toString()}));
       }

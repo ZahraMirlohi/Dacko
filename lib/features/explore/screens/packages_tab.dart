@@ -1,3 +1,4 @@
+import '/core/logging/app_logger.dart';
 import '/l10n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -168,8 +169,8 @@ class _PackagesTabState extends State<PackagesTab> {
         _activePackageIds = userPackages.map((p) => p.id).toSet();
         _isLoadingActive = false;
       });
-    } catch (e) {
-      print('Error loading active packages: $e');
+    } catch (e, stk) {
+      Log.e('packages', 'Error loading active packages: $e', error: e, stack: stk);
 
       if (!mounted) return;
 
@@ -203,8 +204,8 @@ class _PackagesTabState extends State<PackagesTab> {
         final id = item['id'] as String;
         return Package.fromMap(item, id);
       }).toList();
-    } catch (e) {
-      print('Error getting user active packages: $e');
+    } catch (e, stk) {
+      Log.e('packages', 'Error getting user active packages: $e', error: e, stack: stk);
       return [];
     }
   }
@@ -420,7 +421,8 @@ class _PackagesTabState extends State<PackagesTab> {
           ),
         );
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('packages', '_activatePackage failed', error: e, stack: stk);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -814,8 +816,8 @@ class _PackagesTabState extends State<PackagesTab> {
 
         print(
             '✅ Removed ${habitsToRemove.length} habits from package "${package.title}"');
-      } catch (e) {
-        print('Error removing package habits from cache: $e');
+      } catch (e, stk) {
+        Log.e('packages', 'Error removing package habits from cache: $e', error: e, stack: stk);
       }
 
       // ۳. ریفرش
@@ -832,7 +834,8 @@ class _PackagesTabState extends State<PackagesTab> {
           ),
         );
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('packages', '_deactivatePackage failed', error: e, stack: stk);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

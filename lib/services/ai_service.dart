@@ -1,5 +1,6 @@
 // lib/services/ai_service.dart
 
+import '/core/logging/app_logger.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
@@ -108,8 +109,8 @@ class AIService {
         debugPrint('AI API Error: ${response.statusCode}');
         return _getFallbackResponse(message, habits, profile);
       }
-    } catch (e) {
-      debugPrint('AI Service Error: $e');
+    } catch (e, stk) {
+      Log.e('ai_service', 'AI Service Error: $e', error: e, stack: stk);
       return _getFallbackResponse(message, habits, profile);
     }
   }

@@ -1,3 +1,4 @@
+import '/core/logging/app_logger.dart';
 import 'package:flutter/material.dart';
 import '/l10n/app_strings.dart';
 import '/services/chat_service.dart';
@@ -38,7 +39,8 @@ Future<void> openBuddyChat(BuildContext context, String otherId) async {
     if (i < 0) throw Exception('conversation not found');
     await nav.push(MaterialPageRoute(
         builder: (_) => BuddyChatScreen(conversation: convs[i])));
-  } catch (e) {
+  } catch (e, stk) {
+    Log.e('open_buddy_chat', 'block failed', error: e, stack: stk);
     messenger.showSnackBar(SnackBar(content: Text('$errText: $e')));
   } finally {
     _opening = false;

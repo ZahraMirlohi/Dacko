@@ -1,6 +1,7 @@
 // lib/features/profile/screens/color_picker_screen.dart
 // صفحهٔ انتخاب رنگ اپلیکیشن — مطابق artboard «ColorPicker».
 
+import '/core/logging/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '/l10n/app_strings.dart';
@@ -409,7 +410,8 @@ class _ColorPickerScreenState extends State<ColorPickerScreen> {
         );
         Navigator.pop(context, true);
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('color_picker', '_saveColor failed', error: e, stack: stk);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -510,7 +512,8 @@ class _ColorPickerScreenState extends State<ColorPickerScreen> {
           ),
         );
         Navigator.pop(context, true);
-      } catch (_) {
+      } catch (err, stk) {
+        Log.w('color_picker', '_resetToDefault ignored error', error: err, stack: stk);
         // ignore
       } finally {
         if (mounted) {

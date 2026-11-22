@@ -1,5 +1,6 @@
 // lib/features/arena/screens/today_tab.dart
 
+import '/core/logging/app_logger.dart';
 import '/services/sound_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -368,8 +369,8 @@ class TodayTabState extends State<TodayTab> with TickerProviderStateMixin {
       }
 
       _resetTotalItems();
-    } catch (e) {
-      print('Error loading data: $e');
+    } catch (e, stk) {
+      Log.e('today', 'Error loading data: $e', error: e, stack: stk);
       if (mounted) {
         setState(() => _isLoading = false);
       }
@@ -462,7 +463,8 @@ class TodayTabState extends State<TodayTab> with TickerProviderStateMixin {
               challengeId: habit.challengeId!,
               date: widget.selectedDate,
             );
-          } catch (e) {
+          } catch (e, stk) {
+            Log.e('today', '_performDatabaseOperations failed', error: e, stack: stk);
             if (mounted) {
               showArenaSnack(context, 'ثبت پیشرفت چالش ناموفق بود: $e',
                   kind: ArenaSnackKind.error);
@@ -502,8 +504,8 @@ class TodayTabState extends State<TodayTab> with TickerProviderStateMixin {
       }
 
       _checkAllCompletedAndShowCongratulation();
-    } catch (e) {
-      print('Error in database operations: $e');
+    } catch (e, stk) {
+      Log.e('today', 'Error in database operations: $e', error: e, stack: stk);
       if (mounted) {
         setState(() {
           _habitCompletionStatus[habit.id] = false;
@@ -556,8 +558,8 @@ class TodayTabState extends State<TodayTab> with TickerProviderStateMixin {
           await _loadData();
         }
       }
-    } catch (e) {
-      print('Challenge completion check error: $e');
+    } catch (e, stk) {
+      Log.e('today', 'Challenge completion check error: $e', error: e, stack: stk);
     }
   }
 
@@ -588,8 +590,8 @@ class TodayTabState extends State<TodayTab> with TickerProviderStateMixin {
           await _loadData();
         }
       }
-    } catch (e) {
-      print('Quest completion error: $e');
+    } catch (e, stk) {
+      Log.e('today', 'Quest completion error: $e', error: e, stack: stk);
     }
   }
 
@@ -605,8 +607,8 @@ class TodayTabState extends State<TodayTab> with TickerProviderStateMixin {
         if (widget.profileRefreshNotifier != null) {
           widget.profileRefreshNotifier!.value++;
         }
-      } catch (e) {
-        print('Profile refresh error: $e');
+      } catch (e, stk) {
+        Log.e('today', 'Profile refresh error: $e', error: e, stack: stk);
       }
     }
   }
@@ -690,8 +692,8 @@ class TodayTabState extends State<TodayTab> with TickerProviderStateMixin {
         if (habit.questId != null && syncProvider.isOnline) {
           unawaited(_recalculateQuestProgress(_currentUserId!, habit.questId!));
         }
-      } catch (e) {
-        print('Error unmarking habit: $e');
+      } catch (e, stk) {
+        Log.e('today', 'Error unmarking habit: $e', error: e, stack: stk);
         if (mounted) {
           setState(() {
             _habitCompletionStatus[habit.id] = true;
@@ -763,7 +765,8 @@ class TodayTabState extends State<TodayTab> with TickerProviderStateMixin {
       }
 
       return false;
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('today', '_checkIfTodayHasOtherActivities failed', error: e, stack: stk);
       return false;
     }
   }
@@ -791,8 +794,8 @@ class TodayTabState extends State<TodayTab> with TickerProviderStateMixin {
       await _supabase.client
           .from('user_quests')
           .update({'progress': completedCount}).eq('id', userQuest.id);
-    } catch (e) {
-      print('Error recalculating quest progress: $e');
+    } catch (e, stk) {
+      Log.e('today', 'Error recalculating quest progress: $e', error: e, stack: stk);
     }
   }
 
@@ -849,7 +852,8 @@ class TodayTabState extends State<TodayTab> with TickerProviderStateMixin {
       }
 
       _checkAllCompletedAndShowCongratulation();
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('today', '_markTaskCompleted failed', error: e, stack: stk);
       setState(() {
         task.isCompleted = false;
         _taskCompletedStatus[task.id] = false;
@@ -934,7 +938,8 @@ class TodayTabState extends State<TodayTab> with TickerProviderStateMixin {
 
       _hasShownCongratulationToday = false;
       _checkAllCompletedAndShowCongratulation();
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('today', '_unmarkTask failed', error: e, stack: stk);
       setState(() {
         task.isCompleted = true;
         _taskCompletedStatus[task.id] = true;
@@ -1324,8 +1329,8 @@ class TodayTabState extends State<TodayTab> with TickerProviderStateMixin {
 
         // 5. رفرش دیتای صفحه
         await _loadData();
-      } catch (e) {
-        print('Error deleting habit: $e');
+      } catch (e, stk) {
+        Log.e('today', 'Error deleting habit: $e', error: e, stack: stk);
         if (mounted) {
           showArenaSnack(context,
               context.tr('ah.habits.delError', {'e': e.toString()}),
@@ -1380,8 +1385,8 @@ class TodayTabState extends State<TodayTab> with TickerProviderStateMixin {
 
         // 5. رفرش دیتای صفحه
         await _loadData();
-      } catch (e) {
-        print('Error deleting task: $e');
+      } catch (e, stk) {
+        Log.e('today', 'Error deleting task: $e', error: e, stack: stk);
         if (mounted) {
           showArenaSnack(context,
               context.tr('ah.tasks.delError', {'e': e.toString()}),
@@ -1633,7 +1638,8 @@ class TodayTabState extends State<TodayTab> with TickerProviderStateMixin {
         return HabitTimeTracking.fromMap(response);
       }
       return null;
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('today', '_getHabitTimeToday failed', error: e, stack: stk);
       return null;
     }
   }
@@ -1697,8 +1703,8 @@ class TodayTabState extends State<TodayTab> with TickerProviderStateMixin {
                           if (syncProvider.isOnline) {
                             await syncProvider.refreshHabitsAndTasks();
                           }
-                        } catch (e) {
-                          print('Error refreshing after timer: $e');
+                        } catch (e, stk) {
+                          Log.e('today', 'Error refreshing after timer: $e', error: e, stack: stk);
                         }
 
                         if (mounted) {
@@ -1737,8 +1743,8 @@ class TodayTabState extends State<TodayTab> with TickerProviderStateMixin {
           }
         });
       }
-    } catch (e) {
-      print('Error reloading habit time: $e');
+    } catch (e, stk) {
+      Log.e('today', 'Error reloading habit time: $e', error: e, stack: stk);
     }
   }
 
@@ -1812,7 +1818,8 @@ class TodayTabState extends State<TodayTab> with TickerProviderStateMixin {
         showArenaSnack(context, context.tr('at.snack.settingsSaved'),
             kind: ArenaSnackKind.success);
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('today', '_saveTimerSetting failed', error: e, stack: stk);
       if (mounted) {
         showArenaSnack(context, context.tr('ad.tmr.error', {'e': e.toString()}),
             kind: ArenaSnackKind.error);
@@ -1844,7 +1851,8 @@ class TodayTabState extends State<TodayTab> with TickerProviderStateMixin {
       }
 
       return CompletionLevel.full;
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('today', '_getHabitCompletionLevel failed', error: e, stack: stk);
       return CompletionLevel.full;
     }
   }

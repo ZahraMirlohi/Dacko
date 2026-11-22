@@ -1,5 +1,6 @@
 // lib/services/image_crop_service.dart
 
+import '/core/logging/app_logger.dart';
 import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
@@ -46,8 +47,8 @@ class ImageCropService {
       // در Web، باید bytes را بخوانیم و به File تبدیل کنیم
       // اما image_cropper در Web یک فایل موقت می‌سازد که path دارد
       return File(croppedFile.path);
-    } catch (e) {
-      debugPrint('Error cropping: $e');
+    } catch (e, stk) {
+      Log.e('image_crop', 'Error cropping: $e', error: e, stack: stk);
       return null;
     }
   }
@@ -96,8 +97,8 @@ class ImageCropService {
 
       if (croppedFile == null) return null;
       return File(croppedFile.path);
-    } catch (e) {
-      debugPrint('Error cropping: $e');
+    } catch (e, stk) {
+      Log.e('image_crop', 'Error cropping: $e', error: e, stack: stk);
       return null;
     }
   }

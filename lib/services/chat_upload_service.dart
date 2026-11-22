@@ -1,4 +1,5 @@
 // انتخاب چندتایی و آپلود فایل/عکس/موزیک برای چت گروه و کانال
+import '/core/logging/app_logger.dart';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
@@ -41,7 +42,7 @@ class ChatUploadService {
       try {
         final bytes = f.bytes ?? await File(f.path!).readAsBytes();
         out.add(ChatAttachment(f.name, bytes.length, bytes, kind));
-      } catch (_) {}
+      } catch (err, stk) { Log.w('chat_upload', 'pick ignored error', error: err, stack: stk); }
     }
     return out;
   }

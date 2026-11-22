@@ -1,5 +1,6 @@
 // lib/services/buddy_matcher_service.dart
 
+import '/core/logging/app_logger.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../features/profile/models/user_personality.dart';
 import 'chat_service.dart';
@@ -19,8 +20,8 @@ class BuddyMatcherService {
 
       if (response == null) return null;
       return UserPersonality.fromMap(response, userId);
-    } catch (e) {
-      print('Error getting user personality: $e');
+    } catch (e, stk) {
+      Log.e('buddy_matcher', 'Error getting user personality: $e', error: e, stack: stk);
       return null;
     }
   }
@@ -151,8 +152,8 @@ class BuddyMatcherService {
             userId,
           );
           matchScore = currentPersonality.calculateMatchScore(otherPersonality);
-        } catch (e) {
-          print('Error calculating match score: $e');
+        } catch (e, stk) {
+          Log.e('buddy_matcher', 'Error calculating match score: $e', error: e, stack: stk);
         }
       }
 
@@ -188,8 +189,8 @@ class BuddyMatcherService {
         'request_id': requestsResponse?['id'],
         'conversation_id': conversationId,
       };
-    } catch (e) {
-      print('Error searching user: $e');
+    } catch (e, stk) {
+      Log.e('buddy_matcher', 'Error searching user: $e', error: e, stack: stk);
       return null;
     }
   }
@@ -221,8 +222,8 @@ class BuddyMatcherService {
       }
 
       return response != null;
-    } catch (e) {
-      print('Error checking user existence: $e');
+    } catch (e, stk) {
+      Log.e('buddy_matcher', 'Error checking user existence: $e', error: e, stack: stk);
       return false;
     }
   }
@@ -394,8 +395,8 @@ class BuddyMatcherService {
           (b['match_score'] as double).compareTo(a['match_score'] as double));
 
       return matches.take(limit).toList();
-    } catch (e) {
-      print('Error finding matching buddies: $e');
+    } catch (e, stk) {
+      Log.e('buddy_matcher', 'Error finding matching buddies: $e', error: e, stack: stk);
       return [];
     }
   }
@@ -441,7 +442,7 @@ class BuddyMatcherService {
         if (target?['allow_buddy_requests'] == false) {
           throw Exception('این کاربر درخواست هم‌مسیری دریافت نمی‌کند');
         }
-      } on PostgrestException catch (_) {}
+      } on PostgrestException catch (err, stk) { Log.w('buddy_matcher', 'sendBuddyRequestWithMatch ignored error', error: err, stack: stk); }
 
       // 1. حذف درخواست‌های قبلی بین این دو کاربر
       await _client
@@ -515,8 +516,8 @@ class BuddyMatcherService {
       }
 
       return result;
-    } catch (e) {
-      print('Error getting sent buddy requests: $e');
+    } catch (e, stk) {
+      Log.e('buddy_matcher', 'Error getting sent buddy requests: $e', error: e, stack: stk);
       return [];
     }
   }
@@ -549,8 +550,8 @@ class BuddyMatcherService {
       }
 
       return result;
-    } catch (e) {
-      print('Error getting buddy requests: $e');
+    } catch (e, stk) {
+      Log.e('buddy_matcher', 'Error getting buddy requests: $e', error: e, stack: stk);
       return [];
     }
   }
@@ -610,8 +611,8 @@ class BuddyMatcherService {
       }
 
       return result;
-    } catch (e) {
-      print('Error getting request history: $e');
+    } catch (e, stk) {
+      Log.e('buddy_matcher', 'Error getting request history: $e', error: e, stack: stk);
       return [];
     }
   }
@@ -770,7 +771,8 @@ class BuddyMatcherService {
   Future<User?> getCurrentUser() async {
     try {
       return _client.auth.currentUser;
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('buddy_matcher', 'getCurrentUser failed', error: e, stack: stk);
       return null;
     }
   }

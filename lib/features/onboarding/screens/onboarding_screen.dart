@@ -4,6 +4,7 @@
 //   نام کاربری و عکس هدف اولین کار (ساخته می‌شود) شخصیت ساعت‌ها
 // هر صفحه رنگ پاستلی خودش را دارد و بین صفحه‌ها نرم جابه‌جا می‌شویم.
 
+import '/core/logging/app_logger.dart';
 import 'dart:async';
 import 'dart:io';
 import 'dart:math' as math;
@@ -168,7 +169,8 @@ class _OnboardingScreenState extends State<OnboardingScreen>
         try {
           await SupabaseService().setUsername(uid, name);
           auth.setHasUsername(true);
-        } catch (_) {
+        } catch (err, stk) {
+          Log.w('onboarding', '_commitProfile ignored error', error: err, stack: stk);
           messenger.showSnackBar(SnackBar(content: Text(failText)));
         }
       }
@@ -180,7 +182,8 @@ class _OnboardingScreenState extends State<OnboardingScreen>
             originalFileName: 'avatar.jpg',
           );
           await SupabaseService().updateAvatarUrl(uid, url);
-        } catch (_) {
+        } catch (err, stk) {
+          Log.w('onboarding', '_commitProfile ignored error', error: err, stack: stk);
           // عکس اختیاری است؛ بعداً از پروفایل می‌شود گذاشت
         }
       }
@@ -218,7 +221,8 @@ class _OnboardingScreenState extends State<OnboardingScreen>
         if (!sync.isOnline) throw Exception('offline');
         await SupabaseService().createTask(task); // سرور شناسهٔ واقعی می‌سازد
         await sync.refreshHabitsAndTasks();
-      } catch (_) {
+      } catch (err, stk) {
+        Log.w('onboarding', '_commitFirstTask ignored error', error: err, stack: stk);
         // آفلاین یا خطا: محلی ذخیره و در صف ارسال
         await sync.saveTaskToLocal(task);
         await sync.addOfflineOperation(
@@ -230,7 +234,8 @@ class _OnboardingScreenState extends State<OnboardingScreen>
       messenger
         ..hideCurrentSnackBar()
         ..showSnackBar(SnackBar(content: Text(okText)));
-    } catch (_) {
+    } catch (err, stk) {
+      Log.w('onboarding', '_commitFirstTask ignored error', error: err, stack: stk);
       messenger.showSnackBar(SnackBar(content: Text(errText)));
     } finally {
       if (mounted) setState(() => _busy = false);
@@ -283,7 +288,8 @@ class _OnboardingScreenState extends State<OnboardingScreen>
       bool available;
       try {
         available = await SupabaseService().isUsernameAvailable(v);
-      } catch (_) {
+      } catch (err, stk) {
+        Log.w('onboarding', '_onUsernameChanged ignored error', error: err, stack: stk);
         available = false;
       }
       if (!mounted || _username.text.trim().toLowerCase() != v) return;
@@ -309,7 +315,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
       if (cropped == null) return; // کاربر برش را لغو کرد
       final bytes = await cropped.readAsBytes();
       if (mounted) setState(() => _avatar = bytes);
-    } catch (_) {}
+    } catch (err, stk) { Log.w('onboarding', '_pickAvatar ignored error', error: err, stack: stk); }
   }
 
   Future<void> _pickTime(bool wake) async {

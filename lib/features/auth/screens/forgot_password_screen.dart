@@ -3,6 +3,7 @@
 // بازیابی رمز با لینک ایمیل: ایمیل را می‌گیرد و لینک می‌فرستد.
 // با باز شدن لینک، برنامه خودش صفحهٔ «رمز جدید» (ResetPasswordScreen) را نشان می‌دهد.
 
+import '/core/logging/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -42,7 +43,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     try {
       await context.read<AuthProvider>().sendPasswordReset(_email.text);
       if (mounted) setState(() => _sent = true);
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('forgot_password', '_send failed', error: e, stack: stk);
       if (mounted) setState(() => _error = authErrorText(context, e));
     } finally {
       if (mounted) setState(() => _loading = false);
@@ -52,7 +54,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Future<void> _resend() async {
     try {
       await context.read<AuthProvider>().sendPasswordReset(_email.text);
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('forgot_password', '_resend failed', error: e, stack: stk);
       if (mounted) setState(() => _error = authErrorText(context, e));
     }
   }

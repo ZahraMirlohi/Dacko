@@ -1,5 +1,6 @@
 // lib/features/arena/screens/add_habit_screen.dart
 
+import '/core/logging/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:inner_hero_app/providers/sync_provider.dart';
 import 'package:provider/provider.dart';
@@ -269,7 +270,8 @@ class _AddHabitScreenState extends State<AddHabitScreen> {
           Navigator.pop(context, true);
         }
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('add_habit', '_saveHabit failed', error: e, stack: stk);
       if (mounted) {
         showArenaSnack(
           context,

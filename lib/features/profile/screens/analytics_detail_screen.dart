@@ -1,5 +1,6 @@
 // lib/features/profile/screens/analytics_detail_screen.dart
 
+import '/core/logging/app_logger.dart';
 import '/widgets/bottom_safe.dart';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
@@ -119,7 +120,8 @@ class _AnalyticsDetailScreenState extends State<AnalyticsDetailScreen>
         } else {
           _activeDays = _getSampleActiveDays();
         }
-      } catch (e) {
+      } catch (e, stk) {
+        Log.e('analytics_detail', '_loadData failed', error: e, stack: stk);
         _activeDays = _getSampleActiveDays();
       }
 
@@ -135,7 +137,8 @@ class _AnalyticsDetailScreenState extends State<AnalyticsDetailScreen>
           _isLoading = false;
         });
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('analytics_detail', '_loadData failed', error: e, stack: stk);
       _activeDays = _getSampleActiveDays();
       _totalActiveDays = _activeDays.length;
 
@@ -218,7 +221,8 @@ class _AnalyticsDetailScreenState extends State<AnalyticsDetailScreen>
       }
 
       return habitStreaks;
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('analytics_detail', '_calculateAllHabitsStreak failed', error: e, stack: stk);
       return {};
     }
   }
@@ -303,7 +307,8 @@ class _AnalyticsDetailScreenState extends State<AnalyticsDetailScreen>
           completions.putIfAbsent(habitId, () => {}).add(date);
         }
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('analytics_detail', '_calculateSuccessData failed', error: e, stack: stk);
       _calculateSuccessDataFallback();
       return;
     }
@@ -1413,7 +1418,8 @@ class _AnalyticsDetailScreenState extends State<AnalyticsDetailScreen>
       _cacheTime = DateTime.now();
 
       return result;
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('analytics_detail', '_getAllHabitsWeeklyStatus failed', error: e, stack: stk);
       for (var habit in _habits) {
         result[habit.id] = List.filled(7, false);
       }
@@ -1453,7 +1459,8 @@ class _AnalyticsDetailScreenState extends State<AnalyticsDetailScreen>
             .putIfAbsent(item['habit_id'] as String, () => {})
             .add(item['date'] as String);
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('analytics_detail', '_calculateHabitRates failed', error: e, stack: stk);
       // بدون داده‌ی تکمیل، نرخ‌ها صفر می‌مانند
     }
 
@@ -1498,7 +1505,8 @@ class _AnalyticsDetailScreenState extends State<AnalyticsDetailScreen>
             .eq('date', todayStr)
             .inFilter('habit_id', scheduled.map((h) => h.id).toList());
         doneIds = {for (var r in response) r['habit_id'] as String};
-      } catch (e) {
+      } catch (e, stk) {
+        Log.e('analytics_detail', '_calculateToday failed', error: e, stack: stk);
         // نادیده بگیر
       }
     }

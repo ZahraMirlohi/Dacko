@@ -6,6 +6,7 @@
 //
 // تمام getterهای قبلی دست‌نخورده موندن، پس ویجت‌های فعلی بدون تغییر کار می‌کنن.
 
+import '/core/logging/app_logger.dart';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -78,7 +79,8 @@ class ThemeProvider extends ChangeNotifier with WidgetsBindingObserver {
         colorValue != null ? Color(colorValue) : defaultPrimary,
         mode,
       );
-    } catch (_) {
+    } catch (err, stk) {
+      Log.w('theme', 'load ignored error', error: err, stack: stk);
       return ThemeProvider._preloaded(defaultPrimary, AppThemeMode.light);
     }
   }
@@ -179,7 +181,7 @@ class ThemeProvider extends ChangeNotifier with WidgetsBindingObserver {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setInt(_primaryColorKey, color.value);
-    } catch (_) {}
+    } catch (err, stk) { Log.w('theme', 'setPrimaryColor ignored error', error: err, stack: stk); }
   }
 
   Future<void> setThemeMode(AppThemeMode mode) async {
@@ -190,7 +192,7 @@ class ThemeProvider extends ChangeNotifier with WidgetsBindingObserver {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(_themeModeKey, mode.name);
       await prefs.setBool(_isDarkModeKey, _dark);
-    } catch (_) {}
+    } catch (err, stk) { Log.w('theme', 'setThemeMode ignored error', error: err, stack: stk); }
   }
 
   Future<void> setDarkMode(bool value) =>
@@ -307,6 +309,6 @@ class ThemeProvider extends ChangeNotifier with WidgetsBindingObserver {
       }
       _recompute();
       notifyListeners();
-    } catch (_) {}
+    } catch (err, stk) { Log.w('theme', '_loadSavedValues ignored error', error: err, stack: stk); }
   }
 }

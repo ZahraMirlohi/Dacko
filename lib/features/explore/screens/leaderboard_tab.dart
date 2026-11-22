@@ -1,5 +1,6 @@
 // lib/features/explore/screens/leaderboard_tab.dart
 
+import '/widgets/skeleton.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '/widgets/net_image.dart';
 import '/core/logging/app_logger.dart';
@@ -721,18 +722,7 @@ class _LeaderboardTabState extends State<LeaderboardTab> {
   }
 
   Widget _buildLoadingState(Color primaryColor, ThemeProvider theme) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          CircularProgressIndicator(color: theme.effectivePrimary),
-          const SizedBox(height: 16),
-          Text(context.tr('lb.k016'),
-              style:
-                  TextStyle(color: theme.textSecondaryColor, fontSize: 13)),
-        ],
-      ),
-    );
+    return const SkeletonList(itemCount: 8);
   }
 
   Widget _buildErrorState(Color primaryColor, ThemeProvider theme) {

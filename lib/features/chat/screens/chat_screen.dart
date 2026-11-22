@@ -1,3 +1,4 @@
+import '/widgets/skeleton.dart';
 import '/widgets/net_image.dart';
 import '/core/logging/app_logger.dart';
 import 'dart:async';

@@ -1,5 +1,6 @@
 // lib/main.dart
 
+import 'core/timeout_http_client.dart';
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
@@ -87,6 +88,7 @@ Future<void> _initSupabase() async {
   await Supabase.initialize(
     url: supabaseUrl,
     anonKey: supabaseAnonKey,
+    httpClient: TimeoutHttpClient(),
     authOptions: const FlutterAuthClientOptions(
       authFlowType: AuthFlowType.pkce,
       autoRefreshToken: true,

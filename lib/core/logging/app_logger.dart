@@ -11,7 +11,7 @@ import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math' as math;
-import 'dart:ui' show PlatformDispatcher;
+import 'dart:ui' show FrameTiming, PlatformDispatcher;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
@@ -401,6 +401,7 @@ class Log {
       return true;
     };
     WidgetsBinding.instance.addObserver(_LifeObserver());
+    _watchPerformance();
 
     i('app', 'session start', fields: {
       'version': kAppVersion,
@@ -408,6 +409,27 @@ class Log {
       'platform': _platformLabel,
       'dart': kIsWeb ? 'web' : Platform.version.split(' ').first,
       'locale': PlatformDispatcher.instance.locale.toLanguageTag(),
+    });
+  }
+
+  static final Stopwatch _clock = Stopwatch()..start();
+
+  /// پایش کارایی: زمان تا اولین فریم و فریم‌های بسیار کند (jank) با زمان build/raster
+  static void _watchPerformance() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      i('perf', 'first frame', fields: {'ms': _clock.elapsedMilliseconds});
+    });
+    WidgetsBinding.instance.addTimingsCallback((List<FrameTiming> timings) {
+      for (final t in timings) {
+        final ms = t.totalSpan.inMilliseconds;
+        if (ms >= 250) {
+          w('perf', ms >= 700 ? 'frozen frame' : 'slow frame', fields: {
+            'ms': ms,
+            'build': t.buildDuration.inMilliseconds,
+            'raster': t.rasterDuration.inMilliseconds,
+          });
+        }
+      }
     });
   }
 

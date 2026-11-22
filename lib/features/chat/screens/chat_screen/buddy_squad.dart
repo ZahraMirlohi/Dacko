@@ -47,9 +47,7 @@ extension _ChatScreenStateBuddySquad on _ChatScreenState {
 
   Widget _buildBuddyConversations(ThemeProvider theme, Color primaryColor) {
     if (_isLoading) {
-      return Center(
-        child: CircularProgressIndicator(color: primaryColor),
-      );
+      return const SkeletonList(itemCount: 7);
     }
 
     final buddyConversations =
@@ -83,9 +81,7 @@ extension _ChatScreenStateBuddySquad on _ChatScreenState {
 
   Widget _buildSquadTab(ThemeProvider theme, Color primaryColor) {
     if (_isLoading) {
-      return Center(
-        child: CircularProgressIndicator(color: primaryColor),
-      );
+      return const SkeletonList(itemCount: 7);
     }
 
     final squadConversations =
@@ -120,9 +116,7 @@ extension _ChatScreenStateBuddySquad on _ChatScreenState {
 
   Widget _buildArenaTab(ThemeProvider theme, Color primaryColor) {
     if (_isLoading) {
-      return Center(
-        child: CircularProgressIndicator(color: primaryColor),
-      );
+      return const SkeletonList(itemCount: 7);
     }
 
     final arenaConversations =

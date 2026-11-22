@@ -100,7 +100,7 @@ class AIService {
           'temperature': 0.7,
           'max_tokens': 300,
         }),
-      );
+      ).timeout(const Duration(seconds: 20)); // بعد از ۲۰ ثانیه پاسخ آفلاین (fallback)
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);

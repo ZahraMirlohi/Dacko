@@ -34,6 +34,8 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   String? _uid;
 
   int _currentIndex = 0;
+  // تب‌ها فقط بار اولِ باز شدن ساخته می‌شوند (راه‌اندازی سریع‌تر: دیتای چت/اکسپلور/پروفایل موقع شروع لود نمی‌شود)
+  final List<bool> _built = [true, false, false, false];
   final List<int> _tabHistory = []; // برای دکمه‌ی بک: یک مرحله برگشت
   DateTime? _lastBack;
 
@@ -156,8 +158,10 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       _popupDismissed = true;
       if (_currentIndex != 1) _tabHistory.add(_currentIndex);
       _currentIndex = 1;
+      _built[1] = true;
     });
-    ChatScreen.openRequestsSignal.value++;
+    // بعد از فریم: اگر تب چت همین حالا ساخته شده، listener اش آماده است
+    WidgetsBinding.instance.addPostFrameCallback((_) => ChatScreen.openRequestsSignal.value++);
   }
 
   @override
@@ -170,7 +174,10 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       onPopInvokedWithResult: (didPop, _) {
         if (didPop) return;
         if (_tabHistory.isNotEmpty) {
-          setState(() => _currentIndex = _tabHistory.removeLast());
+          setState(() {
+            _currentIndex = _tabHistory.removeLast();
+            _built[_currentIndex] = true;
+          });
           return;
         }
         if (_currentIndex != 0) {
@@ -206,11 +213,13 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
                 ArenaScreen(
                   profileRefreshNotifier: _profileRefreshNotifier,
                 ),
-                const ChatScreen(),
-                ExploreScreen(refreshNotifier: _exploreRefreshNotifier),
-                ProfileScreen(
-                  refreshNotifier: _profileRefreshNotifier,
-                ),
+                _built[1] ? const ChatScreen() : const SizedBox.shrink(),
+                _built[2]
+                    ? ExploreScreen(refreshNotifier: _exploreRefreshNotifier)
+                    : const SizedBox.shrink(),
+                _built[3]
+                    ? ProfileScreen(refreshNotifier: _profileRefreshNotifier)
+                    : const SizedBox.shrink(),
               ],
             ),
           ),
@@ -251,6 +260,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
                       if (_tabHistory.length > 10) _tabHistory.removeAt(0);
                     }
                     _currentIndex = index;
+                    _built[index] = true;
                   });
 
                   if (index == 3) {

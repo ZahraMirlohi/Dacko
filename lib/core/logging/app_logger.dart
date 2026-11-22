@@ -145,6 +145,12 @@ Object? _scrubValue(Object? v, [int depth = 0]) {
   return _scrub(v.toString());
 }
 
+@visibleForTesting
+String scrubText(String s) => _scrub(s);
+
+@visibleForTesting
+Object? scrubValue(Object? v) => _scrubValue(v);
+
 // ───────────────────────── مقصدها ─────────────────────────
 
 abstract class _Sink {
@@ -360,6 +366,16 @@ class Log {
   /// ارسال لاگ‌های error+ به سرور را روشن/خاموش کنید (مثلاً از تنظیمات حریم خصوصی)
   static set remoteEnabled(bool v) => _remote.enabled = v;
   static bool get remoteEnabled => _remote.enabled;
+
+  /// فقط برای تست‌ها: حافظه، حذف تکرار و وضعیت کاربر/صفحه را پاک می‌کند
+  @visibleForTesting
+  static void resetForTest() {
+    _memory.clear();
+    _recent.clear();
+    _userId = null;
+    _screen = null;
+    _remote.enabled = false;
+  }
 
   /// یک‌بار در ابتدای _bootstrap صدا زده شود (بعد از ensureInitialized).
   static Future<void> init() async {

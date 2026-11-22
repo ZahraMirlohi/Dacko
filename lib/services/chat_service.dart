@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '/core/logging/app_logger.dart';
 import '../features/chat/models/message_model.dart';
 import '../features/chat/models/conversation_model.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -1299,7 +1300,7 @@ class ChatService {
       return id as String;
     } catch (e) {
       if (e.toString().contains('not buddies')) rethrow;
-      print('RPC get_or_create_buddy_conversation failed, falling back: $e');
+      Log.w('chat', 'buddy RPC failed, falling back', error: e, fields: {'other': other});
       return createConversation(
           type: 'buddy', memberIds: [me, other], createdBy: me);
     }

@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'app.dart';
+import 'core/logging/app_logger.dart';
 import 'providers/auth_provider.dart';
 import 'providers/calendar_provider.dart';
 import 'providers/settings_provider.dart';
@@ -23,19 +24,17 @@ void main() {
   // همهٔ print های برنامه فقط در حالت دیباگ چاپ می‌شن (در نسخهٔ نهایی ساکتند و کند نمی‌کنن)
   runZonedGuarded(
     _bootstrap,
-    (error, stack) {
-      if (kDebugMode) debugPrint('Uncaught: $error\n$stack');
-    },
+    (error, stack) => Log.f('zone', 'Uncaught error', error: error, stack: stack),
+    // همهٔ print های برنامه به سیستم لاگ می‌روند (کنسول فقط در دیباگ)
     zoneSpecification: ZoneSpecification(
-      print: (self, parent, zone, line) {
-        if (kDebugMode) parent.print(zone, line);
-      },
+      print: (self, parent, zone, line) => Log.fromPrint(line),
     ),
   );
 }
 
 Future<void> _bootstrap() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Log.init();
 
   try {
     // خواندن همزمان مواردی که به هم وابسته نیستن
@@ -65,8 +64,8 @@ Future<void> _bootstrap() async {
         child: const HeroApp(),
       ),
     );
-  } catch (e) {
-    if (kDebugMode) debugPrint('Startup error: $e');
+  } catch (e, st) {
+    Log.f('app', 'Startup error', error: e, stack: st);
     runApp(_StartupError(error: e.toString(), onRetry: main));
   }
 }

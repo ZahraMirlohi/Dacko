@@ -10,6 +10,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+import '/core/logging/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -101,7 +102,8 @@ class AuthProvider extends ChangeNotifier {
 
   Future<void> _onAuthEvent(AuthState data) async {
     final event = data.event;
-    if (kDebugMode) debugPrint('Auth event: $event');
+    Log.i('auth', 'event', fields: {'event': event.name});
+    Log.setUser(data.session?.user.id);
 
     switch (event) {
       case AuthChangeEvent.signedOut:

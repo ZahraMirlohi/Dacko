@@ -1,5 +1,12 @@
 // رشته‌های tx
 const Map<String, String> txFa = {
+  'log.title': 'گزارش‌های عیب‌یابی',
+  'log.history': 'جلسه‌های قبلی',
+  'log.copy': 'کپی',
+  'log.share': 'اشتراک‌گذاری',
+  'log.clear': 'پاک کردن',
+  'log.search': 'جستجو در لاگ‌ها',
+  'log.empty': 'لاگی وجود ندارد',
   'ch.q1': 'آیا از انصراف از چالش "{t}" مطمئن هستید؟',
   'pf.k001': 'خطا در بارگذاری اطلاعات',
   'pf.k002': 'خطا در بارگذاری: {p0}',
@@ -142,6 +149,13 @@ const Map<String, String> txFa = {
 };
 
 const Map<String, String> txEn = {
+  'log.title': 'Diagnostic logs',
+  'log.history': 'Previous sessions',
+  'log.copy': 'Copy',
+  'log.share': 'Share',
+  'log.clear': 'Clear',
+  'log.search': 'Search logs',
+  'log.empty': 'No logs',
   'ch.q1': 'Are you sure you want to quit the challenge "{t}"?',
   'pf.k001': 'Error loading data',
   'pf.k002': 'Loading error: {p0}',

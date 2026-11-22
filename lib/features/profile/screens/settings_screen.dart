@@ -1,6 +1,7 @@
 // lib/features/profile/screens/settings_screen.dart
 
 import 'package:flutter/material.dart';
+import '/core/logging/log_viewer_screen.dart';
 import 'package:provider/provider.dart';
 
 import '/core/app_palette.dart';
@@ -284,6 +285,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   context,
                   MaterialPageRoute(
                       builder: (_) => const TermsAndConditionsScreen()),
+                ),
+              ),
+              _row(
+                theme,
+                tone: Tone.butter,
+                icon: Icons.bug_report_rounded,
+                title: context.tr('log.title'),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const LogViewerScreen()),
                 ),
               ),
             ]),

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../core/logging/app_logger.dart';
 import '../../../l10n/app_strings.dart';
 import '../../../services/supabase_service.dart';
 import '../../arena/screens/arena_screen.dart';
@@ -243,6 +244,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
               child: CustomBottomNavBar(
                 currentIndex: _currentIndex,
                 onTap: (index) {
+                  Log.screen(const ['arena', 'chat', 'explore', 'profile'][index]);
                   setState(() {
                     if (index != _currentIndex) {
                       _tabHistory.add(_currentIndex);

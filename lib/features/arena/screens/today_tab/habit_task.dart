@@ -69,7 +69,9 @@ extension TodayTabStateHabitTask on TodayTabState {
 
     return Dismissible(
       key: ValueKey('dismissible_habit_${habit.id}'),
-      direction: DismissDirection.horizontal,
+      direction: _isViewingToday
+          ? DismissDirection.horizontal
+          : DismissDirection.none,
       dismissThresholds: const {
         DismissDirection.startToEnd: 0.3,
         DismissDirection.endToStart: 0.3,
@@ -94,11 +96,12 @@ extension TodayTabStateHabitTask on TodayTabState {
         key: ValueKey('habit_card_${habit.id}'),
         habit: habit,
         isCompleted: false,
+        viewOnly: !_isViewingToday,
         recordedTimeSeconds: _habitRecordedTimes[habit.id], // پاس دادن زمان
         onToggle: () => _markHabitCompleted(habit),
         onEdit: isEditable ? () => _editHabit(habit) : () {},
         onDelete: isEditable ? () => _deleteHabit(habit) : () {},
-        onTimer: isEditable ? () => _showTimerDialog(habit) : null,
+        onTimer: isEditable && _isViewingToday ? () => _showTimerDialog(habit) : null,
         onToggleSubHabit: (subHabit) => _toggleSubHabit(habit, subHabit),
         onTap: () {
           Navigator.push(
@@ -119,7 +122,9 @@ extension TodayTabStateHabitTask on TodayTabState {
 
     return Dismissible(
       key: ValueKey('dismissible_completed_habit_${habit.id}'),
-      direction: DismissDirection.horizontal,
+      direction: _isViewingToday
+          ? DismissDirection.horizontal
+          : DismissDirection.none,
       dismissThresholds: const {
         DismissDirection.startToEnd: 0.3,
         DismissDirection.endToStart: 0.3,
@@ -146,10 +151,11 @@ extension TodayTabStateHabitTask on TodayTabState {
         key: ValueKey('completed_habit_card_${habit.id}'),
         habit: habit,
         isCompleted: true,
+        viewOnly: !_isViewingToday,
         onToggle: () => _unmarkHabit(habit),
         onEdit: isEditable ? () => _editHabit(habit) : () {},
         onDelete: isEditable ? () => _deleteHabit(habit) : () {},
-        onTimer: isEditable ? () => _showTimerDialog(habit) : null,
+        onTimer: isEditable && _isViewingToday ? () => _showTimerDialog(habit) : null,
         onToggleSubHabit: (subHabit) => _toggleSubHabit(habit, subHabit),
         onTap: () {
           Navigator.push(

@@ -4,6 +4,10 @@ part of '../challenges_tab.dart';
 
 extension _ChallengesTabStateCardCached on _ChallengesTabState {
 
+  // یک Future پایدار برای هر کارت؛ بدون این، هر build اشتراک FutureBuilder را از نو می‌ساخت (پرش/کندی)
+  Future<T> _memo<T>(String k, Future<T> Function() make) =>
+      (_futures[k] ??= make()) as Future<T>;
+
   Future<void> _checkExpiredChallenges() async {
     if (_isInitialized) return;
     _isInitialized = true;
@@ -47,9 +51,6 @@ extension _ChallengesTabStateCardCached on _ChallengesTabState {
       return {'completedDays': 0, 'totalDays': 0};
     } finally {
       _isLoadingProgress[challengeId] = false;
-      if (mounted) {
-        setState(() {});
-      }
     }
   }
 
@@ -205,10 +206,10 @@ extension _ChallengesTabStateCardCached on _ChallengesTabState {
 
     return FutureBuilder<List<dynamic>>(
       key: ValueKey('active_${challengeId}_$_refreshCounter'),
-      future: Future.wait([
+      future: _memo('a_$challengeId', () => Future.wait([
         _getCachedProgress(challengeId),
         _getCachedParticipants(challengeId),
-      ]),
+      ])),
       builder: (context, snapshot) {
         int completedDays = 0;
         int total = totalDays;
@@ -372,7 +373,7 @@ extension _ChallengesTabStateCardCached on _ChallengesTabState {
 
     return FutureBuilder<int>(
       key: ValueKey('new_${challengeId}_$_refreshCounter'),
-      future: _getCachedParticipants(challengeId),
+      future: _memo('n_$challengeId', () => _getCachedParticipants(challengeId)),
       builder: (context, snapshot) {
         return GestureDetector(
           onTap: () => widget.showChallengeDetails(challenge),

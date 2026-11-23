@@ -12,12 +12,11 @@ extension _ExploreScreenStateChallengeQuest on _ExploreScreenState {
     _loadData();
   }
 
-  void forceRefresh() {
-    print('Force refresh called');
+  Future<void> forceRefresh() {
     _challengeDetailsCache.clear();
     _isInitialized = false;
     _isLoadingInProgress = false;
-    _loadData();
+    return _loadData();
   }
 
   Future<void> _loadData() async {
@@ -135,10 +134,9 @@ extension _ExploreScreenStateChallengeQuest on _ExploreScreenState {
         await syncProvider.saveChallengesToLocal(newChallenges);
       }
 
-      if (newUserChallenges.isNotEmpty) {
-        _myChallenges = newUserChallenges;
-        await syncProvider.saveUserChallengesToLocal(newUserChallenges);
-      }
+      // بدون شرط خالی نبودن: حذف آخرین چالش فعال هم باید دیده شود
+      _myChallenges = newUserChallenges;
+      await syncProvider.saveUserChallengesToLocal(newUserChallenges);
 
       if (newPackages.isNotEmpty) {
         _templatePackages = newPackages;

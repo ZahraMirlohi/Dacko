@@ -12,7 +12,7 @@ import '../widgets/card_image.dart';
 class PackagesTab extends StatefulWidget {
   final List<Package> packages;
   final String currentUserId;
-  final VoidCallback onRefresh;
+  final Future<void> Function() onRefresh;
 
   const PackagesTab({
     super.key,
@@ -251,7 +251,11 @@ class _PackagesTabState extends State<PackagesTab> {
         .where((p) => !_activePackageIds.contains(p.id))
         .toList();
 
-    return SingleChildScrollView(
+    return RefreshIndicator(
+     edgeOffset: 96,
+     onRefresh: widget.onRefresh,
+     child: SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.fromLTRB(20, 96, 20, 120),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -311,6 +315,7 @@ class _PackagesTabState extends State<PackagesTab> {
           ],
         ],
       ),
+     ),
     );
   }
 

@@ -21,7 +21,7 @@ class ChallengesTab extends StatefulWidget {
   final List<Map<String, dynamic>> challenges;
   final List<Map<String, dynamic>> myChallenges;
   final String currentUserId;
-  final VoidCallback onRefresh;
+  final Future<void> Function() onRefresh;
   final Function(Map<String, dynamic>) joinChallenge;
   final Function(Map<String, dynamic>) leaveChallenge;
   final Function(Map<String, dynamic>) showChallengeDetails;
@@ -48,6 +48,7 @@ class _ChallengesTabState extends State<ChallengesTab> {
 
   final Map<String, _CachedProgress> _progressCache = {};
   final Map<String, bool> _isLoadingProgress = {};
+  final Map<String, Future<dynamic>> _futures = {};
   final Map<String, _CachedValue<int>> _participantsCache = {};
 
   @override
@@ -59,9 +60,14 @@ class _ChallengesTabState extends State<ChallengesTab> {
   @override
   void didUpdateWidget(ChallengesTab oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // هر بازسازی از والد (مثلاً بعد از رفرش کاوش) کش پیشرفت را باطل می‌کند
-    _progressCache.clear();
-    _participantsCache.clear();
+    // فقط وقتی فهرست چالش‌ها واقعاً عوض شد (اضافه/حذف/تغییر وضعیت) کش باطل می‌شود
+    String sig(List<Map<String, dynamic>> l) =>
+        l.map((c) => '${c['id']}:${c['is_completed']}:${c['is_active']}').join('|');
+    if (sig(oldWidget.challenges) != sig(widget.challenges)) {
+      _progressCache.clear();
+      _participantsCache.clear();
+      _futures.clear();
+    }
   }
 
   // آخرین مقدار شناخته‌شده؛ تا رسیدن داده‌ی تازه نوار به صفر نپرد
@@ -117,7 +123,16 @@ class _ChallengesTabState extends State<ChallengesTab> {
 
     return Container(
       color: theme.backgroundColor, // از Color(0xFFF7FCEB) به theme
-      child: SingleChildScrollView(
+      child: RefreshIndicator(
+       edgeOffset: 96,
+       onRefresh: () async {
+        _progressCache.clear();
+        _participantsCache.clear();
+        setState(_futures.clear);
+        await widget.onRefresh();
+       },
+       child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.fromLTRB(20, 96, 20, 120),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -250,6 +265,7 @@ class _ChallengesTabState extends State<ChallengesTab> {
           ],
         ),
       ),
+     ),
     );
   }
 }

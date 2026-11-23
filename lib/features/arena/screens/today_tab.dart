@@ -31,6 +31,7 @@ import '../widgets/completion_level_picker.dart';
 import '../models/habit_completion.dart';
 import '/features/arena/screens/habit_detail_screen.dart';
 import '../widgets/habit_card.dart';
+import '../widgets/day_review.dart';
 import '../widgets/task_card.dart';
 
 part 'today_tab/calculate_data.dart';
@@ -136,6 +137,11 @@ class TodayTabState extends State<TodayTab> with TickerProviderStateMixin {
   // ==================== بارگذاری داده‌ها ====================
 
   bool _hasLoadedOnce = false;
+
+  bool get _isViewingToday {
+    final n = DateTime.now(), d = widget.selectedDate;
+    return n.year == d.year && n.month == d.month && n.day == d.day;
+  }
 
   // ==================== Main Build ====================
 

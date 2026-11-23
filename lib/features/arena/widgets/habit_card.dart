@@ -21,6 +21,8 @@ class HabitCard extends StatefulWidget {
 
   // پارامتر جدید
   final int? recordedTimeSeconds;
+  // روزهای دیگر: فقط نمایش/ویرایش/حذف/جزئیات؛ بدون تیک و تایمر
+  final bool viewOnly;
 
   const HabitCard({
     super.key,
@@ -32,7 +34,8 @@ class HabitCard extends StatefulWidget {
     this.onTimer,
     this.onTap,
     this.onToggleSubHabit,
-    this.recordedTimeSeconds, // 
+    this.recordedTimeSeconds,
+    this.viewOnly = false,
   });
 
   @override
@@ -156,7 +159,7 @@ class _HabitCardState extends State<HabitCard>
                         ? MainAxisAlignment.center
                         : MainAxisAlignment.spaceAround,
                     children: [
-                      _buildActionButton(
+                      if (!widget.viewOnly) _buildActionButton(
                         icon: widget.isCompleted
                             ? Icons.refresh_rounded
                             : Icons.check_circle_outline_rounded,
@@ -228,7 +231,7 @@ class _HabitCardState extends State<HabitCard>
                       final isChecked =
                           widget.habit.completedSubHabits.contains(subHabit);
                       return InkWell(
-                        onTap: widget.isCompleted
+                        onTap: widget.isCompleted || widget.viewOnly
                             ? null
                             : () => widget.onToggleSubHabit?.call(subHabit),
                         borderRadius: BorderRadius.circular(14),
@@ -312,7 +315,7 @@ class _HabitCardState extends State<HabitCard>
                 children: [
                   // دایرهٔ سیاه آیکون؛ لمس = انجام دادن
                   AnimatedCheckOverlay(
-                    onTap: widget.onToggle,
+                    onTap: widget.viewOnly ? () {} : widget.onToggle,
                     checkColor: checkIconColor,
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 300),

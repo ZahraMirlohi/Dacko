@@ -16,7 +16,7 @@ class QuestsTab extends StatefulWidget {
   final List<Quest> quests;
   final List<Quest> completedQuests;
   final String currentUserId;
-  final VoidCallback onRefresh;
+  final Future<void> Function() onRefresh;
   final Function(Quest) showQuestDetail;
 
   const QuestsTab({
@@ -102,7 +102,11 @@ class _QuestsTabState extends State<QuestsTab> {
               ),
             );
 
-        return SingleChildScrollView(
+        return RefreshIndicator(
+         edgeOffset: 96,
+         onRefresh: widget.onRefresh,
+         child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.fromLTRB(20, 96, 20, 120),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -166,6 +170,7 @@ class _QuestsTabState extends State<QuestsTab> {
               ],
             ],
           ),
+         ),
         );
       },
     );

@@ -240,6 +240,11 @@ extension TodayTabStateCalculateData on TodayTabState {
       }
 
       _resetTotalItems();
+
+      // مرور دیروز و پرسش‌های مربی؛ بعد از نمایش امروز و فقط وقتی امروز دیده می‌شود
+      if (_isViewingToday && mounted) {
+        unawaited(runDailyFlows(context, onChanged: _loadData));
+      }
     } catch (e, stk) {
       Log.e('today', 'Error loading data: $e', error: e, stack: stk);
       if (mounted) {
@@ -251,7 +256,7 @@ extension TodayTabStateCalculateData on TodayTabState {
   // ==================== متدهای تکمیل عادت و وظیفه ====================
 
   Future<void> _markHabitCompleted(Habit habit) async {
-    if (!mounted) return;
+    if (!mounted || !_isViewingToday) return;
 
     final level = await showDialog<CompletionLevel>(
       context: context,
@@ -485,6 +490,7 @@ extension TodayTabStateCalculateData on TodayTabState {
   }
 
   Future<void> _unmarkHabit(Habit habit) async {
+    if (!_isViewingToday) return;
     final syncProvider = Provider.of<SyncProvider>(context, listen: false);
     SoundService.instance.play(Sfx.tap);
 

@@ -155,6 +155,13 @@ class AppStrings {
     'notif.body4': 'برنامه‌هات منتظرن روی ماهتو ببینن',
     'notif.body5': 'حالا که عادت ساختی، یه یادی ازشون بکن، گناه دارن!',
     'notif.body6': 'عادت ساختی که تیک بزنی، نه اینکه قاب بگیری',
+    'notif.body7': 'استریکت داره به غیبتت اعتراض می‌کنه؛ رسیدگی کن.',
+    'notif.body8': 'استریکت داره نفس‌های آخرشو می‌کشه، یه سر بهش بزن، می‌خواد وصیت کنه',
+    'notif.body9': 'استریکت همیشه روی تو حساب کرده',
+    'notif.body10': 'یه تیک بزن، قول می‌دم مشتری شی!',
+    'notif.body11': 'استریکت منتظر انگشتای زیبای توئه تا یه عادت تیک بزنی',
+    'notif.body12': 'این همه روز رو تیک زدی؛ حیفه امروز رو بی‌خیال بشی.',
+    'notif.body13': 'در شأن یه استریک نیست که اینقدر منتظرت بمونه! اونم غرور داره، بالاخره یه روز می‌شکنه',
 
     // استریک
     'streak.title': 'استریک روزانه',
@@ -306,6 +313,13 @@ class AppStrings {
     'notif.body4': 'Your plans are waiting to see your face.',
     'notif.body5': 'You built a habit, so spare it a thought. It\'s not its fault!',
     'notif.body6': 'You built a habit to tick it, not to frame it.',
+    'notif.body7': 'Your streak is protesting your absence; please attend to it.',
+    'notif.body8': 'Your streak is breathing its last. Drop by, it wants to write its will.',
+    'notif.body9': 'Your streak has always counted on you.',
+    'notif.body10': 'Tick one habit, I promise you\'ll become a regular!',
+    'notif.body11': 'Your streak is waiting for your lovely fingers to tick a habit.',
+    'notif.body12': 'You\'ve ticked so many days; it would be a shame to give up on today.',
+    'notif.body13': 'It\'s beneath a streak to wait this long! It has pride too, and one day it will break.',
 
     'streak.title': 'Daily streak',
     'streak.record': 'Record {n}',

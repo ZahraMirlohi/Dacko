@@ -95,8 +95,8 @@ class ChatBackgroundLayer extends StatelessWidget {
 }
 
 const _palette = <Color>[
-  Dk.f(Color(0xFFFFFFFF)), Dk.f(Color(0xFFF5EFE6)), Color(0xFFFFE4E1), Color(0xFFFFF3C4),
-  Dk.f(Color(0xFFDFF5E1)), Color(0xFFD9ECFF), Color(0xFFE9DDFB), Dk.l(Color(0xFFCFD8DC)),
+  Color(0xFFFFFFFF), Color(0xFFF5EFE6), Color(0xFFFFE4E1), Color(0xFFFFF3C4),
+  Color(0xFFDFF5E1), Color(0xFFD9ECFF), Color(0xFFE9DDFB), Color(0xFFCFD8DC),
   Color(0xFF263238), Color(0xFF1B2A3A), Color(0xFF2E3B2F), Color(0xFF3B2A3F),
 ];
 

@@ -87,7 +87,7 @@ extension _AnalyticsDetailScreenStateMonthToday on _AnalyticsDetailScreenState {
     final bg = dark ? const Color(0xFF1E2119) : _AnalyticsDetailScreenState._ink;
     final tileBg = dark ? const Color(0xFF2A2D24) : const Color(0xFF1E2119);
     final track = dark ? const Color(0xFF3A3E33) : const Color(0xFF2A2D24);
-    const mutedText = Dk.l(Color(0xFFBFC5B3));
+    const mutedText = Color(0xFFBFC5B3);
 
     final done = _tHabitsDone + _tTasksDone + _tChDone + _tQuDone;
     final total = _tHabitsTotal + _tTasksTotal + _tChTotal + _tQuTotal;

@@ -8,7 +8,7 @@ import '/providers/sync_provider.dart';
 import '/services/supabase_service.dart';
 import '../models/habit_completion.dart';
 import '../models/habit_model.dart';
-import '../screens/edit_habit_screen.dart' as edit_habit;
+import '../edit_habit_screen.dart' as edit_habit;
 
 bool _ranThisSession = false;
 

@@ -129,7 +129,7 @@ class NotificationService {
         var when = tz.TZDateTime(
             tz.local, now.year, now.month, now.day, t.hour, t.minute);
         if (!when.isAfter(now)) when = when.add(const Duration(days: 1));
-        final n = Random().nextInt(23) + 1; // تعداد notif.body در app_strings
+        final n = Random().nextInt(30) + 1; // تعداد notif.body در app_strings
         await _plugin.zonedSchedule(
           _dailyId,
           AppStrings.t(lang, 'notif.title'),

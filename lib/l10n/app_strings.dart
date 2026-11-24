@@ -172,6 +172,13 @@ class AppStrings {
     'notif.body21': 'فردوسی سی سال شاهنامه نوشت، تو پنج دقیقه وقت نداری یه عادت انجام بدی؟!',
     'notif.body22': 'پنج دقیقه وقت داری؟ باور کن جای دوری نمی‌ره.',
     'notif.body23': 'کار کوچیک، بهانهٔ بزرگ نمی‌خواد؛ پنج دقیقه کافیه برای شروع.',
+    'notif.body24': 'امروز هنوز تیکی نزدی؛ نمی‌گی دلمون برات تنگ می‌شه؟',
+    'notif.body25': 'چرا هنوز شروع نکردی؟ زیرلفظی می‌خوای؟',
+    'notif.body26': 'امروز که نبودی تیک بزنی، هیچی از گلوم پایین نمی‌رفت!',
+    'notif.body27': 'برای شروع هیچ‌وقت دیر نیست!',
+    'notif.body28': 'همیشه شروع کردن سخته، ولی اگه فکر کردی تموم کردن آسونه، سخت در اشتباهی :)',
+    'notif.body29': 'اگه فکر کردی برای شروع کردن میام نازتو می‌کشم، سخت در اشتباهی',
+    'notif.body30': 'اگه شروع کنی یه شکلات پیش من داری!',
 
     // استریک
     'streak.title': 'استریک روزانه',
@@ -340,6 +347,13 @@ class AppStrings {
     'notif.body21': 'Ferdowsi spent thirty years writing the Shahnameh, and you can\'t spare five minutes for a habit?!',
     'notif.body22': 'Got five minutes? Trust me, it\'s not going anywhere.',
     'notif.body23': 'A small task needs no big excuse; five minutes is enough to start.',
+    'notif.body24': 'No ticks yet today; don\'t you think we miss you?',
+    'notif.body25': 'Why haven\'t you started yet? Do you need a hand-holding?',
+    'notif.body26': 'While you weren\'t around ticking today, I couldn\'t swallow a thing!',
+    'notif.body27': 'It\'s never too late to start!',
+    'notif.body28': 'Starting is always hard, but if you think finishing is easy, you\'re badly mistaken :)',
+    'notif.body29': 'If you think I\'ll come coax you into starting, you\'re badly mistaken.',
+    'notif.body30': 'Start, and you\'ve got a chocolate waiting with me!',
 
     'streak.title': 'Daily streak',
     'streak.record': 'Record {n}',

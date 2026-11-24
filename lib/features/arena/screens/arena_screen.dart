@@ -1,5 +1,6 @@
 // lib/features/arena/screens/arena_screen.dart
 
+import '/core/tour_target.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -350,7 +351,7 @@ class _ArenaScreenState extends State<ArenaScreen>
     return Semantics(
       button: true,
       label: context.tr('ah.fab.add'),
-      child: GestureDetector(
+      child: TourTarget(id: 'add', child: GestureDetector(
         onTap: _showAddSheet,
         child: Container(
           width: size,
@@ -364,7 +365,7 @@ class _ArenaScreenState extends State<ArenaScreen>
           child: Icon(Icons.add_rounded,
               size: size * 0.52, color: theme.primaryColor),
         ),
-      ),
+      )),
     );
   }
 

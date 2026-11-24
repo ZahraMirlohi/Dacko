@@ -60,7 +60,15 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     _initRequests();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final u = await SupabaseService().getCurrentUser();
-      if (u != null && mounted) maybeShowIntroTour(context, u.id);
+      if (u != null && mounted) {
+        maybeShowIntroTour(context, u.id, (i) {
+          if (!mounted) return;
+          setState(() {
+            _currentIndex = i;
+            _built[i] = true;
+          });
+        });
+      }
     });
     // اجازهٔ اعلان (اندروید ۱۳+) و تازه‌سازی یادآورها؛ بعد از لحظه‌ای تا باز شدن صفحه مزاحم نشود
     Future.delayed(const Duration(seconds: 2), () async {

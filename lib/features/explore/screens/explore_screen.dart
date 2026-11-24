@@ -106,7 +106,12 @@ class _ExploreScreenState extends State<ExploreScreen>
     return Scaffold(
       backgroundColor: theme.backgroundColor,
       body: _isLoading
-          ? const SkeletonList(itemCount: 5, itemHeight: 110, avatar: false, padding: EdgeInsets.fromLTRB(20, 96, 20, 24))
+          ? switch (_tabController.index) {
+              1 => const PackagesSkeleton(),
+              2 => const QuestsSkeleton(),
+              3 => const SkeletonList(itemCount: 8),
+              _ => const ChallengesSkeleton(),
+            }
           : _errorMessage.isNotEmpty
               ? _buildErrorState(primaryColor, theme)
               : _buildMainContent(primaryColor, theme),

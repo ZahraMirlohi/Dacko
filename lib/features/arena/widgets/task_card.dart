@@ -327,12 +327,7 @@ class ArenaLoadingView extends StatelessWidget {
   const ArenaLoadingView({super.key, this.message});
 
   @override
-  Widget build(BuildContext context) => const SkeletonList(
-        itemCount: 4,
-        itemHeight: 84,
-        shrinkWrap: true,
-        padding: EdgeInsets.symmetric(vertical: 8),
-      );
+  Widget build(BuildContext context) => const HabitListSkeleton(count: 4);
 }
 
 // ============================================================

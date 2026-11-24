@@ -225,7 +225,7 @@ class _PackagesTabState extends State<PackagesTab> {
 
   Widget _buildBody(Color primaryColor, ThemeProvider theme) {
     if (_isLoadingActive) {
-      return const SkeletonList(itemCount: 4, itemHeight: 120, avatar: false, padding: EdgeInsets.fromLTRB(20, 96, 20, 24));
+      return const PackagesSkeleton();
     }
 
     if (widget.packages.isEmpty) {

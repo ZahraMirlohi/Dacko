@@ -1,5 +1,6 @@
 // lib/widgets/custom_bottom_nav_bar.dart
 
+import '/core/tour_target.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '/providers/theme_provider.dart';
@@ -62,7 +63,7 @@ class CustomBottomNavBar extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: List.generate(items.length, (i) {
                 final active = i == currentIndex;
-                return GestureDetector(
+                return TourTarget(id: 'tab$i', child: GestureDetector(
                   behavior: HitTestBehavior.opaque,
                   onTap: () {
                     if (!active) onTap(i);
@@ -118,7 +119,7 @@ class CustomBottomNavBar extends StatelessWidget {
                       ),
                     ),
                   ),
-                );
+                ));
               }),
             ),
           ),

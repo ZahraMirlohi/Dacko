@@ -117,9 +117,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         builder: (context, syncProvider, child) {
           // حالت بارگذاری
           if (_isLoading && _profile == null) {
-            return const SafeArea(
-              child: SkeletonList(itemCount: 6, itemHeight: 88, padding: EdgeInsets.fromLTRB(20, 24, 20, 24)),
-            );
+            return const SafeArea(child: ProfileSkeleton());
           }
 
           // حالت خطا

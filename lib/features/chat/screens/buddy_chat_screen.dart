@@ -64,6 +64,7 @@ import '/services/xp_gift_service.dart';
 import 'user_profile_screen.dart';
 import 'location_picker_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '/core/dk.dart';
 
 part 'buddy_chat_screen/color_bubble.dart';
 part 'buddy_chat_screen/contact_file.dart';

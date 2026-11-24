@@ -4,6 +4,7 @@ import '/l10n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '/providers/theme_provider.dart';
+import '/core/dk.dart';
 
 class ChallengeCard extends StatelessWidget {
   final Map<String, dynamic> challenge;
@@ -23,7 +24,7 @@ class ChallengeCard extends StatelessWidget {
     final Color primaryColor = themeProvider.primaryColor;
 
     final bgColor = isRegistrationClosed
-        ? Colors.grey.shade300
+        ? Dk.l(Colors.grey.shade300)
         : primaryColor.withOpacity(0.1);
 
     return GestureDetector(
@@ -59,7 +60,7 @@ class ChallengeCard extends StatelessWidget {
                         ),
                         decoration: BoxDecoration(
                           color: isRegistrationClosed
-                              ? Colors.grey.shade400
+                              ? Dk.s(Colors.grey.shade400)
                               : Colors.white.withOpacity(0.5),
                           borderRadius: BorderRadius.circular(20),
                         ),
@@ -69,7 +70,7 @@ class ChallengeCard extends StatelessWidget {
                             fontSize: 10,
                             fontWeight: FontWeight.w600,
                             color: isRegistrationClosed
-                                ? Colors.grey.shade600
+                                ? Dk.s(Colors.grey.shade600)
                                 : const Color(0xFF1A1A2E),
                           ),
                         ),
@@ -82,16 +83,16 @@ class ChallengeCard extends StatelessWidget {
                         ),
                         decoration: BoxDecoration(
                           color: isRegistrationClosed
-                              ? Colors.grey.shade400
+                              ? Dk.s(Colors.grey.shade400)
                               : Colors.white.withOpacity(0.5),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Row(
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.people,
                               size: 12,
-                              color: Color(0xFF1A1A2E),
+                              color: Dk.t(Color(0xFF1A1A2E)),
                             ),
                             const SizedBox(width: 4),
                             Text(
@@ -114,7 +115,7 @@ class ChallengeCard extends StatelessWidget {
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: isRegistrationClosed
-                          ? Colors.grey.shade600
+                          ? Dk.s(Colors.grey.shade600)
                           : const Color(0xFF1A1A2E),
                     ),
                   ),
@@ -124,8 +125,8 @@ class ChallengeCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12,
                       color: isRegistrationClosed
-                          ? Colors.grey.shade500
-                          : Colors.grey[700],
+                          ? Dk.s(Colors.grey.shade500)
+                          : Dk.s(Colors.grey[700]),
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,

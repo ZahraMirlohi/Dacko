@@ -11,6 +11,7 @@ import '/services/supabase_service.dart';
 import '/providers/theme_provider.dart';
 import '/providers/sync_provider.dart';
 import '/core/app_palette.dart';
+import '/core/dk.dart';
 
 class QuestsTab extends StatefulWidget {
   final List<Quest> quests;
@@ -579,8 +580,8 @@ class _QuestsTabState extends State<QuestsTab> {
                     const Color(0xFF3D3520), // کرم تیره برای تم شب
                     const Color(0xFF2A2515),
                   ]
-                : const [
-                    Color(0xFFFFFDF5),
+                : [
+                    Dk.f(Color(0xFFFFFDF5)),
                     Color(0xFFFFF3D6),
                   ],
           ),

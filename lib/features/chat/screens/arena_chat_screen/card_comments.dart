@@ -515,7 +515,7 @@ extension _ArenaChatScreenStateCardComments on _ArenaChatScreenState {
                       // ✅ باکس استیکر با تم هماهنگ
                       color: theme.isDarkMode
                           ? const Color(0xFF2A2A2A)
-                          : Colors.grey.shade100,
+                          : Dk.f(Colors.grey.shade100),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Center(

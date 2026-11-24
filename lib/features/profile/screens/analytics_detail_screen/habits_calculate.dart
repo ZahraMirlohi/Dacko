@@ -457,8 +457,8 @@ extension _AnalyticsDetailScreenStateHabitsCalculate on _AnalyticsDetailScreenSt
                         children: [
                           Text(
                             ctx.tr('an.rec_longest'),
-                            style: const TextStyle(
-                                fontSize: 13, color: Color(0xFFBFC5B3)),
+                            style: TextStyle(
+                                fontSize: 13, color: Dk.l(Color(0xFFBFC5B3))),
                           ),
                           const SizedBox(height: 2),
                           Text(

@@ -13,6 +13,7 @@ import 'package:image_picker/image_picker.dart';
 import '/services/storage_service.dart';
 import 'user_avatar.dart';
 import 'dart:typed_data';
+import '/core/dk.dart';
 
 class AvatarCustomizationScreen extends StatefulWidget {
   final String userId;
@@ -720,7 +721,7 @@ class _AvatarCustomizationScreenState extends State<AvatarCustomizationScreen> {
                           ? primaryColor
                           : (theme.isDarkMode
                               ? const Color(0xFF2A2A2A)
-                              : Colors.grey.shade100),
+                              : Dk.f(Colors.grey.shade100)),
                   borderRadius: BorderRadius.circular(16),
                   border: isSelected
                       ? Border.all(color: primaryColor, width: 2)

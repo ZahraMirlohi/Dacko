@@ -440,7 +440,7 @@ extension _BuddyChatScreenStateChallengeProgress on _BuddyChatScreenState {
           const SizedBox(height: 12),
           Text(
             context.tr('bc.k143'),
-            style: TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
+            style: TextStyle(fontSize: 13, color: Dk.s(Color(0xFF6B7280))),
           ),
         ],
       ),

@@ -17,6 +17,7 @@ import '../../../config/nav_items.dart';
 import '../../../providers/settings_provider.dart';
 import '../../../services/notification_service.dart';
 import '../widgets/new_request_popup.dart';
+import '../widgets/intro_tour.dart';
 import '../../../providers/theme_provider.dart'; // اضافه کنید
 
 class MainScreen extends StatefulWidget {
@@ -57,6 +58,10 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     _runDailyCheck();
     _initRequests();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final u = await SupabaseService().getCurrentUser();
+      if (u != null && mounted) maybeShowIntroTour(context, u.id);
+    });
     // اجازهٔ اعلان (اندروید ۱۳+) و تازه‌سازی یادآورها؛ بعد از لحظه‌ای تا باز شدن صفحه مزاحم نشود
     Future.delayed(const Duration(seconds: 2), () async {
       await NotificationService.instance.requestPermission();

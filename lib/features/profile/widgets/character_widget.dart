@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/animation.dart';
 import '../models/character_model.dart';
 import '../models/hero_class_model.dart';
+import '/core/dk.dart';
 
 class CharacterWidget extends StatefulWidget {
   final Character character;
@@ -202,10 +203,10 @@ class _CharacterWidgetState extends State<CharacterWidget>
               ),
               child: Text(
                 widget.character.catchphrase,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
-                  color: Color(0xFF1A1A2E),
+                  color: Dk.t(Color(0xFF1A1A2E)),
                 ),
               ),
             ),

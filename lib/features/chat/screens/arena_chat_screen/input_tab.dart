@@ -354,7 +354,7 @@ extension _ArenaChatScreenStateInputTab on _ArenaChatScreenState {
                     color: _isSending || _messageController.text.isEmpty
                         ? (theme.isDarkMode
                             ? const Color(0xFF2A2A2A)
-                            : Colors.grey.shade300)
+                            : Dk.l(Colors.grey.shade300))
                         : primaryColor,
                     shape: BoxShape.circle,
                   ),

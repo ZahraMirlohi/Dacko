@@ -367,7 +367,7 @@ extension _ChallengesTabStateCardCached on _ChallengesTabState {
     final theme = Provider.of<ThemeProvider>(context, listen: false);
     const tones = [Tone.sky, Tone.lilac, Tone.rose, Tone.mint, Tone.peach, Tone.butter];
     final bg = isExpired
-        ? const Color(0xFFE3E6D8)
+        ? Dk.l(const Color(0xFFE3E6D8))
         : theme.tone(tones[colorIndex % tones.length]).bg;
     final fg = isExpired ? const Color(0xFF7B8170) : const Color(0xFF090909);
 
@@ -400,7 +400,7 @@ extension _ChallengesTabStateCardCached on _ChallengesTabState {
                         icon: Icons.calendar_today_rounded, fg: fg),
                     if (isExpired)
                       _chip(context.tr('ch.k018'),
-                          bg: const Color(0xFFCFD3C4),
+                          bg: Dk.l(const Color(0xFFCFD3C4)),
                           fg: const Color(0xFF555B4B))
                     else if (isBoss)
                       _chip(context.tr('ch.k005'),

@@ -607,7 +607,7 @@ class _NotchedChallengeCard extends StatelessWidget {
             ? Colors.white.withValues(alpha: 0.2)
             : (theme.isDarkMode
                 ? const Color(0xFF2A2A2A)
-                : (isCompleted ? Colors.grey.shade200 : Colors.grey.shade100)),
+                : (isCompleted ? Dk.f(Colors.grey.shade200) : Dk.f(Colors.grey.shade100))),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Row(

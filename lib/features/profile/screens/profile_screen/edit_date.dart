@@ -274,7 +274,7 @@ extension _ProfileScreenStateEditDate on _ProfileScreenState {
                             decoration: BoxDecoration(
                               color: _theme.isDarkMode
                                   ? const Color(0xFF2A2A2A)
-                                  : Colors.grey.shade50,
+                                  : Dk.f(Colors.grey.shade50),
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(color: _theme.borderColor),
                             ),
@@ -327,7 +327,7 @@ extension _ProfileScreenStateEditDate on _ProfileScreenState {
                             // تم‌محور
                             fillColor: _theme.isDarkMode
                                 ? const Color(0xFF2A2A2A)
-                                : Colors.grey.shade50,
+                                : Dk.f(Colors.grey.shade50),
                           ),
                           items: [
                             DropdownMenuItem(value: 'male', child: Text(context.tr('pf.k037'))),

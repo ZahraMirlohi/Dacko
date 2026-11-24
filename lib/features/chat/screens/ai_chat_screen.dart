@@ -10,6 +10,7 @@ import '/providers/sync_provider.dart';
 import '/providers/theme_provider.dart';
 import '/features/chat/models/message_model.dart';
 import '/features/chat/models/conversation_model.dart';
+import '/core/dk.dart';
 
 class AIChatScreen extends StatefulWidget {
   const AIChatScreen({super.key});
@@ -542,7 +543,7 @@ class _AIChatScreenState extends State<AIChatScreen>
                 color: _isLoading
                     ? (theme.isDarkMode
                         ? const Color(0xFF2A2A2A)
-                        : Colors.grey.shade300)
+                        : Dk.l(Colors.grey.shade300))
                     : primaryColor,
                 shape: BoxShape.circle,
                 boxShadow: _isLoading

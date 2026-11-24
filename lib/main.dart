@@ -20,6 +20,7 @@ import 'providers/theme_provider.dart';
 import 'services/audio_player_service.dart';
 import 'services/download_service.dart';
 import 'services/local_storage_service.dart';
+import '/core/dk.dart';
 
 void main() {
   // همهٔ print های برنامه فقط در حالت دیباگ چاپ می‌شن (در نسخهٔ نهایی ساکتند و کند نمی‌کنن)
@@ -125,7 +126,7 @@ class _StartupError extends StatelessWidget {
                 Text(
                   error,
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.grey.shade600),
+                  style: TextStyle(color: Dk.s(Colors.grey.shade600)),
                 ),
                 const SizedBox(height: 16),
                 ElevatedButton(

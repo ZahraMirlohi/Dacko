@@ -8,6 +8,7 @@ import '/core/app_palette.dart';
 import '/l10n/app_strings.dart';
 import '/providers/theme_provider.dart';
 import 'animated_check_overlay.dart';
+import '/core/dk.dart';
 
 class HabitCard extends StatefulWidget {
   final Habit habit;

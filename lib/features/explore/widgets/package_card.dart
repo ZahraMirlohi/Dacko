@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../models/package_model.dart';
 import 'package_detail_dialog.dart';
 import '/providers/theme_provider.dart';
+import '/core/dk.dart';
 
 class PackageCard extends StatelessWidget {
   final Package package;
@@ -25,7 +26,7 @@ class PackageCard extends StatelessWidget {
     final Color primaryColor = themeProvider.primaryColor;
 
     final color = primaryColor;
-    final bgColor = isActive ? color.withOpacity(0.08) : Colors.grey.shade100;
+    final bgColor = isActive ? color.withOpacity(0.08) : Dk.f(Colors.grey.shade100);
 
     return GestureDetector(
       onTap: () async {
@@ -41,7 +42,7 @@ class PackageCard extends StatelessWidget {
       },
       child: Container(
         decoration: BoxDecoration(
-          color: isActive ? bgColor : Colors.grey.shade100,
+          color: isActive ? bgColor : Dk.f(Colors.grey.shade100),
           borderRadius: BorderRadius.circular(24),
           border: isActive ? Border.all(color: color, width: 2) : null,
           boxShadow: isActive
@@ -61,7 +62,7 @@ class PackageCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: isActive ? color : Colors.grey.shade300,
+                color: isActive ? color : Dk.l(Colors.grey.shade300),
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(24),
                   topRight: Radius.circular(24),
@@ -71,7 +72,7 @@ class PackageCard extends StatelessWidget {
                 children: [
                   Icon(
                     _getIconData(package.icon),
-                    color: isActive ? Colors.white : Colors.grey.shade600,
+                    color: isActive ? Colors.white : Dk.s(Colors.grey.shade600),
                     size: 24,
                   ),
                   const Spacer(),
@@ -83,14 +84,14 @@ class PackageCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: isActive
                           ? Colors.white.withOpacity(0.3)
-                          : Colors.grey.shade400,
+                          : Dk.s(Colors.grey.shade400),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
                       context.tr('ex.habits_n', {'n': '${package.habits.length}'}),
                       style: TextStyle(
                         fontSize: 11,
-                        color: isActive ? Colors.white : Colors.grey.shade600,
+                        color: isActive ? Colors.white : Dk.s(Colors.grey.shade600),
                       ),
                     ),
                   ),
@@ -116,7 +117,7 @@ class PackageCard extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                             color: isActive
                                 ? const Color(0xFF1A1A2E)
-                                : Colors.grey.shade600,
+                                : Dk.s(Colors.grey.shade600),
                           ),
                         ),
                       ),
@@ -128,8 +129,8 @@ class PackageCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12,
                       color: isActive
-                          ? Colors.grey.shade700
-                          : Colors.grey.shade500,
+                          ? Dk.s(Colors.grey.shade700)
+                          : Dk.s(Colors.grey.shade500),
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -154,14 +155,14 @@ class PackageCard extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: isActive
                                 ? color.withOpacity(0.2)
-                                : Colors.grey.shade300,
+                                : Dk.l(Colors.grey.shade300),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
                             habit.title,
                             style: TextStyle(
                               fontSize: 10,
-                              color: isActive ? color : Colors.grey.shade600,
+                              color: isActive ? color : Dk.s(Colors.grey.shade600),
                             ),
                           ),
                         );
@@ -182,7 +183,7 @@ class PackageCard extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: isActive
                               ? const Color(0xFFFFA500).withOpacity(0.15)
-                              : Colors.grey.shade300,
+                              : Dk.l(Colors.grey.shade300),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Row(
@@ -192,7 +193,7 @@ class PackageCard extends StatelessWidget {
                               size: 14,
                               color: isActive
                                   ? const Color(0xFFFFA500)
-                                  : Colors.grey.shade500,
+                                  : Dk.s(Colors.grey.shade500),
                             ),
                             const SizedBox(width: 4),
                             Text(
@@ -202,7 +203,7 @@ class PackageCard extends StatelessWidget {
                                 fontWeight: FontWeight.bold,
                                 color: isActive
                                     ? const Color(0xFFFFA500)
-                                    : Colors.grey.shade500,
+                                    : Dk.s(Colors.grey.shade500),
                               ),
                             ),
                           ],
@@ -215,7 +216,7 @@ class PackageCard extends StatelessWidget {
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: isActive ? color : Colors.grey.shade300,
+                          color: isActive ? color : Dk.l(Colors.grey.shade300),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
@@ -224,7 +225,7 @@ class PackageCard extends StatelessWidget {
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
                             color:
-                                isActive ? Colors.white : Colors.grey.shade600,
+                                isActive ? Colors.white : Dk.s(Colors.grey.shade600),
                           ),
                         ),
                       ),

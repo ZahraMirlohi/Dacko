@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '/services/audio_player_service.dart';
 import '/providers/theme_provider.dart';
+import '/core/dk.dart';
 
 class AudioPlayerHeader extends StatefulWidget {
   const AudioPlayerHeader({super.key});
@@ -182,11 +183,11 @@ class _AudioPlayerHeaderState extends State<AudioPlayerHeader> {
                               overlayRadius: 8,
                             ),
                             activeTrackColor: _isLoading || _isBuffering
-                                ? Colors.grey.shade600
+                                ? Dk.s(Colors.grey.shade600)
                                 : primaryColor,
-                            inactiveTrackColor: Colors.grey.shade700,
+                            inactiveTrackColor: Dk.s(Colors.grey.shade700),
                             thumbColor: _isLoading || _isBuffering
-                                ? Colors.grey.shade600
+                                ? Dk.s(Colors.grey.shade600)
                                 : primaryColor,
                             overlayColor: primaryColor.withValues(alpha: 0.2),
                           ),
@@ -212,8 +213,8 @@ class _AudioPlayerHeaderState extends State<AudioPlayerHeader> {
                         style: TextStyle(
                           fontSize: 9,
                           color: _isLoading || _isBuffering
-                              ? Colors.grey.shade500
-                              : Colors.grey.shade400,
+                              ? Dk.s(Colors.grey.shade500)
+                              : Dk.s(Colors.grey.shade400),
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -238,7 +239,7 @@ class _AudioPlayerHeaderState extends State<AudioPlayerHeader> {
               height: 32,
               decoration: BoxDecoration(
                 color: (_isLoading || _isBuffering)
-                    ? Colors.grey.shade700
+                    ? Dk.s(Colors.grey.shade700)
                     : primaryColor,
                 shape: BoxShape.circle,
                 boxShadow: [

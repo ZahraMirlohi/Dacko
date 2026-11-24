@@ -86,7 +86,7 @@ extension _BuddyChatScreenStateSelectedPicker on _BuddyChatScreenState {
                       // ✅ با تم هماهنگ
                       color: theme.isDarkMode
                           ? const Color(0xFF2A2A2A)
-                          : Colors.grey.shade100,
+                          : Dk.f(Colors.grey.shade100),
                       borderRadius: BorderRadius.circular(14),
                     ),
                     child: Center(
@@ -188,7 +188,7 @@ extension _BuddyChatScreenStateSelectedPicker on _BuddyChatScreenState {
                       // ✅ با تم هماهنگ
                       color: theme.isDarkMode
                           ? const Color(0xFF2A2A2A)
-                          : Colors.grey.shade100,
+                          : Dk.f(Colors.grey.shade100),
                       borderRadius: BorderRadius.circular(14),
                     ),
                     child: Column(
@@ -300,8 +300,8 @@ extension _BuddyChatScreenStateSelectedPicker on _BuddyChatScreenState {
                             hintStyle: TextStyle(
                               fontSize: 14,
                               color: theme.isDarkMode
-                                  ? Colors.grey.shade500 // ✅ hint واضح در شب
-                                  : Colors.grey.shade500,
+                                  ? Dk.s(Colors.grey.shade500) // ✅ hint واضح در شب
+                                  : Dk.s(Colors.grey.shade500),
                             ),
                             border: InputBorder.none,
                             contentPadding: const EdgeInsets.symmetric(

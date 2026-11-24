@@ -19,6 +19,7 @@ import '/services/sound_service.dart';
 import '/services/supabase_service.dart';
 import 'color_picker_screen.dart';
 import 'terms_and_conditions_screen.dart';
+import '/core/dk.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -532,7 +533,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ? theme.primaryColor
                 : (theme.isDarkMode
                     ? theme.textSecondaryColor.withValues(alpha: 0.35)
-                    : const Color(0xFFD9DCCF)),
+                    : Dk.l(const Color(0xFFD9DCCF))),
             borderRadius: BorderRadius.circular(15),
           ),
           child: Container(

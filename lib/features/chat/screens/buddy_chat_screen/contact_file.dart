@@ -66,7 +66,7 @@ extension _BuddyChatScreenStateContactFile on _BuddyChatScreenState {
                         width: 40,
                         height: 4,
                         decoration: BoxDecoration(
-                          color: Colors.grey.shade300,
+                          color: Dk.l(Colors.grey.shade300),
                           borderRadius: BorderRadius.circular(2),
                         ),
                       ),
@@ -84,7 +84,7 @@ extension _BuddyChatScreenStateContactFile on _BuddyChatScreenState {
                       context.tr('bc.k016', {'p0': '${contacts.length}'}),
                       style: TextStyle(
                         fontSize: 13,
-                        color: Colors.grey.shade600,
+                        color: Dk.s(Colors.grey.shade600),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -125,7 +125,7 @@ extension _BuddyChatScreenStateContactFile on _BuddyChatScreenState {
                                     phones.first,
                                     style: TextStyle(
                                       fontSize: 12,
-                                      color: Colors.grey.shade600,
+                                      color: Dk.s(Colors.grey.shade600),
                                     ),
                                   )
                                 : null,
@@ -224,7 +224,7 @@ extension _BuddyChatScreenStateContactFile on _BuddyChatScreenState {
                 filled: true,
                 fillColor: theme.isDarkMode
                     ? const Color(0xFF2A2A2A) // ✅
-                    : Colors.grey.shade50,
+                    : Dk.f(Colors.grey.shade50),
               ),
             ),
             SizedBox(height: 12),
@@ -243,7 +243,7 @@ extension _BuddyChatScreenStateContactFile on _BuddyChatScreenState {
                 filled: true,
                 fillColor: theme.isDarkMode
                     ? const Color(0xFF2A2A2A) // ✅
-                    : Colors.grey.shade50,
+                    : Dk.f(Colors.grey.shade50),
               ),
             ),
           ],

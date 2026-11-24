@@ -126,7 +126,7 @@ extension _BuddyChatScreenStateMessagePopup on _BuddyChatScreenState {
                     border: Border.all(
                       color: theme.isDarkMode
                           ? theme.borderColor
-                          : Colors.grey.shade200,
+                          : Dk.f(Colors.grey.shade200),
                       width: 1,
                     ),
                     boxShadow: shadows,
@@ -191,7 +191,7 @@ extension _BuddyChatScreenStateMessagePopup on _BuddyChatScreenState {
                     border: Border.all(
                       color: theme.isDarkMode
                           ? theme.borderColor
-                          : Colors.grey.shade200,
+                          : Dk.f(Colors.grey.shade200),
                       width: 1,
                     ),
                     boxShadow: shadows,
@@ -518,7 +518,7 @@ extension _BuddyChatScreenStateMessagePopup on _BuddyChatScreenState {
     final bgColor = color?.withValues(alpha: 0.15) ??
         (theme.isDarkMode
             ? Colors.white.withValues(alpha: 0.08)
-            : Colors.grey.shade100);
+            : Dk.f(Colors.grey.shade100));
 
     return InkWell(
       onTap: onTap,

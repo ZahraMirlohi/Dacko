@@ -5,6 +5,7 @@ import '/l10n/app_strings.dart';
 import 'package:provider/provider.dart';
 import '../models/character_model.dart';
 import '/providers/theme_provider.dart';
+import '/core/dk.dart';
 
 class HeroStats extends StatelessWidget {
   final Character character;
@@ -166,7 +167,7 @@ class HeroStats extends StatelessWidget {
             value: progress,
             backgroundColor: theme.isDarkMode
                 ? Colors.white.withValues(alpha: 0.1)
-                : Colors.grey.shade200, // 
+                : Dk.f(Colors.grey.shade200), // 
             color: primaryColor,
             minHeight: 8,
           ),

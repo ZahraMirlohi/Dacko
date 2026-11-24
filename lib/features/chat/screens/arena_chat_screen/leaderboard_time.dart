@@ -78,7 +78,7 @@ extension _ArenaChatScreenStateLeaderboardTime on _ArenaChatScreenState {
                                 ? primaryColor
                                 : (theme.isDarkMode
                                     ? const Color(0xFF2A2A2A)
-                                    : Colors.grey.shade300),
+                                    : Dk.l(Colors.grey.shade300)),
                             shape: BoxShape.circle,
                           ),
                           child: Center(

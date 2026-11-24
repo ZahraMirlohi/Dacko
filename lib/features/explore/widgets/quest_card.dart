@@ -8,6 +8,7 @@ import '../models/quest_model.dart';
 import '/providers/theme_provider.dart';
 import '/core/app_palette.dart';
 import 'card_image.dart';
+import '/core/dk.dart';
 
 class QuestCard extends StatelessWidget {
   final Quest quest;
@@ -206,7 +207,7 @@ class QuestCard extends StatelessWidget {
                             theme.effectivePrimary, theme.onPrimaryColor, onStart)
                       else
                         _pill(context.tr('ex.inactive'), Icons.block_rounded,
-                            const Color(0xFFCFD3C4), const Color(0xFF555B4B), null),
+                            Dk.l(const Color(0xFFCFD3C4)), const Color(0xFF555B4B), null),
                     ],
                   ),
                 ],

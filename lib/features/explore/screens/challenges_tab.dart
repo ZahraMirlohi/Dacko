@@ -8,6 +8,7 @@ import '/services/supabase_service.dart';
 import '/providers/theme_provider.dart';
 import '/core/app_palette.dart';
 import '../widgets/card_image.dart';
+import '/core/dk.dart';
 
 part 'challenges_tab/card_cached.dart';
 
@@ -122,7 +123,7 @@ class _ChallengesTabState extends State<ChallengesTab> {
     }
 
     return Container(
-      color: theme.backgroundColor, // از Color(0xFFF7FCEB) به theme
+      color: theme.backgroundColor, // از Dk.f(Color(0xFFF7FCEB)) به theme
       child: RefreshIndicator(
        edgeOffset: 96,
        onRefresh: () async {

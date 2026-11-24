@@ -25,6 +25,7 @@ import '../widgets/message_actions_menu.dart';
 import '../widgets/file_message_widget.dart';
 import '../widgets/group_rich_messages.dart';
 import 'location_picker_screen.dart';
+import '/core/dk.dart';
 
 part 'squad_chat_screen/reactions_squad.dart';
 part 'squad_chat_screen/message_forward.dart';

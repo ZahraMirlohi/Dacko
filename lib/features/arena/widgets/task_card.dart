@@ -9,6 +9,7 @@ import '/l10n/app_strings.dart';
 import '/providers/theme_provider.dart';
 import 'animated_check_overlay.dart';
 import '/providers/calendar_provider.dart';
+import '/core/dk.dart';
 
 // ============================================================
 // ابزارهای مشترک میدان: اسنک‌بار و دیالوگ حذف (طبق ArenaStates)
@@ -721,7 +722,7 @@ class _TaskCardState extends State<TaskCard>
           ],
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,
               color: Color(0xFF090909),

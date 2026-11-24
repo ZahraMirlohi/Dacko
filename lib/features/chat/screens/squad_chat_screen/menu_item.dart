@@ -219,7 +219,7 @@ extension _SquadChatScreenStateMenuItem on _SquadChatScreenState {
             height: 200,
             fit: BoxFit.cover,
             errorBuilder: (_, __, ___) =>
-                const Icon(Icons.image_not_supported, size: 50, color: Colors.grey),
+                Icon(Icons.image_not_supported, size: 50, color: Dk.s(Colors.grey)),
           ),
         ),
       );
@@ -298,7 +298,7 @@ extension _SquadChatScreenStateMenuItem on _SquadChatScreenState {
                       // ✅ با تم هماهنگ
                       color: theme.isDarkMode
                           ? const Color(0xFF2A2A2A)
-                          : Colors.grey.shade100,
+                          : Dk.f(Colors.grey.shade100),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Center(

@@ -44,7 +44,7 @@ extension _BuddyChatScreenStateMessageBubble on _BuddyChatScreenState {
           autofocus: true,
           decoration: InputDecoration(
             hintText: context.tr('bc.k111'),
-            hintStyle: TextStyle(color: Colors.grey.shade400),
+            hintStyle: TextStyle(color: Dk.s(Colors.grey.shade400)),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(color: theme.borderColor),
@@ -56,7 +56,7 @@ extension _BuddyChatScreenStateMessageBubble on _BuddyChatScreenState {
             contentPadding: const EdgeInsets.all(14),
             fillColor: theme.isDarkMode
                 ? const Color(0xFF2A2A2A)
-                : Colors.grey.shade50,
+                : Dk.f(Colors.grey.shade50),
             filled: true,
           ),
         ),
@@ -276,8 +276,8 @@ extension _BuddyChatScreenStateMessageBubble on _BuddyChatScreenState {
                             color: isSelected
                                 ? primaryColor
                                 : (theme.isDarkMode
-                                    ? Colors.grey.shade600
-                                    : Colors.grey.shade400),
+                                    ? Dk.s(Colors.grey.shade600)
+                                    : Dk.s(Colors.grey.shade400)),
                             width: 2,
                           ),
                           boxShadow: isSelected
@@ -495,7 +495,7 @@ extension _BuddyChatScreenStateMessageBubble on _BuddyChatScreenState {
                                               : (theme.isDarkMode
                                                   ? Colors.white
                                                       .withValues(alpha: 0.05)
-                                                  : Colors.grey.shade100)),
+                                                  : Dk.f(Colors.grey.shade100))),
                                       borderRadius: BorderRadius.circular(8),
                                       border: Border(
                                         left: BorderSide(
@@ -555,8 +555,8 @@ extension _BuddyChatScreenStateMessageBubble on _BuddyChatScreenState {
                                                 ? (const Color(0xFF090909)
                                                         .withValues(alpha: 0.8))
                                                 : (theme.isDarkMode
-                                                    ? Colors.grey.shade400
-                                                    : Colors.grey.shade700),
+                                                    ? Dk.s(Colors.grey.shade400)
+                                                    : Dk.s(Colors.grey.shade700)),
                                           ),
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,

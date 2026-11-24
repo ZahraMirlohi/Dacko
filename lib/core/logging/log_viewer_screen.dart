@@ -6,6 +6,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '/l10n/app_strings.dart';
 import 'app_logger.dart';
+import '/core/dk.dart';
 
 class LogViewerScreen extends StatefulWidget {
   const LogViewerScreen({super.key});
@@ -30,7 +31,7 @@ class _LogViewerScreenState extends State<LogViewerScreen> {
       case LogLevel.info:
         return Colors.blue;
       default:
-        return Colors.grey;
+        return Dk.s(Colors.grey);
     }
   }
 

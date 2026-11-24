@@ -469,6 +469,7 @@ class AuthProvider extends ChangeNotifier {
     await prefs.setString('onboarding_answers_$uid', jsonEncode(answers.toJson()));
     await prefs.setBool('onboarding_done_$uid', true);
     await prefs.setBool('onboarding_pending_$uid', true);
+    await prefs.setBool('intro_pending_$uid', true); // اینترو آموزشی در صفحه اصلی
     _justSignedUp = false;
     _onboardingDone = true;
     notifyListeners();
@@ -482,6 +483,7 @@ class AuthProvider extends ChangeNotifier {
     if (uid == null) return;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('onboarding_done_$uid', true);
+    await prefs.setBool('intro_pending_$uid', true);
     _justSignedUp = false;
     _onboardingDone = true;
     notifyListeners();

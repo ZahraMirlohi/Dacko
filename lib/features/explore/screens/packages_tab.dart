@@ -9,6 +9,7 @@ import '/providers/theme_provider.dart';
 import '/providers/sync_provider.dart';
 import '/core/app_palette.dart';
 import '../widgets/card_image.dart';
+import '/core/dk.dart';
 
 class PackagesTab extends StatefulWidget {
   final List<Package> packages;
@@ -217,7 +218,7 @@ class _PackagesTabState extends State<PackagesTab> {
     final Color primaryColor = theme.primaryColor;
 
     return Container(
-      color: theme.backgroundColor, // از Color(0xFFF7FCEB)
+      color: theme.backgroundColor, // از Dk.f(Color(0xFFF7FCEB))
       child: _buildBody(primaryColor, theme),
     );
   }
@@ -448,7 +449,7 @@ class _PackagesTabState extends State<PackagesTab> {
                 height: 56,
                 decoration: BoxDecoration(
                     color: const Color(0xFFFFD3CF), shape: BoxShape.circle),
-                child: const Icon(Icons.power_settings_new_rounded,
+                child: Icon(Icons.power_settings_new_rounded,
                     size: 28, color: Color(0xFF090909)),
               ),
               const SizedBox(height: 14),

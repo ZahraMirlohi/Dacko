@@ -618,7 +618,7 @@ extension _BuddyFinderScreenStateRequestSearch on _BuddyFinderScreenState {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(context.tr(accept ? 'ct.bf.accepted' : 'ct.bf.rejected')),
-            backgroundColor: accept ? primaryColor : Colors.grey,
+            backgroundColor: accept ? primaryColor : Dk.s(Colors.grey),
             duration: const Duration(seconds: 2),
           ),
         );

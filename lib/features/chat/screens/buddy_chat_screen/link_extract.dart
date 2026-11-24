@@ -94,7 +94,7 @@ extension _BuddyChatScreenStateLinkExtract on _BuddyChatScreenState {
                     width: 14,
                     height: 14,
                     decoration: BoxDecoration(
-                      color: _isBuddyOnline ? Colors.green : Colors.grey,
+                      color: _isBuddyOnline ? Colors.green : Dk.s(Colors.grey),
                       shape: BoxShape.circle,
                       border: Border.all(color: Colors.white, width: 2),
                     ),
@@ -349,7 +349,7 @@ extension _BuddyChatScreenStateLinkExtract on _BuddyChatScreenState {
                     width: 40,
                     height: 4,
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade300,
+                      color: Dk.l(Colors.grey.shade300),
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
@@ -446,7 +446,7 @@ extension _BuddyChatScreenStateLinkExtract on _BuddyChatScreenState {
       ),
       subtitle: Text(
         subtitle,
-        style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+        style: TextStyle(fontSize: 12, color: Dk.s(Colors.grey.shade600)),
       ),
       onTap: onTap,
     );

@@ -333,14 +333,14 @@ extension _BuddyFinderScreenStateMatchCard on _BuddyFinderScreenState {
             child: ElevatedButton(
               onPressed: null,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.grey.shade200,
+                backgroundColor: Dk.f(Colors.grey.shade200),
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
                 ),
                 disabledBackgroundColor: theme.isDarkMode
                     ? const Color(0xFF2A2A2A)
-                    : Colors.grey.shade200,
+                    : Dk.f(Colors.grey.shade200),
               ),
               child: Text(
                 context.tr('ct.bf.badge.wait'),
@@ -348,8 +348,8 @@ extension _BuddyFinderScreenStateMatchCard on _BuddyFinderScreenState {
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                   color: theme.isDarkMode
-                      ? Colors.grey.shade400
-                      : Colors.grey.shade700,
+                      ? Dk.s(Colors.grey.shade400)
+                      : Dk.s(Colors.grey.shade700),
                 ),
               ),
             ),
@@ -533,6 +533,6 @@ extension _BuddyFinderScreenStateMatchCard on _BuddyFinderScreenState {
   Color _getScoreColor(double score) {
     if (score >= 70) return const Color(0xFF2ECC71);
     if (score >= 50) return const Color(0xFFFFA500);
-    return Colors.grey;
+    return Dk.s(Colors.grey);
   }
 }

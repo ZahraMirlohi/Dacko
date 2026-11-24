@@ -490,8 +490,8 @@ extension _BuddyChatScreenStateMessageReaction on _BuddyChatScreenState {
                         color: isUserReacted
                             ? primaryColor
                             : (theme.isDarkMode
-                                ? Colors.grey.shade400
-                                : Colors.grey.shade600),
+                                ? Dk.s(Colors.grey.shade400)
+                                : Dk.s(Colors.grey.shade600)),
                         fontWeight:
                             isUserReacted ? FontWeight.bold : FontWeight.w500,
                       ),
@@ -530,13 +530,13 @@ extension _BuddyChatScreenStateMessageReaction on _BuddyChatScreenState {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         child: Row(
           children: [
-            Icon(icon, size: 20, color: color ?? Colors.grey.shade700),
+            Icon(icon, size: 20, color: color ?? Dk.s(Colors.grey.shade700)),
             const SizedBox(width: 14),
             Text(
               label,
               style: TextStyle(
                 fontSize: 14,
-                color: color ?? Colors.grey.shade700,
+                color: color ?? Dk.s(Colors.grey.shade700),
               ),
             ),
           ],

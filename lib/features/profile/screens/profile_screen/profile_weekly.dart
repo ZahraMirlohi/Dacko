@@ -601,7 +601,7 @@ extension _ProfileScreenStateProfileWeekly on _ProfileScreenState {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.person_outline, size: 80, color: Colors.grey.shade300),
+          Icon(Icons.person_outline, size: 80, color: Dk.l(Colors.grey.shade300)),
           const SizedBox(height: 16),
           Text(context.tr('pf.k007')),
           const SizedBox(height: 16),

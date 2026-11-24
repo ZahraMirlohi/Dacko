@@ -448,7 +448,7 @@ extension _ArenaChatScreenStateChallengeMessage on _ArenaChatScreenState {
           decoration: BoxDecoration(
             color: theme.isDarkMode
                 ? Color(0xFF2A2A2A)
-                : Colors.grey.shade200,
+                : Dk.f(Colors.grey.shade200),
             borderRadius: BorderRadius.circular(14),
           ),
           child: Text(

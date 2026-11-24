@@ -506,13 +506,13 @@ extension _BuddyChatScreenStateMenuChat on _BuddyChatScreenState {
               focusNode: focusNode,
               decoration: InputDecoration(
                 hintText: context.tr('bc.k067'),
-                hintStyle: TextStyle(color: Colors.grey.shade400),
+                hintStyle: TextStyle(color: Dk.s(Colors.grey.shade400)),
                 prefixIcon: Icon(Icons.search, color: primaryColor),
                 suffixIcon: searchController.text.isNotEmpty
                     ? IconButton(
-                        icon: const Icon(
+                        icon: Icon(
                           Icons.close,
-                          color: Colors.grey,
+                          color: Dk.s(Colors.grey),
                           size: 18,
                         ),
                         onPressed: () {
@@ -527,7 +527,7 @@ extension _BuddyChatScreenStateMenuChat on _BuddyChatScreenState {
                 filled: true,
                 fillColor: theme.isDarkMode
                     ? const Color(0xFF2A2A2A)
-                    : Colors.grey.shade50,
+                    : Dk.f(Colors.grey.shade50),
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 16,
                   vertical: 12,

@@ -52,7 +52,7 @@ extension _BuddyChatScreenStateMessageFailed on _BuddyChatScreenState {
                     width: 40,
                     height: 4,
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade300,
+                      color: Dk.l(Colors.grey.shade300),
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
@@ -69,7 +69,7 @@ extension _BuddyChatScreenStateMessageFailed on _BuddyChatScreenState {
                 SizedBox(height: 8),
                 Text(
                   context.tr('bc.k116'),
-                  style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+                  style: TextStyle(fontSize: 13, color: Dk.s(Colors.grey.shade600)),
                 ),
                 SizedBox(height: 16),
                 Divider(height: 1),
@@ -88,7 +88,7 @@ extension _BuddyChatScreenStateMessageFailed on _BuddyChatScreenState {
                   icon: Icons.copy,
                   title: context.tr('bc.k119'),
                   subtitle: context.tr('bc.k120'),
-                  color: Colors.grey,
+                  color: Dk.s(Colors.grey),
                   onTap: () {
                     Navigator.pop(context);
                     _copyMessage(message);
@@ -143,7 +143,7 @@ extension _BuddyChatScreenStateMessageFailed on _BuddyChatScreenState {
       ),
       subtitle: Text(
         subtitle,
-        style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+        style: TextStyle(fontSize: 12, color: Dk.s(Colors.grey.shade600)),
       ),
       onTap: onTap,
     );
@@ -255,13 +255,13 @@ extension _BuddyChatScreenStateMessageFailed on _BuddyChatScreenState {
         checkColor = isMe ? const Color(0xFF4FC3F7) : Colors.grey.shade500;
         break;
       case MessageStatus.sent:
-        checkColor = Colors.grey.shade500;
+        checkColor = Dk.s(Colors.grey.shade500);
         break;
       case MessageStatus.failed:
         checkColor = Colors.red;
         break;
       case MessageStatus.sending:
-        checkColor = Colors.grey.shade500;
+        checkColor = Dk.s(Colors.grey.shade500);
         break;
     }
 

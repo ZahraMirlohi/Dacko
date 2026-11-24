@@ -217,7 +217,7 @@ extension _BuddyChatScreenStateColorBubble on _BuddyChatScreenState {
           ? const Color(0xFF4FC3F7) // آبی روشن (دیده شده)
           : theme.primaryColor;
     }
-    return Colors.grey.shade500;
+    return Dk.s(Colors.grey.shade500);
   }
 
 // ✅ در متد _buildMessageBubble
@@ -310,7 +310,7 @@ extension _BuddyChatScreenStateColorBubble on _BuddyChatScreenState {
                       width: 40,
                       height: 4,
                       decoration: BoxDecoration(
-                        color: Colors.grey.shade300,
+                        color: Dk.l(Colors.grey.shade300),
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),

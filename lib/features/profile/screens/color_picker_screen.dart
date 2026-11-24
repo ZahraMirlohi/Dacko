@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '/l10n/app_strings.dart';
 import '/providers/theme_provider.dart';
+import '/core/dk.dart';
 
 class ColorPickerScreen extends StatefulWidget {
   const ColorPickerScreen({super.key});
@@ -255,7 +256,7 @@ class _ColorPickerScreenState extends State<ColorPickerScreen> {
                     color: Colors.white.withValues(alpha: 0.55),
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  child: const Icon(Icons.menu_book_rounded,
+                  child: Icon(Icons.menu_book_rounded,
                       size: 22, color: Color(0xFF090909)),
                 ),
                 const SizedBox(width: 12),
@@ -308,7 +309,7 @@ class _ColorPickerScreenState extends State<ColorPickerScreen> {
                 decoration: BoxDecoration(
                     color: soft, borderRadius: BorderRadius.circular(22)),
                 child: Text(context.tr('pm.cp.tag'),
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                         color: Color(0xFF090909))),

@@ -210,7 +210,7 @@ extension _ExploreScreenStateDetailDialog on _ExploreScreenState {
             ? const Color(0xFFFFD3CF)
             : actionKind == _SheetAction.neutral
                 ? (theme.isDarkMode ? theme.cardSecondaryColor : ink)
-                : const Color(0xFFCFD3C4);
+                : Dk.l(const Color(0xFFCFD3C4));
     final Color btnFg = actionKind == _SheetAction.primary
         ? (theme.isDarkMode ? ink : theme.effectivePrimary)
         : actionKind == _SheetAction.danger
@@ -563,7 +563,7 @@ extension _ExploreScreenStateDetailDialog on _ExploreScreenState {
         isActive ? theme.textColor : theme.textSecondaryColor;
     final Color bgColor = theme.isDarkMode
         ? (isActive ? const Color(0xFF2A2A2A) : const Color(0xFF1E1E1E))
-        : (isActive ? Colors.grey.shade50 : Colors.grey.shade100);
+        : (isActive ? Dk.f(Colors.grey.shade50) : Dk.f(Colors.grey.shade100));
     final Color borderColor = theme.borderColor;
 
     return Container(

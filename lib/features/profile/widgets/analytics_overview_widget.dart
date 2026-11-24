@@ -8,6 +8,7 @@ import '/services/supabase_service.dart';
 import '/features/arena/models/habit_model.dart';
 import '/features/explore/models/quest_model.dart';
 import '/providers/theme_provider.dart';
+import '/core/dk.dart';
 
 class AnalyticsOverviewWidget extends StatefulWidget {
   final String userId;
@@ -439,7 +440,7 @@ class AnalyticsOverviewWidgetState extends State<AnalyticsOverviewWidget>
                       border: Border.all(
                         color: theme.isDarkMode
                             ? Colors.white.withValues(alpha: 0.1)
-                            : Colors.grey.shade200,
+                            : Dk.f(Colors.grey.shade200),
                         width: 3,
                       ),
                     ),
@@ -686,7 +687,7 @@ class AnalyticsOverviewWidgetState extends State<AnalyticsOverviewWidget>
         decoration: BoxDecoration(
           color: theme.isDarkMode
               ? Colors.white.withValues(alpha: 0.05)
-              : Colors.grey.shade50,
+              : Dk.f(Colors.grey.shade50),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(

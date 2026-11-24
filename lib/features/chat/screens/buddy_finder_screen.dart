@@ -17,6 +17,7 @@ import 'user_profile_screen.dart';
 import '../widgets/open_buddy_chat.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import '/core/dk.dart';
 
 part 'buddy_finder_screen/request_search.dart';
 part 'buddy_finder_screen/tab_search.dart';

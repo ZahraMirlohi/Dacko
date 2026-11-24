@@ -12,6 +12,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import '/providers/theme_provider.dart';
+import '/core/dk.dart';
 
 class LocationPickerScreen extends StatefulWidget {
   const LocationPickerScreen({super.key});
@@ -230,9 +231,9 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
         children: [
           CircularProgressIndicator(color: primaryColor, strokeWidth: 2),
           const SizedBox(height: 16),
-          const Text(
+          Text(
             'در حال بارگذاری اطلاعات...',
-            style: TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
+            style: TextStyle(fontSize: 13, color: Dk.s(Color(0xFF6B7280))),
           ),
         ],
       ),

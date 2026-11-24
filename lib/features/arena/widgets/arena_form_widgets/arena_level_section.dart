@@ -221,7 +221,7 @@ class ArenaIconColorSection extends StatelessWidget {
                           : null,
                     ),
                     child: selectedColor == value
-                        ? const Icon(Icons.check_rounded,
+                        ? Icon(Icons.check_rounded,
                             size: 18, color: Color(0xFF090909))
                         : null,
                   ),

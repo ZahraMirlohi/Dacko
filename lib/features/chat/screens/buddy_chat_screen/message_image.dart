@@ -117,7 +117,7 @@ extension _BuddyChatScreenStateMessageImage on _BuddyChatScreenState {
             ),
             child: Text(
               context.tr('bc.k127'),
-              style: TextStyle(fontSize: 13, color: Colors.grey),
+              style: TextStyle(fontSize: 13, color: Dk.s(Colors.grey)),
             ),
           );
         }
@@ -434,10 +434,10 @@ extension _BuddyChatScreenStateMessageImage on _BuddyChatScreenState {
             width: 200,
             height: 200,
             fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => const Icon(
+            errorBuilder: (_, __, ___) => Icon(
               Icons.image_not_supported,
               size: 50,
-              color: Colors.grey,
+              color: Dk.s(Colors.grey),
             ),
             loadingBuilder: (context, child, loadingProgress) {
               if (loadingProgress == null) return child;

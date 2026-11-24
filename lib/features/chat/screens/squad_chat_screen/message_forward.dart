@@ -342,7 +342,7 @@ extension _SquadChatScreenStateMessageForward on _SquadChatScreenState {
             // ✅ با تم هماهنگ
             color: theme.isDarkMode
                 ? Color(0xFF2A2A2A)
-                : Colors.grey.shade200,
+                : Dk.f(Colors.grey.shade200),
             borderRadius: BorderRadius.circular(14),
           ),
           child: Text(
@@ -533,14 +533,14 @@ extension _SquadChatScreenStateMessageForward on _SquadChatScreenState {
           width: 12,
           height: 12,
           child: CircularProgressIndicator(
-              strokeWidth: 1.2, color: Colors.grey.shade500),
+              strokeWidth: 1.2, color: Dk.s(Colors.grey.shade500)),
         );
       case MessageStatus.failed:
         return const Icon(Icons.error_outline, size: 14, color: Colors.red);
       case MessageStatus.seen:
         return const Icon(Icons.done_all, size: 14, color: Color(0xFF4FC3F7));
       default:
-        return Icon(Icons.done_all, size: 14, color: Colors.grey.shade500);
+        return Icon(Icons.done_all, size: 14, color: Dk.s(Colors.grey.shade500));
     }
   }
 

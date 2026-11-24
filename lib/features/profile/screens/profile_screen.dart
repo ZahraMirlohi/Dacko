@@ -2,6 +2,7 @@
 
 import '/core/logging/app_logger.dart';
 import '/l10n/app_strings.dart';
+import '/widgets/skeleton.dart';
 import '/core/app_palette.dart';
 import 'package:flutter/material.dart';
 import '../../chat/widgets/avatar_viewer.dart';
@@ -115,18 +116,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         builder: (context, syncProvider, child) {
           // حالت بارگذاری
           if (_isLoading && _profile == null) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(color: _theme.primaryColor),
-                  const SizedBox(height: 16),
-                  Text(
-                    context.tr('pf.k005'),
-                    style: TextStyle(color: Color(0xFF6B7280)),
-                  ),
-                ],
-              ),
+            return const SafeArea(
+              child: SkeletonList(itemCount: 6, itemHeight: 88, padding: EdgeInsets.fromLTRB(20, 24, 20, 24)),
             );
           }
 

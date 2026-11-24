@@ -225,11 +225,11 @@ class _LeaderboardTabState extends State<LeaderboardTab> {
   Widget _xpLabel(int xp, {double size = 12}) => Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.star_rounded, size: size + 2, color: _ink),
+          Icon(Icons.star_rounded, size: size + 2, color: Provider.of<ThemeProvider>(context, listen: false).textColor),
           const SizedBox(width: 3),
           Text('$xp',
               style: TextStyle(
-                  fontSize: size, fontWeight: FontWeight.w800, color: _ink)),
+                  fontSize: size, fontWeight: FontWeight.w800, color: Provider.of<ThemeProvider>(context, listen: false).textColor)),
         ],
       );
 
@@ -410,10 +410,10 @@ class _LeaderboardTabState extends State<LeaderboardTab> {
           const SizedBox(height: 6),
           Text(context.tr('lb.k010'),
               style: TextStyle(
-                  fontSize: 20, fontWeight: FontWeight.w800, color: _ink)),
+                  fontSize: 20, fontWeight: FontWeight.w800, color: theme.textColor)),
           const SizedBox(height: 4),
           Text(context.tr('lb.k011'),
-              style: TextStyle(fontSize: 13, color: Color(0xFF3C4034))),
+              style: TextStyle(fontSize: 13, color: theme.textSecondaryColor)),
           if (_currentUserRank > 0) ...[
             const SizedBox(height: 8),
             Container(
@@ -421,13 +421,13 @@ class _LeaderboardTabState extends State<LeaderboardTab> {
               padding: const EdgeInsets.symmetric(horizontal: 14),
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: theme.cardColor,
                   borderRadius: BorderRadius.circular(16)),
               child: Text(context.tr('lb.k012', {'_currentUserRank': '$_currentUserRank'}),
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
-                      color: _ink)),
+                      color: theme.textColor)),
             ),
           ],
         ],
@@ -525,10 +525,10 @@ class _LeaderboardTabState extends State<LeaderboardTab> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text('$rank',
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.w800,
-                          color: _ink)),
+                          color: theme.textColor)),
                   _xpLabel((u['total_xp'] ?? 0) as int),
                 ],
               ),
@@ -562,8 +562,8 @@ class _LeaderboardTabState extends State<LeaderboardTab> {
           height: 32,
           decoration: BoxDecoration(
               color: theme.primarySoft, shape: BoxShape.circle),
-          child: const Icon(Icons.format_list_numbered_rounded,
-              size: 18, color: _ink),
+          child: Icon(Icons.format_list_numbered_rounded,
+              size: 18, color: theme.textColor),
         ),
         const SizedBox(width: 8),
         Text(context.tr('lb.k014'),
@@ -618,7 +618,7 @@ class _LeaderboardTabState extends State<LeaderboardTab> {
                 style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w800,
-                    color: isMe ? _ink : theme.textColor)),
+                    color: theme.textColor)),
           ),
           const SizedBox(width: 12),
           _avatar(user['avatar_url'], 40, theme),
@@ -636,7 +636,7 @@ class _LeaderboardTabState extends State<LeaderboardTab> {
                           style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w700,
-                              color: isMe ? _ink : theme.textColor)),
+                              color: theme.textColor)),
                     ),
                     if (isMe) ...[
                       const SizedBox(width: 6),
@@ -660,9 +660,7 @@ class _LeaderboardTabState extends State<LeaderboardTab> {
                   Text(context.tr('lb.k013', {'badges': '$badges'}),
                       style: TextStyle(
                           fontSize: 11,
-                          color: isMe
-                              ? const Color(0xFF3C4034)
-                              : theme.textSecondaryColor)),
+                          color: theme.textSecondaryColor)),
               ],
             ),
           ),
@@ -700,7 +698,7 @@ class _LeaderboardTabState extends State<LeaderboardTab> {
               height: 88,
               decoration: BoxDecoration(
                   color: theme.tone(tone).bg, shape: BoxShape.circle),
-              child: Icon(icon, size: 40, color: _ink),
+              child: Icon(icon, size: 40, color: theme.tone(tone).fg),
             ),
             const SizedBox(height: 16),
             Text(title,

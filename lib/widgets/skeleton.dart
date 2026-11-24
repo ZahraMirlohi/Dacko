@@ -6,6 +6,7 @@ class SkeletonList extends StatefulWidget {
   final int itemCount;
   final double itemHeight;
   final bool avatar;
+  final bool shrinkWrap; // داخل ListView/Column دیگر
   final EdgeInsetsGeometry padding;
 
   const SkeletonList({
@@ -13,6 +14,7 @@ class SkeletonList extends StatefulWidget {
     this.itemCount = 6,
     this.itemHeight = 64,
     this.avatar = true,
+    this.shrinkWrap = false,
     this.padding = const EdgeInsets.fromLTRB(16, 12, 16, 12),
   });
 
@@ -52,6 +54,7 @@ class _SkeletonListState extends State<SkeletonList>
                 ),
               );
           return ListView.separated(
+            shrinkWrap: widget.shrinkWrap,
             physics: const NeverScrollableScrollPhysics(),
             padding: widget.padding,
             itemCount: widget.itemCount,

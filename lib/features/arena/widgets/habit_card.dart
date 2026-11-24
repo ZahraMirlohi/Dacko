@@ -111,7 +111,9 @@ class _HabitCardState extends State<HabitCard>
       textColor = theme.textColor;
     } else {
       // روی کارت رنگی، متن همیشه مشکی
-      textColor = const Color(0xFF090909);
+      textColor = cardColor.computeLuminance() > 0.4
+          ? const Color(0xFF090909)
+          : theme.textColor;
     }
 
     // رنگ دکمه انجام (دایره سمت چپ)
@@ -405,6 +407,9 @@ class _HabitCardState extends State<HabitCard>
                                   label: _formatRecordedTime(
                                       widget.recordedTimeSeconds!),
                                   bg: theme.tone(Tone.lilac).bg,
+                                  fg: theme.isDarkMode
+                                      ? theme.tone(Tone.lilac).fg
+                                      : const Color(0xFF090909),
                                 ),
                               _chip(
                                 icon: Icons.access_time_rounded,
@@ -422,12 +427,15 @@ class _HabitCardState extends State<HabitCard>
                                   label: '${widget.habit.currentStreak}',
                                   bg: theme.tone(Tone.apricot).bg,
                                   iconColor: const Color(0xFFE8890C),
+                                  fg: theme.isDarkMode
+                                      ? theme.tone(Tone.apricot).fg
+                                      : const Color(0xFF090909),
                                 ),
                             ],
                           ),
                           if (widget.habit.subHabits.isNotEmpty) ...[
                             const SizedBox(height: 8),
-                            _buildSubProgress(),
+                            _buildSubProgress(textColor),
                           ],
                         ],
                       ],
@@ -443,7 +451,7 @@ class _HabitCardState extends State<HabitCard>
   }
 
   /// نوار پیشرفت زیرعادت‌ها روی کارت رنگی
-  Widget _buildSubProgress() {
+  Widget _buildSubProgress(Color onCard) {
     final int total = widget.habit.subHabits.length;
     final int done = widget.habit.subHabits
         .where((s) => widget.habit.completedSubHabits.contains(s))
@@ -457,7 +465,9 @@ class _HabitCardState extends State<HabitCard>
               children: [
                 Container(
                   height: 6,
-                  color: Colors.white.withValues(alpha: 0.6),
+                  color: onCard == const Color(0xFF090909)
+                      ? Colors.white.withValues(alpha: 0.6)
+                      : onCard.withValues(alpha: 0.25),
                 ),
                 FractionallySizedBox(
                   alignment: AlignmentDirectional.centerStart,
@@ -465,7 +475,7 @@ class _HabitCardState extends State<HabitCard>
                   child: Container(
                     height: 6,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF090909),
+                      color: onCard,
                       borderRadius: BorderRadius.circular(3),
                     ),
                   ),
@@ -477,10 +487,10 @@ class _HabitCardState extends State<HabitCard>
         const SizedBox(width: 8),
         Text(
           context.tr('ah.card.progress', {'a': '$done', 'b': '$total'}),
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w700,
-            color: Color(0xFF090909),
+            color: onCard,
           ),
         ),
       ],

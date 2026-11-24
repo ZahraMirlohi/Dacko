@@ -187,6 +187,6 @@ class _CompletionViewState extends State<CompletionView>
             style: TextStyle(
                 fontSize: size,
                 fontWeight: FontWeight.w700,
-                color: const Color(0xFF090909))),
+                color: Provider.of<ThemeProvider>(context, listen: false).textColor)),
       );
 }

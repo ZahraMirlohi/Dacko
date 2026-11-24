@@ -927,7 +927,7 @@ class _QuestsTabState extends State<QuestsTab> {
           height: 32,
           decoration:
               BoxDecoration(color: theme.tone(tone).bg, shape: BoxShape.circle),
-          child: Icon(icon, size: 18, color: const Color(0xFF090909)),
+          child: Icon(icon, size: 18, color: theme.tone(tone).fg),
         ),
         const SizedBox(width: 8),
         Text(title,

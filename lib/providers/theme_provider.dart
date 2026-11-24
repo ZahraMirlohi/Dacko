@@ -6,6 +6,7 @@
 //
 // تمام getterهای قبلی دست‌نخورده موندن، پس ویجت‌های فعلی بدون تغییر کار می‌کنن.
 
+import '/core/dk.dart';
 import '/core/logging/app_logger.dart';
 import 'dart:ui' as ui;
 
@@ -286,6 +287,13 @@ class ThemeProvider extends ChangeNotifier with WidgetsBindingObserver {
       _onCheckButton = Colors.white;
     }
     _effectivePrimary = primary;
+    Dk.update(
+      isDark: _dark,
+      fill: _cardSecondaryColor,
+      line: _borderColor,
+      sub: _textSecondaryColor,
+      text: _textColor,
+    );
   }
 
   Color _effectivePrimary = defaultPrimary;

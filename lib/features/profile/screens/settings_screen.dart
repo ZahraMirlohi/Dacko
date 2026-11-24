@@ -403,7 +403,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         color: t.bg,
         borderRadius: BorderRadius.circular(14),
       ),
-      child: Icon(icon, color: danger ? _danger : const Color(0xFF090909).withValues(alpha: theme.isDarkMode ? 0 : 1), size: 20),
+      child: Icon(icon, color: danger ? _danger : (theme.isDarkMode ? t.fg : const Color(0xFF090909)), size: 20),
     );
   }
 
@@ -528,7 +528,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
           alignment:
               value ? AlignmentDirectional.centerEnd : AlignmentDirectional.centerStart,
           decoration: BoxDecoration(
-            color: value ? theme.primaryColor : const Color(0xFFD9DCCF),
+            color: value
+                ? theme.primaryColor
+                : (theme.isDarkMode
+                    ? theme.textSecondaryColor.withValues(alpha: 0.35)
+                    : const Color(0xFFD9DCCF)),
             borderRadius: BorderRadius.circular(15),
           ),
           child: Container(

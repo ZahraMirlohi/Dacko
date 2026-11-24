@@ -107,7 +107,7 @@ extension _ProfileScreenStateAvatarButton on _ProfileScreenState {
           padding: const EdgeInsets.symmetric(vertical: 14),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
-            side: BorderSide(color: Colors.grey.shade300),
+            side: BorderSide(color: _theme.borderColor),
           ),
           elevation: 0,
         ),
@@ -404,7 +404,7 @@ extension _ProfileScreenStateAvatarButton on _ProfileScreenState {
           padding: const EdgeInsets.symmetric(vertical: 14),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
-            side: BorderSide(color: Colors.grey.shade300),
+            side: BorderSide(color: _theme.borderColor),
           ),
           elevation: 0,
         ),

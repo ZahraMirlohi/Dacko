@@ -495,7 +495,7 @@ extension _BuddyChatScreenStateChallengeProgress on _BuddyChatScreenState {
       decoration: BoxDecoration(
         color: theme.surfaceColor,
         border: Border(
-          bottom: BorderSide(color: Colors.grey.shade200),
+          bottom: BorderSide(color: theme.borderColor),
         ),
       ),
       child: Row(

@@ -52,7 +52,9 @@ class _NewRequestPopupState extends State<NewRequestPopup>
           child: Container(
             padding: const EdgeInsets.fromLTRB(14, 10, 8, 10),
             decoration: BoxDecoration(
-              color: const Color(0xFF090909),
+              color: theme.isDarkMode
+                  ? theme.cardSecondaryColor
+                  : const Color(0xFF090909),
               borderRadius: BorderRadius.circular(28),
               boxShadow: theme.softShadow,
             ),

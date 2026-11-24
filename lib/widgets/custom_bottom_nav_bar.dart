@@ -30,9 +30,10 @@ class CustomBottomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<ThemeProvider>(context);
-    final navColor = theme.isDarkMode ? Colors.white : const Color(0xFF090909);
+    final navColor =
+        theme.isDarkMode ? theme.cardSecondaryColor : const Color(0xFF090909);
     final inactive =
-        theme.isDarkMode ? Colors.grey.shade400 : const Color(0xFF8A8A8A);
+        theme.isDarkMode ? theme.textSecondaryColor : const Color(0xFF8A8A8A);
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
@@ -45,6 +46,9 @@ class CustomBottomNavBar extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 8),
             decoration: BoxDecoration(
               color: navColor,
+              border: theme.isDarkMode
+                  ? Border.all(color: theme.borderColor)
+                  : null,
               borderRadius: BorderRadius.circular(32),
               boxShadow: [
                 BoxShadow(

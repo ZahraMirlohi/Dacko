@@ -355,8 +355,10 @@ class _ArenaScreenState extends State<ArenaScreen>
         child: Container(
           width: size,
           height: size,
-          decoration: const BoxDecoration(
-            color: Color(0xFF090909),
+          decoration: BoxDecoration(
+            color: theme.isDarkMode
+                ? theme.cardSecondaryColor
+                : const Color(0xFF090909),
             shape: BoxShape.circle,
           ),
           child: Icon(Icons.add_rounded,

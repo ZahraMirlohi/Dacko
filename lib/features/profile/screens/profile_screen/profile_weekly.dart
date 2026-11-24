@@ -574,7 +574,7 @@ extension _ProfileScreenStateProfileWeekly on _ProfileScreenState {
           const SizedBox(height: 16),
           Text(
             _errorMessage!,
-            style: const TextStyle(color: Color(0xFF6B7280)),
+            style: TextStyle(color: _theme.textSecondaryColor),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 16),

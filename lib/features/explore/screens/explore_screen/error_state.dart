@@ -29,7 +29,7 @@ extension _ExploreScreenStateErrorState on _ExploreScreenState {
             label: Text(context.tr('ex.retry')),
             style: ElevatedButton.styleFrom(
               backgroundColor: primaryColor,
-              foregroundColor: Colors.white,
+              foregroundColor: theme.onPrimaryColor,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),

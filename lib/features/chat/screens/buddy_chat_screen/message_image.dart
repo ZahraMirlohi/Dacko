@@ -29,7 +29,7 @@ extension _BuddyChatScreenStateMessageImage on _BuddyChatScreenState {
               context.tr('bc.k125'),
               style: TextStyle(
                 fontSize: 13,
-                color: isMe ? Colors.white70 : Colors.grey.shade600,
+                color: isMe ? const Color(0xFF090909) : theme.textSecondaryColor,
               ),
             ),
           ],
@@ -112,7 +112,7 @@ extension _BuddyChatScreenStateMessageImage on _BuddyChatScreenState {
           return Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.grey.shade100,
+              color: theme.cardSecondaryColor,
               borderRadius: BorderRadius.circular(16),
             ),
             child: Text(
@@ -445,7 +445,7 @@ extension _BuddyChatScreenStateMessageImage on _BuddyChatScreenState {
                 width: 200,
                 height: 200,
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade200,
+                  color: theme.cardSecondaryColor,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Center(
@@ -575,7 +575,9 @@ extension _BuddyChatScreenStateMessageImage on _BuddyChatScreenState {
       width: 280,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: isMe ? const Color(0xFF090909) : theme.surfaceColor,
+        color: isMe
+            ? (theme.isDarkMode ? theme.cardSecondaryColor : const Color(0xFF090909))
+            : theme.surfaceColor,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(

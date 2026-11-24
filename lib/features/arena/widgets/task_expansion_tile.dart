@@ -72,6 +72,7 @@ class _TaskExpansionTileState extends State<TaskExpansionTile> {
     final int total = widget.task.subTasks.length;
     final progress = total == 0 ? 0.0 : _completedSubTasks.length / total;
     const Color ink = Color(0xFF090909);
+    final Color onCard = theme.isDarkMode ? theme.textColor : ink;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
@@ -115,10 +116,10 @@ class _TaskExpansionTileState extends State<TaskExpansionTile> {
                           widget.task.title,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w700,
-                            color: ink,
+                            color: onCard,
                           ),
                         ),
                         if (widget.task.dueDate != null) ...[
@@ -127,9 +128,9 @@ class _TaskExpansionTileState extends State<TaskExpansionTile> {
                             calendar.formatShort(widget.task.dueDate!),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 12,
-                              color: ink,
+                              color: onCard,
                             ),
                           ),
                         ],
@@ -158,8 +159,8 @@ class _TaskExpansionTileState extends State<TaskExpansionTile> {
                   AnimatedRotation(
                     duration: const Duration(milliseconds: 250),
                     turns: _isExpanded ? 0.5 : 0,
-                    child: const Icon(Icons.keyboard_arrow_down_rounded,
-                        size: 24, color: ink),
+                    child: Icon(Icons.keyboard_arrow_down_rounded,
+                        size: 24, color: onCard),
                   ),
                 ],
               ),

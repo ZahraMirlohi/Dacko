@@ -1,3 +1,4 @@
+import '/widgets/skeleton.dart';
 import '/core/logging/app_logger.dart';
 import '/l10n/app_strings.dart';
 import 'package:flutter/material.dart';
@@ -223,22 +224,7 @@ class _PackagesTabState extends State<PackagesTab> {
 
   Widget _buildBody(Color primaryColor, ThemeProvider theme) {
     if (_isLoadingActive) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(color: primaryColor),
-            const SizedBox(height: 16),
-            Text(
-              context.tr('ex.pkg.loading'),
-              style: TextStyle(
-                color: theme.textSecondaryColor,
-                fontSize: 13,
-              ),
-            ),
-          ],
-        ),
-      );
+      return const SkeletonList(itemCount: 4, itemHeight: 120, avatar: false, padding: EdgeInsets.fromLTRB(20, 96, 20, 24));
     }
 
     if (widget.packages.isEmpty) {
@@ -349,7 +335,7 @@ class _PackagesTabState extends State<PackagesTab> {
           height: 32,
           decoration:
               BoxDecoration(color: theme.tone(tone).bg, shape: BoxShape.circle),
-          child: Icon(icon, size: 18, color: const Color(0xFF090909)),
+          child: Icon(icon, size: 18, color: theme.tone(tone).fg),
         ),
         const SizedBox(width: 8),
         Text(title,
@@ -536,7 +522,7 @@ class _PackagesTabState extends State<PackagesTab> {
                 width: 38,
                 height: 38,
                 decoration: BoxDecoration(color: soft, shape: BoxShape.circle),
-                child: Icon(icon, size: 18, color: ink),
+                child: Icon(icon, size: 18, color: theme.tone(Tone.lime).fg),
               ),
               const SizedBox(width: 12),
               Text(label,
@@ -693,12 +679,14 @@ class _PackagesTabState extends State<PackagesTab> {
                           ? _sheetButton(
                               context.tr('ex.pkg.activate_btn'),
                               Icons.play_arrow_rounded,
-                              ink,
-                              theme.effectivePrimary, () {
+                              theme.isDarkMode ? theme.effectivePrimary : ink,
+                              theme.isDarkMode ? ink : theme.effectivePrimary, () {
                               Navigator.pop(ctx);
                               _activatePackage(package, primaryColor);
                             })
-                          : _sheetButton(context.tr('ex.close'), null, ink, Colors.white,
+                          : _sheetButton(context.tr('ex.close'), null,
+                              theme.isDarkMode ? theme.cardSecondaryColor : ink,
+                              theme.isDarkMode ? theme.textColor : Colors.white,
                               () => Navigator.pop(ctx)),
                     ),
                   ],
@@ -718,10 +706,10 @@ class _PackagesTabState extends State<PackagesTab> {
         decoration:
             BoxDecoration(color: bg, borderRadius: BorderRadius.circular(13)),
         child: Text(t,
-            style: const TextStyle(
+            style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: Color(0xFF090909))),
+                color: Provider.of<ThemeProvider>(context, listen: false).textColor)),
       );
 
   Widget _sheetButton(
@@ -917,8 +905,8 @@ class _PackageCard extends StatelessWidget {
     // بستهٔ فعال: پر با رنگ اصلی + قاب ضخیم تا از بسته‌های غیرفعال کاملاً متمایز باشد
     final tone = theme.tone(_tones[package.id.hashCode.abs() % _tones.length]);
     final Color cardBg = isActive ? theme.effectivePrimary : tone.bg;
-    final Color on = isActive ? theme.onPrimaryColor : _ink;
-    final Color onBody = isActive ? theme.onPrimaryColor : const Color(0xFF3C4034);
+    final Color on = isActive ? theme.onPrimaryColor : theme.textColor;
+    final Color onBody = isActive ? theme.onPrimaryColor : theme.textSecondaryColor;
     final habits = package.habits.take(3).toList();
     final remaining = package.habits.length - habits.length;
     final white70 = Colors.white.withValues(alpha: 0.7);

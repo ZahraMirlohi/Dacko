@@ -1,6 +1,7 @@
 // lib/features/explore/screens/explore_screen.dart
 
 import '/core/logging/app_logger.dart';
+import '/widgets/skeleton.dart';
 import '/l10n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -104,19 +105,7 @@ class _ExploreScreenState extends State<ExploreScreen>
     return Scaffold(
       backgroundColor: theme.backgroundColor,
       body: _isLoading
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(color: primaryColor),
-                  const SizedBox(height: 16),
-                  Text(
-                    context.tr('ex.loading'),
-                    style: TextStyle(color: theme.textSecondaryColor),
-                  ),
-                ],
-              ),
-            )
+          ? const SkeletonList(itemCount: 5, itemHeight: 110, avatar: false, padding: EdgeInsets.fromLTRB(20, 96, 20, 24))
           : _errorMessage.isNotEmpty
               ? _buildErrorState(primaryColor, theme)
               : _buildMainContent(primaryColor, theme),

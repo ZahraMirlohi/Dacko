@@ -41,9 +41,12 @@ class QuestCard extends StatelessWidget {
         : isActive
             ? theme.effectivePrimary
             : theme.cardColor;
-    final Color textOn = isActive ? theme.onPrimaryColor : _ink;
-    final Color body = isActive ? theme.onPrimaryColor : const Color(0xFF3C4034);
-    final chipBg = isActive ? Colors.white.withValues(alpha: 0.6) : const Color(0x0F090909);
+    final Color textOn = isActive ? theme.onPrimaryColor : theme.textColor;
+    final Color body = isActive ? theme.onPrimaryColor : theme.textSecondaryColor;
+    final chipBg = isActive
+        ? Colors.white.withValues(alpha: 0.6)
+        : (theme.isDarkMode ? Colors.white.withValues(alpha: 0.12) : const Color(0x0F090909));
+    final Color chipFg = isActive ? _ink : theme.textColor;
     final p = (progress ?? 0).clamp(0, quest.targetCount);
     final ratio = quest.targetCount > 0 ? p / quest.targetCount : 0.0;
 
@@ -81,12 +84,12 @@ class QuestCard extends StatelessWidget {
                 child: Text(quest.title,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                        fontSize: 14, fontWeight: FontWeight.w800, color: _ink)),
+                    style: TextStyle(
+                        fontSize: 14, fontWeight: FontWeight.w800, color: theme.textColor)),
               ),
               const SizedBox(width: 8),
               _chip('+${quest.xpReward} XP', Icons.star_rounded, chipBg,
-                  bold: true),
+                  bold: true, fg: chipFg),
               const SizedBox(width: 6),
               const Icon(Icons.check_circle_rounded,
                   color: Color(0xFF2ECC71), size: 24),
@@ -176,9 +179,9 @@ class QuestCard extends StatelessWidget {
                     runSpacing: 6,
                     children: [
                       _chip(context.tr('ex.days_n', {'n': '${quest.targetCount}'}),
-                          Icons.calendar_today_rounded, chipBg),
+                          Icons.calendar_today_rounded, chipBg, fg: chipFg),
                       _chip('+${quest.xpReward} XP', Icons.star_rounded, chipBg,
-                          bold: true),
+                          bold: true, fg: chipFg),
                       if (isCompleted && quest.badge.isNotEmpty)
                         _chip(quest.badge, null,
                             Colors.white.withValues(alpha: 0.75)),
@@ -239,7 +242,8 @@ class QuestCard extends StatelessWidget {
     );
   }
 
-  Widget _chip(String text, IconData? icon, Color bg, {bool bold = false}) {
+  Widget _chip(String text, IconData? icon, Color bg,
+      {bool bold = false, Color fg = _ink}) {
     return Container(
       height: 26,
       padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -249,14 +253,14 @@ class QuestCard extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (icon != null) ...[
-            Icon(icon, size: 13, color: _ink),
+            Icon(icon, size: 13, color: fg),
             const SizedBox(width: 4),
           ],
           Text(text,
               style: TextStyle(
                   fontSize: 12,
                   fontWeight: bold ? FontWeight.w700 : FontWeight.w600,
-                  color: _ink)),
+                  color: fg)),
         ],
       ),
     );

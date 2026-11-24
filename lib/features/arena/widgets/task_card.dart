@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '/widgets/skeleton.dart';
 import '../models/task_model.dart';
 import '/core/app_palette.dart';
 import '/l10n/app_strings.dart';
@@ -325,37 +326,12 @@ class ArenaLoadingView extends StatelessWidget {
   const ArenaLoadingView({super.key, this.message});
 
   @override
-  Widget build(BuildContext context) {
-    final theme = Provider.of<ThemeProvider>(context);
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 16),
-      decoration: BoxDecoration(
-        color: theme.cardColor,
-        borderRadius: BorderRadius.circular(28),
-        boxShadow: theme.softShadow,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SizedBox(
-            width: 56,
-            height: 56,
-            child: CircularProgressIndicator(
-              strokeWidth: 6,
-              color: theme.primaryColor,
-              backgroundColor: theme.cardSecondaryColor,
-            ),
-          ),
-          const SizedBox(height: 14),
-          Text(
-            message ?? context.tr('ah.state.loading'),
-            style: TextStyle(fontSize: 14, color: theme.textSecondaryColor),
-          ),
-        ],
-      ),
-    );
-  }
+  Widget build(BuildContext context) => const SkeletonList(
+        itemCount: 4,
+        itemHeight: 84,
+        shrinkWrap: true,
+        padding: EdgeInsets.symmetric(vertical: 8),
+      );
 }
 
 // ============================================================

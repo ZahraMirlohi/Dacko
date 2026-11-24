@@ -360,7 +360,9 @@ class GroupRichContent {
         width: 250,
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: isMe ? const Color(0xFF090909) : theme.surfaceColor,
+          color: isMe
+              ? (theme.isDarkMode ? theme.cardSecondaryColor : const Color(0xFF090909))
+              : theme.surfaceColor,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Row(children: [

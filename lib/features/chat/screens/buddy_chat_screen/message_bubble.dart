@@ -33,7 +33,7 @@ extension _BuddyChatScreenStateMessageBubble on _BuddyChatScreenState {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF1A1A2E),
+                color: theme.textColor,
               ),
             ),
           ],
@@ -47,7 +47,7 @@ extension _BuddyChatScreenStateMessageBubble on _BuddyChatScreenState {
             hintStyle: TextStyle(color: Colors.grey.shade400),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.grey.shade300),
+              borderSide: BorderSide(color: theme.borderColor),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
@@ -490,10 +490,7 @@ extension _BuddyChatScreenStateMessageBubble on _BuddyChatScreenState {
                                               : otherBubbleColor.withValues(
                                                   alpha: 0.6))
                                           : (isMe
-                                              ? (theme.isDarkMode
-                                                  ? Colors.white
-                                                      .withValues(alpha: 0.1)
-                                                  : const Color(0xFF090909)
+                                              ? (const Color(0xFF090909)
                                                       .withValues(alpha: 0.08))
                                               : (theme.isDarkMode
                                                   ? Colors.white
@@ -524,10 +521,7 @@ extension _BuddyChatScreenStateMessageBubble on _BuddyChatScreenState {
                                               Icons.reply_outlined,
                                               size: 9,
                                               color: isMe
-                                                  ? (theme.isDarkMode
-                                                      ? Colors.white.withValues(
-                                                          alpha: 0.9)
-                                                      : const Color(0xFF090909)
+                                                  ? (const Color(0xFF090909)
                                                           .withValues(
                                                               alpha: 0.9))
                                                   : primaryColor,
@@ -540,11 +534,7 @@ extension _BuddyChatScreenStateMessageBubble on _BuddyChatScreenState {
                                                   fontSize: 9,
                                                   fontWeight: FontWeight.w600,
                                                   color: isMe
-                                                      ? (theme.isDarkMode
-                                                          ? Colors.white
-                                                              .withValues(
-                                                                  alpha: 0.9)
-                                                          : const Color(
+                                                      ? (const Color(
                                                                   0xFF090909)
                                                               .withValues(
                                                                   alpha: 0.9))
@@ -562,10 +552,7 @@ extension _BuddyChatScreenStateMessageBubble on _BuddyChatScreenState {
                                           style: TextStyle(
                                             fontSize: 9,
                                             color: isMe
-                                                ? (theme.isDarkMode
-                                                    ? Colors.white
-                                                        .withValues(alpha: 0.8)
-                                                    : const Color(0xFF090909)
+                                                ? (const Color(0xFF090909)
                                                         .withValues(alpha: 0.8))
                                                 : (theme.isDarkMode
                                                     ? Colors.grey.shade400

@@ -69,7 +69,7 @@ extension _ExploreScreenStateDetailDialog on _ExploreScreenState {
         banner = _sheetBanner(theme.tone(Tone.rose).bg, context.tr('ex.ch.fail_t'),
             context.tr('ex.ch.fail_s', {'n': '$completedDays', 'm': '$totalDays'}));
       } else if (isExpired) {
-        banner = _sheetBanner(const Color(0xFFE3E6D8), context.tr('ex.ch.expired_t'),
+        banner = _sheetBanner(theme.isDarkMode ? const Color(0xFF2A2D24) : const Color(0xFFE3E6D8), context.tr('ex.ch.expired_t'),
             context.tr('ex.ch.expired_s'));
       } else {
         banner = _sheetBanner(theme.tone(Tone.butter).bg, context.tr('ex.ready'),
@@ -127,14 +127,14 @@ extension _ExploreScreenStateDetailDialog on _ExploreScreenState {
         child: Column(
           children: [
             Text(title,
-                style: const TextStyle(
+                style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w800,
-                    color: Color(0xFF090909))),
+                    color: Provider.of<ThemeProvider>(context, listen: false).textColor)),
             const SizedBox(height: 4),
             Text(sub,
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 13, color: Color(0xFF3C4034))),
+                style: TextStyle(fontSize: 13, color: Provider.of<ThemeProvider>(context, listen: false).textSecondaryColor)),
           ],
         ),
       );
@@ -157,12 +157,12 @@ extension _ExploreScreenStateDetailDialog on _ExploreScreenState {
                   style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w800,
-                      color: Color(0xFF090909))),
+                      color: theme.textColor)),
               Text(context.tr('ex.quest.progress', {'n': '$done', 'm': '$total'}),
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF090909))),
+                      color: theme.textColor)),
             ],
           ),
           const SizedBox(height: 10),
@@ -171,17 +171,19 @@ extension _ExploreScreenStateDetailDialog on _ExploreScreenState {
             child: LinearProgressIndicator(
               value: ratio.clamp(0.0, 1.0),
               minHeight: 8,
-              backgroundColor: Colors.white.withValues(alpha: 0.7),
-              valueColor: const AlwaysStoppedAnimation(Color(0xFF090909)),
+              backgroundColor: theme.isDarkMode
+                  ? Colors.white.withValues(alpha: 0.15)
+                  : Colors.white.withValues(alpha: 0.7),
+              valueColor: AlwaysStoppedAnimation(theme.textColor),
             ),
           ),
           const SizedBox(height: 6),
           Text(
               context.tr('ex.sheet.pct', {'n': '${(ratio * 100).toInt()}'}) + (remainingText != null ? ' - $remainingText' : ''),
-              style: const TextStyle(
+              style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF3C4034))),
+                  color: theme.textSecondaryColor)),
         ],
       ),
     );
@@ -203,18 +205,18 @@ extension _ExploreScreenStateDetailDialog on _ExploreScreenState {
     if (!mounted) return;
     const ink = Color(0xFF090909);
     final Color btnBg = actionKind == _SheetAction.primary
-        ? ink
+        ? (theme.isDarkMode ? theme.effectivePrimary : ink)
         : actionKind == _SheetAction.danger
             ? const Color(0xFFFFD3CF)
             : actionKind == _SheetAction.neutral
-                ? ink
+                ? (theme.isDarkMode ? theme.cardSecondaryColor : ink)
                 : const Color(0xFFCFD3C4);
     final Color btnFg = actionKind == _SheetAction.primary
-        ? theme.effectivePrimary
+        ? (theme.isDarkMode ? ink : theme.effectivePrimary)
         : actionKind == _SheetAction.danger
             ? ink
             : actionKind == _SheetAction.neutral
-                ? Colors.white
+                ? (theme.isDarkMode ? theme.textColor : Colors.white)
                 : const Color(0xFF555B4B);
 
     showModalBottomSheet(
@@ -285,10 +287,10 @@ extension _ExploreScreenStateDetailDialog on _ExploreScreenState {
                                     color: theme.tone(Tone.butter).bg,
                                     borderRadius: BorderRadius.circular(14)),
                                 child: Text(status,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.w600,
-                                        color: ink)),
+                                        color: theme.tone(Tone.butter).fg)),
                               ),
                             ],
                           ),
@@ -317,21 +319,21 @@ extension _ExploreScreenStateDetailDialog on _ExploreScreenState {
                                   borderRadius: BorderRadius.circular(24)),
                               child: Column(
                                 children: [
-                                  Icon(tiles[i].icon, size: 20, color: ink),
+                                  Icon(tiles[i].icon, size: 20, color: theme.textColor),
                                   const SizedBox(height: 4),
                                   Text(tiles[i].label,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                           fontSize: 12,
-                                          color: Color(0xFF3C4034))),
+                                          color: theme.textSecondaryColor)),
                                   const SizedBox(height: 4),
                                   Text(tiles[i].value,
                                       textAlign: TextAlign.center,
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                           fontSize: 13,
                                           fontWeight: FontWeight.w800,
-                                          color: ink)),
+                                          color: theme.textColor)),
                                 ],
                               ),
                             ),

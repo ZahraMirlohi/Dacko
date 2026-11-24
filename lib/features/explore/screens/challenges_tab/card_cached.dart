@@ -165,11 +165,11 @@ extension _ChallengesTabStateCardCached on _ChallengesTabState {
                 textAlign: TextAlign.center,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
+                style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
                     height: 1.5,
-                    color: ink)),
+                    color: theme.textColor)),
             const SizedBox(height: 8),
             Container(
               height: 24,
@@ -419,7 +419,7 @@ extension _ChallengesTabStateCardCached on _ChallengesTabState {
                         fontSize: 14,
                         fontWeight: FontWeight.w800,
                         height: 1.6,
-                        color: fg)),
+                        color: isExpired ? fg : theme.textColor)),
                 const SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -463,7 +463,7 @@ extension _ChallengesTabStateCardCached on _ChallengesTabState {
             color: theme.tone(tone).bg,
             shape: BoxShape.circle,
           ),
-          child: Icon(icon, size: 18, color: const Color(0xFF090909)),
+          child: Icon(icon, size: 18, color: theme.tone(tone).fg),
         ),
         const SizedBox(width: 8),
         Text(title.trim(),

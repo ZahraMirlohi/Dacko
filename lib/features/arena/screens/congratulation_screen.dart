@@ -75,7 +75,7 @@ class _CongratulationScreenState extends State<CongratulationScreen>
   late Animation<double> _fadeAnimation;
   int _quoteIndex = 0;
 
-  static const int _quoteCount = 3;
+  static const int _quoteCount = 15;
 
   @override
   void initState() {
@@ -158,7 +158,7 @@ class _CongratulationScreenState extends State<CongratulationScreen>
                           ),
                           const SizedBox(height: 6),
                           Text(
-                            context.tr('ad.cg.subtitle'),
+                            context.trv('ad.cg.subtitle'),
                             style: TextStyle(
                               fontSize: 16,
                               color: theme.textSecondaryColor,

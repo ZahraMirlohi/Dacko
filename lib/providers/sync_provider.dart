@@ -1,5 +1,6 @@
 // lib/providers/sync_provider.dart
 
+import '/core/logging/app_logger.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -65,8 +66,8 @@ class SyncProvider extends ChangeNotifier {
       if (_isOnline && _currentUserId != null) {
         _syncAllData();
       }
-    } catch (e) {
-      print('Init error: $e');
+    } catch (e, stk) {
+      Log.e('sync', 'Init error: $e', error: e, stack: stk);
       _isInitialized = true;
       notifyListeners();
     }
@@ -110,7 +111,7 @@ class SyncProvider extends ChangeNotifier {
         await _localStorage.clearForUserSwitch();
       }
       await prefs.setString('last_data_user', userId);
-    } catch (_) {}
+    } catch (err, stk) { Log.w('sync', '_switchUserThenSync ignored error', error: err, stack: stk); }
     _isInitialized = true;
     notifyListeners();
     if (_isOnline) _syncAllData();
@@ -151,8 +152,8 @@ class SyncProvider extends ChangeNotifier {
       _localStorage.saveHabits(updatedHabits);
       notifyListeners();
       print('Removed habit: $habitId');
-    } catch (e) {
-      print('Error removing habit: $e');
+    } catch (e, stk) {
+      Log.e('sync', 'Error removing habit: $e', error: e, stack: stk);
     }
   }
 
@@ -168,8 +169,8 @@ class SyncProvider extends ChangeNotifier {
       print(
         'Removed ${currentHabits.length - updatedHabits.length} habits for challenge: $challengeId',
       );
-    } catch (e) {
-      print('Error removing habits by challengeId: $e');
+    } catch (e, stk) {
+      Log.e('sync', 'Error removing habits by challengeId: $e', error: e, stack: stk);
     }
   }
 
@@ -183,8 +184,8 @@ class SyncProvider extends ChangeNotifier {
       _localStorage.saveUserChallenges(updatedChallenges);
       notifyListeners();
       print('Removed user challenge: $challengeId');
-    } catch (e) {
-      print('Error removing user challenge: $e');
+    } catch (e, stk) {
+      Log.e('sync', 'Error removing user challenge: $e', error: e, stack: stk);
     }
   }
 
@@ -201,8 +202,8 @@ class SyncProvider extends ChangeNotifier {
           .toList();
       _localStorage.saveHabits(updatedHabits);
       notifyListeners();
-    } catch (e) {
-      print('Error removing package habits: $e');
+    } catch (e, stk) {
+      Log.e('sync', 'Error removing package habits: $e', error: e, stack: stk);
     }
   }
 
@@ -228,8 +229,8 @@ class SyncProvider extends ChangeNotifier {
           }
         }
       });
-    } catch (e) {
-      print('Connectivity check error: $e');
+    } catch (e, stk) {
+      Log.e('sync', 'Connectivity check error: $e', error: e, stack: stk);
       _isOnline = true;
       notifyListeners();
       if (_currentUserId != null) {
@@ -281,13 +282,13 @@ class SyncProvider extends ChangeNotifier {
         if (profile != null) {
           await _localStorage.saveUserProfile(profile);
         }
-      } catch (e) {
-        print('Profile sync error: $e');
+      } catch (e, stk) {
+        Log.e('sync', 'Profile sync error: $e', error: e, stack: stk);
       }
 
       print('Force refresh completed');
-    } catch (e) {
-      print('Force refresh error: $e');
+    } catch (e, stk) {
+      Log.e('sync', 'Force refresh error: $e', error: e, stack: stk);
     } finally {
       _isSyncing = false;
       notifyListeners();
@@ -308,8 +309,8 @@ class SyncProvider extends ChangeNotifier {
       notifyListeners();
       print(
           '🗑️ Removed ${currentHabits.length - updatedHabits.length} quest habits for quest: $questId');
-    } catch (e) {
-      print('Error removing quest habits: $e');
+    } catch (e, stk) {
+      Log.e('sync', 'Error removing quest habits: $e', error: e, stack: stk);
     }
   }
 
@@ -352,8 +353,8 @@ class SyncProvider extends ChangeNotifier {
         if (profile != null) {
           await _localStorage.saveUserProfile(profile);
         }
-      } catch (e) {
-        print('Profile sync error: $e');
+      } catch (e, stk) {
+        Log.e('sync', 'Profile sync error: $e', error: e, stack: stk);
       }
 
       final challenges = await _supabase.getChallenges();
@@ -367,8 +368,8 @@ class SyncProvider extends ChangeNotifier {
       }
 
       print('Sync completed');
-    } catch (e) {
-      print('Sync error: $e');
+    } catch (e, stk) {
+      Log.e('sync', 'Sync error: $e', error: e, stack: stk);
     } finally {
       _isSyncing = false;
       notifyListeners();
@@ -386,8 +387,8 @@ class SyncProvider extends ChangeNotifier {
         await _executeOfflineOperation(operation);
         await _localStorage.removeOfflineOperation(operation.id);
         _opFailures.remove(operation.id);
-      } catch (e) {
-        print('Failed to sync operation: $e');
+      } catch (e, stk) {
+        Log.e('sync', 'Failed to sync operation: $e', error: e, stack: stk);
         final text = e.toString();
         final isNetwork = text.contains('SocketException') ||
             text.contains('ClientException') ||
@@ -559,7 +560,8 @@ class SyncProvider extends ChangeNotifier {
       try {
         await _executeOfflineOperation(operation);
         await _localStorage.removeOfflineOperation(operation.id);
-      } catch (e) {
+      } catch (e, stk) {
+        Log.e('sync', 'addOfflineOperation failed', error: e, stack: stk);
         // خطا رو نادیده بگیر
       }
     }
@@ -570,7 +572,8 @@ class SyncProvider extends ChangeNotifier {
   List<Habit> get habits {
     try {
       return _localStorage.getHabits();
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('sync', 'addOfflineOperation failed', error: e, stack: stk);
       return [];
     }
   }
@@ -578,7 +581,8 @@ class SyncProvider extends ChangeNotifier {
   List<Task> get tasks {
     try {
       return _localStorage.getTasks();
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('sync', 'addOfflineOperation failed', error: e, stack: stk);
       return [];
     }
   }
@@ -586,7 +590,8 @@ class SyncProvider extends ChangeNotifier {
   List<Quest> get quests {
     try {
       return _localStorage.getQuests();
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('sync', 'addOfflineOperation failed', error: e, stack: stk);
       return [];
     }
   }
@@ -594,7 +599,8 @@ class SyncProvider extends ChangeNotifier {
   List<Package> get packages {
     try {
       return _localStorage.getPackages();
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('sync', 'addOfflineOperation failed', error: e, stack: stk);
       return [];
     }
   }
@@ -602,7 +608,8 @@ class SyncProvider extends ChangeNotifier {
   Map<String, dynamic>? get profile {
     try {
       return _localStorage.getUserProfile();
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('sync', 'addOfflineOperation failed', error: e, stack: stk);
       return null;
     }
   }
@@ -610,7 +617,8 @@ class SyncProvider extends ChangeNotifier {
   List<Map<String, dynamic>> get challenges {
     try {
       return _localStorage.getChallenges();
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('sync', 'addOfflineOperation failed', error: e, stack: stk);
       return [];
     }
   }
@@ -618,7 +626,8 @@ class SyncProvider extends ChangeNotifier {
   List<Map<String, dynamic>> get userChallenges {
     try {
       return _localStorage.getUserChallenges();
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('sync', 'addOfflineOperation failed', error: e, stack: stk);
       return [];
     }
   }
@@ -626,7 +635,8 @@ class SyncProvider extends ChangeNotifier {
   bool get hasChallenges {
     try {
       return _localStorage.getChallenges().isNotEmpty;
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('sync', 'addOfflineOperation failed', error: e, stack: stk);
       return false;
     }
   }
@@ -634,7 +644,8 @@ class SyncProvider extends ChangeNotifier {
   bool get hasLocalData {
     try {
       return habits.isNotEmpty || tasks.isNotEmpty || profile != null;
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('sync', 'addOfflineOperation failed', error: e, stack: stk);
       return false;
     }
   }
@@ -642,7 +653,8 @@ class SyncProvider extends ChangeNotifier {
   int get offlineOperationsCount {
     try {
       return _localStorage.offlineOperationsCount;
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('sync', 'addOfflineOperation failed', error: e, stack: stk);
       return 0;
     }
   }
@@ -669,8 +681,8 @@ class SyncProvider extends ChangeNotifier {
       await _localStorage.saveHabits(currentHabits);
       notifyListeners();
       print('Habit saved to local: ${habit.title}');
-    } catch (e) {
-      print('Error saving habit to local: $e');
+    } catch (e, stk) {
+      Log.e('sync', 'Error saving habit to local: $e', error: e, stack: stk);
     }
   }
 
@@ -688,8 +700,8 @@ class SyncProvider extends ChangeNotifier {
       try {
         await _supabase.createHabit(habit);
         return;
-      } catch (e) {
-        print('createHabit queued: $e');
+      } catch (e, stk) {
+        Log.e('sync', 'createHabit queued: $e', error: e, stack: stk);
       }
     }
     await _queueOnly(OperationType.createHabit, data);
@@ -705,8 +717,8 @@ class SyncProvider extends ChangeNotifier {
       try {
         await _supabase.updateHabit(habit);
         return;
-      } catch (e) {
-        print('updateHabit queued: $e');
+      } catch (e, stk) {
+        Log.e('sync', 'updateHabit queued: $e', error: e, stack: stk);
       }
     }
     await _queueOnly(OperationType.updateHabit, data);
@@ -719,8 +731,8 @@ class SyncProvider extends ChangeNotifier {
       try {
         await _supabase.createTask(task);
         return;
-      } catch (e) {
-        print('createTask queued: $e');
+      } catch (e, stk) {
+        Log.e('sync', 'createTask queued: $e', error: e, stack: stk);
       }
     }
     await _queueOnly(OperationType.createTask, data);
@@ -733,8 +745,8 @@ class SyncProvider extends ChangeNotifier {
       try {
         await _supabase.updateTask(task);
         return;
-      } catch (e) {
-        print('updateTask queued: $e');
+      } catch (e, stk) {
+        Log.e('sync', 'updateTask queued: $e', error: e, stack: stk);
       }
     }
     await _queueOnly(OperationType.updateTask, data);
@@ -767,8 +779,8 @@ class SyncProvider extends ChangeNotifier {
       await _localStorage.saveTasks(currentTasks);
       notifyListeners();
       print('Task saved to local: ${task.title}');
-    } catch (e) {
-      print('Error saving task to local: $e');
+    } catch (e, stk) {
+      Log.e('sync', 'Error saving task to local: $e', error: e, stack: stk);
     }
   }
 
@@ -779,8 +791,8 @@ class SyncProvider extends ChangeNotifier {
       await _localStorage.saveTasks(updatedTasks);
       notifyListeners();
       print('Task removed from local: $taskId');
-    } catch (e) {
-      print('Error deleting task from local: $e');
+    } catch (e, stk) {
+      Log.e('sync', 'Error deleting task from local: $e', error: e, stack: stk);
     }
   }
 
@@ -806,8 +818,8 @@ class SyncProvider extends ChangeNotifier {
       }
 
       notifyListeners();
-    } catch (e) {
-      print('Quick refresh error: $e');
+    } catch (e, stk) {
+      Log.e('sync', 'Quick refresh error: $e', error: e, stack: stk);
       // حتی اگه خطا داد، notifyListeners بزن تا UI با کش آپدیت شه
       notifyListeners();
     }
@@ -828,8 +840,8 @@ class SyncProvider extends ChangeNotifier {
     try {
       await _localStorage.saveUserProfile(profile);
       notifyListeners();
-    } catch (e) {
-      print('[SyncProvider] Error saving profile to local: $e');
+    } catch (e, stk) {
+      Log.e('sync', '[SyncProvider] Error saving profile to local: $e', error: e, stack: stk);
     }
   }
 
@@ -839,7 +851,8 @@ class SyncProvider extends ChangeNotifier {
     try {
       await _localStorage.saveChallenges(challenges);
       notifyListeners();
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('sync', 'saveChallengesToLocal failed', error: e, stack: stk);
       // خطا رو نادیده بگیر
     }
   }
@@ -850,7 +863,8 @@ class SyncProvider extends ChangeNotifier {
     try {
       await _localStorage.saveUserChallenges(userChallenges);
       notifyListeners();
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('sync', 'saveUserChallengesToLocal failed', error: e, stack: stk);
       // خطا رو نادیده بگیر
     }
   }
@@ -859,7 +873,8 @@ class SyncProvider extends ChangeNotifier {
     try {
       await _localStorage.savePackages(packages);
       notifyListeners();
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('sync', 'savePackagesToLocal failed', error: e, stack: stk);
       // خطا رو نادیده بگیر
     }
   }
@@ -868,7 +883,8 @@ class SyncProvider extends ChangeNotifier {
     try {
       await _localStorage.saveQuests(quests);
       notifyListeners();
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('sync', 'saveQuestsToLocal failed', error: e, stack: stk);
       // خطا رو نادیده بگیر
     }
   }
@@ -892,7 +908,8 @@ class SyncProvider extends ChangeNotifier {
           await _localStorage.saveUserProfile(profile);
           notifyListeners();
         }
-      } catch (e) {
+      } catch (e, stk) {
+        Log.e('sync', 'refreshProfile failed', error: e, stack: stk);
         // خطا رو نادیده بگیر
       }
     }

@@ -1,6 +1,8 @@
 // lib/features/profile/screens/settings_screen.dart
 
+import '/core/logging/app_logger.dart';
 import 'package:flutter/material.dart';
+import '/core/logging/log_viewer_screen.dart';
 import 'package:provider/provider.dart';
 
 import '/core/app_palette.dart';
@@ -17,6 +19,7 @@ import '/services/sound_service.dart';
 import '/services/supabase_service.dart';
 import 'color_picker_screen.dart';
 import 'terms_and_conditions_screen.dart';
+import '/core/dk.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -46,7 +49,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     setState(() => apply(v));
     try {
       await save(v);
-    } catch (_) {
+    } catch (err, stk) {
+      Log.w('settings', '_togglePrivacy ignored error', error: err, stack: stk);
       if (!mounted) return;
       setState(() => apply(old));
       ScaffoldMessenger.of(context).showSnackBar(
@@ -286,6 +290,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       builder: (_) => const TermsAndConditionsScreen()),
                 ),
               ),
+              _row(
+                theme,
+                tone: Tone.butter,
+                icon: Icons.bug_report_rounded,
+                title: context.tr('log.title'),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const LogViewerScreen()),
+                ),
+              ),
             ]),
             const SizedBox(height: 8),
             SizedBox(
@@ -390,7 +404,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         color: t.bg,
         borderRadius: BorderRadius.circular(14),
       ),
-      child: Icon(icon, color: danger ? _danger : const Color(0xFF090909).withValues(alpha: theme.isDarkMode ? 0 : 1), size: 20),
+      child: Icon(icon, color: danger ? _danger : (theme.isDarkMode ? t.fg : const Color(0xFF090909)), size: 20),
     );
   }
 
@@ -515,7 +529,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
           alignment:
               value ? AlignmentDirectional.centerEnd : AlignmentDirectional.centerStart,
           decoration: BoxDecoration(
-            color: value ? theme.primaryColor : const Color(0xFFD9DCCF),
+            color: value
+                ? theme.primaryColor
+                : (theme.isDarkMode
+                    ? theme.textSecondaryColor.withValues(alpha: 0.35)
+                    : Dk.l(const Color(0xFFD9DCCF))),
             borderRadius: BorderRadius.circular(15),
           ),
           child: Container(
@@ -765,7 +783,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       sync.clear();
       await storage.clearAllUserData();
       await auth.forceLogout();
-    } catch (_) {
+    } catch (err, stk) {
+      Log.w('settings', '_logout ignored error', error: err, stack: stk);
       _snack(errorText);
     }
   }
@@ -877,7 +896,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       messenger
         ..hideCurrentSnackBar()
         ..showSnackBar(SnackBar(content: Text(doneText)));
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('settings', '_deleteAccount failed', error: e, stack: stk);
       navigator.pop();
       if (!mounted) return;
       _snack(context.tr('settings.delete_error', {'error': '$e'}));

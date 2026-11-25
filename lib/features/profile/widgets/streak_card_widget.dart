@@ -12,6 +12,7 @@ import '/core/app_palette.dart';
 import '/l10n/app_strings.dart';
 import '/providers/calendar_provider.dart';
 import '/providers/theme_provider.dart';
+import '/core/dk.dart';
 
 class StreakCardWidget extends StatelessWidget {
   final int currentStreak;
@@ -56,8 +57,8 @@ class StreakCardWidget extends StatelessWidget {
 
     final todayDone = done(todayShown);
     final String footer = currentStreak == 0 && !todayDone
-        ? context.tr('streak.start')
-        : (todayDone ? context.tr('streak.today_done') : context.tr('streak.keep'));
+        ? context.trv('streak.start')
+        : (todayDone ? context.trv('streak.today_done') : context.trv('streak.keep'));
     final IconData stage = currentStreak >= 30
         ? Icons.workspace_premium_rounded
         : currentStreak >= 7
@@ -215,8 +216,8 @@ class StreakCardWidget extends StatelessWidget {
                               const SizedBox(width: 6),
                               Text(
                                 context.tr('streak.days'),
-                                style: const TextStyle(
-                                  color: Color(0xFFBFC5B3),
+                                style: TextStyle(
+                                  color: Dk.l(Color(0xFFBFC5B3)),
                                   fontSize: 14,
                                 ),
                               ),

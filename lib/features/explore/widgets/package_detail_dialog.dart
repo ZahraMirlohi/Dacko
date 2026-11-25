@@ -1,7 +1,9 @@
+import '/core/logging/app_logger.dart';
 import '/l10n/app_strings.dart';
 import 'package:flutter/material.dart';
 import '../models/package_model.dart';
 import '/services/supabase_service.dart';
+import '/core/dk.dart';
 
 class PackageDetailDialog extends StatefulWidget {
   final Package package;
@@ -58,17 +60,17 @@ class _PackageDetailDialogState extends State<PackageDetailDialog> {
                     children: [
                       Text(
                         widget.package.title,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF1A1A2E),
+                          color: Dk.t(Color(0xFF1A1A2E)),
                         ),
                       ),
                       Text(
                         widget.package.category,
                         style: TextStyle(
                           fontSize: 12,
-                          color: Colors.grey.shade600,
+                          color: Dk.s(Colors.grey.shade600),
                         ),
                       ),
                     ],
@@ -110,7 +112,7 @@ class _PackageDetailDialogState extends State<PackageDetailDialog> {
               widget.package.description,
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.grey.shade700,
+                color: Dk.s(Colors.grey.shade700),
                 height: 1.5,
               ),
             ),
@@ -125,7 +127,7 @@ class _PackageDetailDialogState extends State<PackageDetailDialog> {
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF1A1A2E),
+                color: Dk.t(Color(0xFF1A1A2E)),
               ),
             ),
             const SizedBox(height: 12),
@@ -153,9 +155,9 @@ class _PackageDetailDialogState extends State<PackageDetailDialog> {
                         Expanded(
                           child: Text(
                             habit.title,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 14,
-                              color: Color(0xFF1A1A2E),
+                              color: Dk.t(Color(0xFF1A1A2E)),
                             ),
                           ),
                         ),
@@ -165,14 +167,14 @@ class _PackageDetailDialogState extends State<PackageDetailDialog> {
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.grey.shade100,
+                            color: Dk.f(Colors.grey.shade100),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
                             _getFrequencyText(habit.frequencyType),
                             style: TextStyle(
                               fontSize: 10,
-                              color: Colors.grey.shade600,
+                              color: Dk.s(Colors.grey.shade600),
                             ),
                           ),
                         ),
@@ -192,26 +194,26 @@ class _PackageDetailDialogState extends State<PackageDetailDialog> {
                 Icon(
                   Icons.fitness_center,
                   size: 16,
-                  color: Colors.grey.shade600,
+                  color: Dk.s(Colors.grey.shade600),
                 ),
                 const SizedBox(width: 4),
                 Text(
                   context.tr('ex.habits_n', {'n': '${widget.package.habits.length}'}),
-                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                  style: TextStyle(fontSize: 12, color: Dk.s(Colors.grey.shade600)),
                 ),
                 const SizedBox(width: 16),
-                Icon(Icons.category, size: 16, color: Colors.grey.shade600),
+                Icon(Icons.category, size: 16, color: Dk.s(Colors.grey.shade600)),
                 const SizedBox(width: 4),
                 Text(
                   _getCategoryText(widget.package.category),
-                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                  style: TextStyle(fontSize: 12, color: Dk.s(Colors.grey.shade600)),
                 ),
                 const SizedBox(width: 16),
-                Icon(Icons.stars, size: 16, color: Colors.grey.shade600),
+                Icon(Icons.stars, size: 16, color: Dk.s(Colors.grey.shade600)),
                 const SizedBox(width: 4),
                 Text(
                   '${widget.package.xpReward} XP',
-                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                  style: TextStyle(fontSize: 12, color: Dk.s(Colors.grey.shade600)),
                 ),
               ],
             ),
@@ -304,7 +306,8 @@ class _PackageDetailDialogState extends State<PackageDetailDialog> {
         Navigator.pop(context, true);
         // ریفرش صفحه توسط onChanged در PackageCard انجام میشه
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('package_detail_dialog', '_togglePackage failed', error: e, stack: stk);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -324,7 +327,8 @@ class _PackageDetailDialogState extends State<PackageDetailDialog> {
         return Color(int.parse('FF${colorStr.substring(1)}', radix: 16));
       }
       return const Color(0xFF4A90E2);
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('package_detail_dialog', '_parseColor failed', error: e, stack: stk);
       return const Color(0xFF4A90E2);
     }
   }

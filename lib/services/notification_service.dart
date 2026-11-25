@@ -3,6 +3,8 @@
 // یادآور روزانهٔ عادت‌ها (اعلان محلی). با تنظیمات «اعلان‌ها» و «یادآوری عادت‌ها» کنترل می‌شود
 // و ساعتش را کاربر تعیین می‌کند. روی وب کاری نمی‌کند (بدون خطا).
 
+import '/core/logging/app_logger.dart';
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
@@ -14,6 +16,7 @@ import 'package:timezone/timezone.dart' as tz;
 
 import '../l10n/app_strings.dart';
 import '../providers/settings_provider.dart';
+import 'local_storage_service.dart';
 
 class NotificationService {
   NotificationService._();
@@ -36,7 +39,8 @@ class NotificationService {
       try {
         final name = await FlutterTimezone.getLocalTimezone();
         tz.setLocalLocation(tz.getLocation(name));
-      } catch (_) {
+      } catch (err, stk) {
+        Log.w('notification', 'init ignored error', error: err, stack: stk);
         tz.setLocalLocation(tz.getLocation('Asia/Tehran'));
       }
       const android = AndroidInitializationSettings('@mipmap/ic_launcher');
@@ -49,8 +53,8 @@ class NotificationService {
         const InitializationSettings(android: android, iOS: ios),
       );
       _ready = true;
-    } catch (e) {
-      if (kDebugMode) debugPrint('NotificationService init failed: $e');
+    } catch (e, stk) {
+      Log.e('notification', 'NotificationService init failed: $e', error: e, stack: stk);
     }
   }
 
@@ -58,7 +62,8 @@ class NotificationService {
     try {
       final p = await SharedPreferences.getInstance();
       return TimeOfDayLite(p.getInt(_kHour) ?? 20, p.getInt(_kMinute) ?? 0);
-    } catch (_) {
+    } catch (err, stk) {
+      Log.w('notification', 'reminderTime ignored error', error: err, stack: stk);
       return const TimeOfDayLite(20, 0);
     }
   }
@@ -68,7 +73,7 @@ class NotificationService {
       final p = await SharedPreferences.getInstance();
       await p.setInt(_kHour, hour);
       await p.setInt(_kMinute, minute);
-    } catch (_) {}
+    } catch (err, stk) { Log.w('notification', 'setReminderTime ignored error', error: err, stack: stk); }
     await reschedule();
   }
 
@@ -84,50 +89,105 @@ class NotificationService {
       final a = await android?.requestNotificationsPermission();
       final i = await ios?.requestPermissions(alert: true, sound: true);
       return (a ?? i ?? true);
-    } catch (_) {
+    } catch (err, stk) {
+      Log.w('notification', 'requestPermission ignored error', error: err, stack: stk);
       return false;
     }
   }
 
-  /// بر اساس تنظیمات فعلی، یادآور را می‌گذارد یا برمی‌دارد
+  Timer? _debounce;
+
+  /// چند ذخیرهٔ پشت‌سرهم یک بار زمان‌بندی را تازه می‌کند
+  void refreshSoon() {
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(seconds: 3), () => reschedule());
+  }
+
+  static const int _streakId = 1002;
+  static const int _habitBase = 10000; // 10000..10199 برای یادآور عادت‌ها
+
+  /// بر اساس تنظیمات فعلی، یادآورها را می‌گذارد یا برمی‌دارد.
+  /// اعلان‌ها را سیستم‌عامل زمان‌بندی می‌کند، پس با برنامهٔ بسته هم می‌رسند.
   Future<void> reschedule() async {
     if (!_supported) return;
     await init();
     if (!_ready) return;
     try {
       await _plugin.cancel(_dailyId);
+      await _plugin.cancel(_streakId);
+      for (var i = 0; i < 200; i++) {
+        await _plugin.cancel(_habitBase + i);
+      }
       final settings = SettingsProvider.current;
-      if (settings == null || !settings.notifHabits) return;
+      if (settings == null || !settings.notificationsEnabled) return;
 
       final lang = settings.language;
-      final t = await reminderTime();
       final now = tz.TZDateTime.now(tz.local);
-      var when =
-          tz.TZDateTime(tz.local, now.year, now.month, now.day, t.hour, t.minute);
-      if (!when.isAfter(now)) when = when.add(const Duration(days: 1));
 
-      final n = Random().nextInt(4) + 1;
-      await _plugin.zonedSchedule(
-        _dailyId,
-        AppStrings.t(lang, 'notif.title'),
-        AppStrings.t(lang, 'notif.body$n'),
-        when,
-        NotificationDetails(
-          android: AndroidNotificationDetails(
-            'daily_reminder',
-            AppStrings.t(lang, 'notif.channel'),
-            importance: Importance.defaultImportance,
-            priority: Priority.defaultPriority,
-          ),
-          iOS: const DarwinNotificationDetails(),
-        ),
-        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-        uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.absoluteTime,
-        matchDateTimeComponents: DateTimeComponents.time,
-      );
-    } catch (e) {
-      if (kDebugMode) debugPrint('NotificationService schedule failed: $e');
+      if (settings.notifHabits) {
+        final t = await reminderTime();
+        var when = tz.TZDateTime(
+            tz.local, now.year, now.month, now.day, t.hour, t.minute);
+        if (!when.isAfter(now)) when = when.add(const Duration(days: 1));
+        final n = Random().nextInt(30) + 1; // تعداد notif.body در app_strings
+        await _plugin.zonedSchedule(
+          _dailyId,
+          AppStrings.t(lang, 'notif.title'),
+          AppStrings.t(lang, 'notif.body$n'),
+          when,
+          _details('daily_reminder', AppStrings.t(lang, 'notif.channel')),
+          androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+          uiLocalNotificationDateInterpretation:
+              UILocalNotificationDateInterpretation.absoluteTime,
+          matchDateTimeComponents: DateTimeComponents.time,
+        );
+        await _scheduleHabitReminders(lang, now);
+      }
+
+      if (settings.notifStreak) {
+        var when = tz.TZDateTime(tz.local, now.year, now.month, now.day, 21, 30);
+        if (!when.isAfter(now)) when = when.add(const Duration(days: 1));
+        await _plugin.zonedSchedule(
+          _streakId,
+          AppStrings.t(lang, 'notif.title'),
+          AppStrings.v(lang, 'notif.streak'),
+          when,
+          _details('streak_warning', AppStrings.t(lang, 'notif.streakChannel')),
+          androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+          uiLocalNotificationDateInterpretation:
+              UILocalNotificationDateInterpretation.absoluteTime,
+          matchDateTimeComponents: DateTimeComponents.time,
+        );
+      }
+    } catch (e, stk) {
+      Log.e('notification', 'NotificationService schedule failed: $e', error: e, stack: stk);
+    }
+  }
+
+  // یادآور ساعتی هر عادت برای ۷ روز آینده؛ با هر بار باز شدن برنامه تازه می‌شود
+  Future<void> _scheduleHabitReminders(String lang, tz.TZDateTime now) async {
+    var id = _habitBase;
+    final habits = LocalStorageService().getHabits();
+    for (final h in habits) {
+      for (final r in h.reminders.where((r) => r.isEnabled)) {
+        for (var d = 0; d < 7 && id < _habitBase + 200; d++) {
+          final day = now.add(Duration(days: d));
+          if (!h.shouldDoOnDate(DateTime(day.year, day.month, day.day))) continue;
+          final when = tz.TZDateTime(
+              tz.local, day.year, day.month, day.day, r.hour, r.minute);
+          if (!when.isAfter(now)) continue;
+          await _plugin.zonedSchedule(
+            id++,
+            h.title,
+            AppStrings.v(lang, 'notif.habitBody'),
+            when,
+            _details('habit_reminders', AppStrings.t(lang, 'notif.habitChannel')),
+            androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+            uiLocalNotificationDateInterpretation:
+                UILocalNotificationDateInterpretation.absoluteTime,
+          );
+        }
+      }
     }
   }
 
@@ -145,7 +205,7 @@ class NotificationService {
     if (!_ready) return;
     try {
       await _plugin.show(id, title, body, _details(channel, channelName));
-    } catch (_) {}
+    } catch (err, stk) { Log.w('notification', 'showNow ignored error', error: err, stack: stk); }
   }
 
   /// اعلان یک‌بارهٔ زمان‌دار (پایان تایمر، هشدار استریک)
@@ -162,21 +222,21 @@ class NotificationService {
           androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
           uiLocalNotificationDateInterpretation:
               UILocalNotificationDateInterpretation.absoluteTime);
-    } catch (_) {}
+    } catch (err, stk) { Log.w('notification', 'scheduleOnce ignored error', error: err, stack: stk); }
   }
 
   Future<void> cancel(int id) async {
     if (!_supported || !_ready) return;
     try {
       await _plugin.cancel(id);
-    } catch (_) {}
+    } catch (err, stk) { Log.w('notification', 'cancel ignored error', error: err, stack: stk); }
   }
 
   Future<void> cancelAll() async {
     if (!_supported || !_ready) return;
     try {
       await _plugin.cancelAll();
-    } catch (_) {}
+    } catch (err, stk) { Log.w('notification', 'cancelAll ignored error', error: err, stack: stk); }
   }
 }
 

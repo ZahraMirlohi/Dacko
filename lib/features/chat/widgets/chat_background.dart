@@ -1,3 +1,4 @@
+import '/core/logging/app_logger.dart';
 import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
@@ -5,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../l10n/app_strings.dart';
+import '/core/dk.dart';
 
 /// پس‌زمینهٔ شخصی هر چت‌روم (فقط روی همین دستگاه ذخیره می‌شود)
 class ChatBackground {
@@ -14,8 +16,11 @@ class ChatBackground {
     if (kIsWeb) return null;
     try {
       final p = (await SharedPreferences.getInstance()).getString(_key(convId));
-      return (p != null && File(p).existsSync()) ? p : null;
-    } catch (_) {
+      if (p == null) return null;
+      if (p.startsWith('color:')) return p;
+      return File(p).existsSync() ? p : null;
+    } catch (err, stk) {
+      Log.w('chat_background', 'load ignored error', error: err, stack: stk);
       return null;
     }
   }
@@ -27,13 +32,15 @@ class ChatBackground {
       final x = await ImagePicker()
           .pickImage(source: ImageSource.gallery, maxWidth: 1600, imageQuality: 80);
       if (x == null) return null;
+      await clear(convId); // پس‌زمینهٔ قبلی (عکس یا رنگ) حذف می‌شود
       final dir = await getApplicationDocumentsDirectory();
       final dest = '${dir.path}/chat_bg_$convId.jpg';
       await File(x.path).copy(dest);
       await FileImage(File(dest)).evict();
       await (await SharedPreferences.getInstance()).setString(_key(convId), dest);
       return dest;
-    } catch (_) {
+    } catch (err, stk) {
+      Log.w('chat_background', 'pick ignored error', error: err, stack: stk);
       return null;
     }
   }
@@ -43,8 +50,20 @@ class ChatBackground {
       final prefs = await SharedPreferences.getInstance();
       final p = prefs.getString(_key(convId));
       await prefs.remove(_key(convId));
-      if (p != null && File(p).existsSync()) await File(p).delete();
-    } catch (_) {}
+      if (p != null && !p.startsWith('color:') && File(p).existsSync()) {
+        await File(p).delete();
+      }
+    } catch (err, stk) { Log.w('chat_background', 'clear ignored error', error: err, stack: stk); }
+  }
+
+  /// رنگ یکدست؛ عکس قبلی (اگر بود) پاک می‌شود
+  static Future<String> setColor(String convId, Color c) async {
+    await clear(convId);
+    final v = 'color:${c.toARGB32()}';
+    try {
+      await (await SharedPreferences.getInstance()).setString(_key(convId), v);
+    } catch (err, stk) { Log.w('chat_background', 'setColor ignored error', error: err, stack: stk); }
+    return v;
   }
 }
 
@@ -57,6 +76,11 @@ class ChatBackgroundLayer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (path == null) return const SizedBox.shrink();
+    if (path!.startsWith('color:')) {
+      final v = int.tryParse(path!.substring(6));
+      if (v == null) return const SizedBox.shrink();
+      return Positioned.fill(child: IgnorePointer(child: ColoredBox(color: Color(v))));
+    }
     return Positioned.fill(
       child: IgnorePointer(
         child: Stack(fit: StackFit.expand, children: [
@@ -69,6 +93,12 @@ class ChatBackgroundLayer extends StatelessWidget {
     );
   }
 }
+
+const _palette = <Color>[
+  Color(0xFFFFFFFF), Color(0xFFF5EFE6), Color(0xFFFFE4E1), Color(0xFFFFF3C4),
+  Color(0xFFDFF5E1), Color(0xFFD9ECFF), Color(0xFFE9DDFB), Color(0xFFCFD8DC),
+  Color(0xFF263238), Color(0xFF1B2A3A), Color(0xFF2E3B2F), Color(0xFF3B2A3F),
+];
 
 /// شیت انتخاب/حذف پس‌زمینه؛ مسیر جدید (یا null برای حذف) را به onChanged می‌دهد
 Future<void> showChatBackgroundSheet(
@@ -85,6 +115,31 @@ Future<void> showChatBackgroundSheet(
             final p = await ChatBackground.pick(convId);
             if (p != null) onChanged(p);
           },
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          child: Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: [
+              for (final c in _palette)
+                GestureDetector(
+                  onTap: () async {
+                    Navigator.pop(ctx);
+                    onChanged(await ChatBackground.setColor(convId, c));
+                  },
+                  child: Container(
+                    width: 38,
+                    height: 38,
+                    decoration: BoxDecoration(
+                      color: c,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.black26),
+                    ),
+                  ),
+                ),
+            ],
+          ),
         ),
         ListTile(
           leading: const Icon(Icons.hide_image_outlined),

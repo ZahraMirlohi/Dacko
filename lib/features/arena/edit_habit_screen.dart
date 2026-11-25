@@ -1,5 +1,6 @@
 // lib/features/arena/screens/edit_habit_screen.dart
 
+import '/core/logging/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '/services/supabase_service.dart';
@@ -280,8 +281,8 @@ class _EditHabitScreenState extends State<EditHabitScreen> {
         showArenaSnack(context, context.tr('af.habit.updated'));
         Navigator.pop(context, true);
       }
-    } catch (e) {
-      print('Error updating habit: $e');
+    } catch (e, stk) {
+      Log.e('edit_habit', 'Error updating habit: $e', error: e, stack: stk);
       if (mounted) {
         showArenaSnack(
           context,

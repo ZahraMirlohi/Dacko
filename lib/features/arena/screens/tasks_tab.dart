@@ -1,5 +1,6 @@
 // lib/features/arena/screens/tasks_tab.dart
 
+import '/core/logging/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '/services/supabase_service.dart';
@@ -113,8 +114,8 @@ class TasksTabState extends State<TasksTab> with TickerProviderStateMixin {
           showArenaSnack(context, context.tr('ah.tasks.deleted'),
               kind: ArenaSnackKind.dark);
         }
-      } catch (e) {
-        print('Error deleting task: $e');
+      } catch (e, stk) {
+        Log.e('tasks', 'Error deleting task: $e', error: e, stack: stk);
         if (mounted) {
           showArenaSnack(context,
               context.tr('ah.tasks.delError', {'e': e.toString()}),
@@ -152,7 +153,7 @@ class TasksTabState extends State<TasksTab> with TickerProviderStateMixin {
                         children: [
                           ArenaStateView(
                             icon: Icons.assignment_outlined,
-                            title: context.tr('ah.tasks.emptyTitle'),
+                            title: context.trv('ah.tasks.emptyTitle'),
                             subtitle: context.tr('ah.empty.sub'),
                             actionLabel: context.tr('ah.fab.task'),
                             actionIcon: Icons.add_rounded,

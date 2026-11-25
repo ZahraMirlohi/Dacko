@@ -1,3 +1,4 @@
+import '/widgets/net_image.dart';
 import 'dart:ui' show ImageFilter;
 import 'package:flutter/material.dart';
 
@@ -36,14 +37,14 @@ class CardImage extends StatelessWidget {
             children: [
               ImageFiltered(
                 imageFilter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-                child: Image.network(u,
+                child: NetImage(u,
                     fit: BoxFit.cover,
                     errorBuilder: (c, e, s) => const SizedBox.shrink()),
               ),
               Container(color: Colors.white.withValues(alpha: 0.12)),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 6),
-                child: Image.network(u,
+                child: NetImage(u,
                     fit: BoxFit.contain,
                     errorBuilder: (c, e, s) => const SizedBox.shrink()),
               ),
@@ -54,7 +55,7 @@ class CardImage extends StatelessWidget {
     }
     return ClipRRect(
       borderRadius: borderRadius,
-      child: Image.network(
+      child: NetImage(
         url!.trim(),
         width: width ?? double.infinity,
         height: height,

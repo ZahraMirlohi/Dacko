@@ -1,5 +1,6 @@
 // lib/widgets/custom_bottom_nav_bar.dart
 
+import '/core/tour_target.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '/providers/theme_provider.dart';
@@ -30,9 +31,10 @@ class CustomBottomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<ThemeProvider>(context);
-    final navColor = theme.isDarkMode ? Colors.white : const Color(0xFF090909);
+    final navColor =
+        theme.isDarkMode ? theme.cardSecondaryColor : const Color(0xFF090909);
     final inactive =
-        theme.isDarkMode ? Colors.grey.shade400 : const Color(0xFF8A8A8A);
+        theme.isDarkMode ? theme.textSecondaryColor : const Color(0xFF8A8A8A);
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
@@ -45,6 +47,9 @@ class CustomBottomNavBar extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 8),
             decoration: BoxDecoration(
               color: navColor,
+              border: theme.isDarkMode
+                  ? Border.all(color: theme.borderColor)
+                  : null,
               borderRadius: BorderRadius.circular(32),
               boxShadow: [
                 BoxShadow(
@@ -58,7 +63,7 @@ class CustomBottomNavBar extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: List.generate(items.length, (i) {
                 final active = i == currentIndex;
-                return GestureDetector(
+                return TourTarget(id: 'tab$i', child: GestureDetector(
                   behavior: HitTestBehavior.opaque,
                   onTap: () {
                     if (!active) onTap(i);
@@ -114,7 +119,7 @@ class CustomBottomNavBar extends StatelessWidget {
                       ),
                     ),
                   ),
-                );
+                ));
               }),
             ),
           ),

@@ -2,6 +2,8 @@
 //
 // درخواست‌های هم‌مسیری: دریافتی (قبول/رد) و ارسال‌شده (لغو). هر دکمه تا پایان کار قفل می‌شود.
 
+import '/widgets/net_image.dart';
+import '/core/logging/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -75,7 +77,8 @@ class _BuddyRequestsViewState extends State<BuddyRequestsView> {
         _loading = false;
       });
       widget.onChanged(inc.length);
-    } catch (_) {
+    } catch (err, stk) {
+      Log.w('buddy_requests', '_load ignored error', error: err, stack: stk);
       if (mounted) setState(() => _loading = false);
     }
   }
@@ -92,7 +95,8 @@ class _BuddyRequestsViewState extends State<BuddyRequestsView> {
       widget.onChanged(_incoming.length, accepted: accept);
       messenger.showSnackBar(SnackBar(
           content: Text(accept ? 'درخواست پذیرفته شد' : 'درخواست رد شد')));
-    } catch (_) {
+    } catch (err, stk) {
+      Log.w('buddy_requests', '_respond ignored error', error: err, stack: stk);
       messenger.showSnackBar(
           const SnackBar(content: Text('انجام نشد، دوباره امتحان کن')));
     } finally {
@@ -108,7 +112,8 @@ class _BuddyRequestsViewState extends State<BuddyRequestsView> {
     try {
       await _matcher.cancelBuddyRequest(_me, r['other_id'] as String);
       if (mounted) setState(() => _sent.removeWhere((x) => x['id'] == id));
-    } catch (_) {
+    } catch (err, stk) {
+      Log.w('buddy_requests', '_cancel ignored error', error: err, stack: stk);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('لغو انجام نشد')));
@@ -184,7 +189,7 @@ class _BuddyRequestsViewState extends State<BuddyRequestsView> {
           clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(color: tc.bg, shape: BoxShape.circle),
           child: has
-              ? Image.network(url.trim(),
+              ? NetImage(url.trim(),
                   fit: BoxFit.cover,
                   errorBuilder: (c, e, s) =>
                       Icon(Icons.person_rounded, color: tc.fg))

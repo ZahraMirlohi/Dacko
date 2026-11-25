@@ -1,5 +1,6 @@
 // lib/features/chat/screens/ai_chat_screen.dart
 
+import '/l10n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -9,6 +10,7 @@ import '/providers/sync_provider.dart';
 import '/providers/theme_provider.dart';
 import '/features/chat/models/message_model.dart';
 import '/features/chat/models/conversation_model.dart';
+import '/core/dk.dart';
 
 class AIChatScreen extends StatefulWidget {
   const AIChatScreen({super.key});
@@ -207,7 +209,7 @@ class _AIChatScreenState extends State<AIChatScreen>
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'مربی هوش مصنوعی',
+                  context.tr('sq.aiCoach'),
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -224,9 +226,9 @@ class _AIChatScreenState extends State<AIChatScreen>
                         shape: BoxShape.circle,
                       ),
                     ),
-                    const SizedBox(width: 4),
+                    SizedBox(width: 4),
                     Text(
-                      'آنلاین',
+                      context.tr('sq.onlineShort'),
                       style: TextStyle(
                         fontSize: 11,
                         color: primaryColor,
@@ -376,9 +378,9 @@ class _AIChatScreenState extends State<AIChatScreen>
                       ),
                       child: const Text('', style: TextStyle(fontSize: 9)),
                     ),
-                    const SizedBox(width: 4),
+                    SizedBox(width: 4),
                     Text(
-                      'مربی هوش مصنوعی',
+                      context.tr('sq.aiCoach'),
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w600,
@@ -459,18 +461,18 @@ class _AIChatScreenState extends State<AIChatScreen>
               color: primaryColor,
             ),
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: 20),
           Text(
-            'از مربی هوش مصنوعی بپرسید!',
+            context.tr('sq.askAi'),
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
               color: theme.textColor,
             ),
           ),
-          const SizedBox(height: 6),
+          SizedBox(height: 6),
           Text(
-            'برنامه‌ریزی، انگیزه و راهنمایی شخصی',
+            context.tr('sq.aiSub'),
             style: TextStyle(
               fontSize: 13,
               color: theme.textSecondaryColor,
@@ -515,7 +517,7 @@ class _AIChatScreenState extends State<AIChatScreen>
                   focusNode: _focusNode,
                   style: TextStyle(color: theme.textColor),
                   decoration: InputDecoration(
-                    hintText: 'پیام خود را بنویسید...',
+                    hintText: context.tr('sq.typeMsg'),
                     hintStyle: TextStyle(
                       fontSize: 14,
                       color: theme.textSecondaryColor,
@@ -541,7 +543,7 @@ class _AIChatScreenState extends State<AIChatScreen>
                 color: _isLoading
                     ? (theme.isDarkMode
                         ? const Color(0xFF2A2A2A)
-                        : Colors.grey.shade300)
+                        : Dk.l(Colors.grey.shade300))
                     : primaryColor,
                 shape: BoxShape.circle,
                 boxShadow: _isLoading
@@ -584,13 +586,13 @@ class _AIChatScreenState extends State<AIChatScreen>
     final diff = now.difference(time);
 
     if (diff.inDays > 0) {
-      return '${diff.inDays} روز پیش';
+      return context.tr('ct.ago.day', {'n': '${diff.inDays}'});
     } else if (diff.inHours > 0) {
-      return '${diff.inHours} ساعت پیش';
+      return context.tr('ct.ago.hour', {'n': '${diff.inHours}'});
     } else if (diff.inMinutes > 0) {
-      return '${diff.inMinutes} دقیقه پیش';
+      return context.tr('ct.ago.min', {'n': '${diff.inMinutes}'});
     } else {
-      return 'لحظاتی پیش';
+      return context.tr('ct.ago.moments');
     }
   }
 }

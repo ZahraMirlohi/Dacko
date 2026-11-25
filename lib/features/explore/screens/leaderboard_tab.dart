@@ -1,11 +1,17 @@
 // lib/features/explore/screens/leaderboard_tab.dart
 
+import '/widgets/skeleton.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import '/widgets/net_image.dart';
+import '/core/logging/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '/services/supabase_service.dart';
 import '/providers/theme_provider.dart';
 import '/core/app_palette.dart';
 import '/services/buddy_matcher_service.dart';
+import '/l10n/app_strings.dart';
+import '/features/chat/widgets/open_buddy_chat.dart';
 
 class LeaderboardTab extends StatefulWidget {
   const LeaderboardTab({super.key});
@@ -16,6 +22,11 @@ class LeaderboardTab extends StatefulWidget {
 
 class _LeaderboardTabState extends State<LeaderboardTab> {
   final SupabaseService _supabase = SupabaseService();
+  // نمایش فوری آخرین نتیجه (stale-while-revalidate) و تازه‌سازی پس‌زمینه
+  static List<Map<String, dynamic>>? _cache;
+  static int _cacheRank = 0;
+  static String? _cacheUser;
+
   List<Map<String, dynamic>> _leaders = [];
   bool _isLoading = true;
   String _errorMessage = '';
@@ -26,6 +37,12 @@ class _LeaderboardTabState extends State<LeaderboardTab> {
   @override
   void initState() {
     super.initState();
+    final me = Supabase.instance.client.auth.currentUser?.id;
+    if (_cache != null && _cacheUser == me) {
+      _leaders = _cache!;
+      _currentUserRank = _cacheRank;
+      _isLoading = false;
+    }
     _loadLeaderboard();
   }
 
@@ -33,7 +50,7 @@ class _LeaderboardTabState extends State<LeaderboardTab> {
     if (!mounted) return;
 
     setState(() {
-      _isLoading = true;
+      _isLoading = _leaders.isEmpty;
       _errorMessage = '';
     });
 
@@ -70,16 +87,23 @@ class _LeaderboardTabState extends State<LeaderboardTab> {
         }
       }
 
+      _cache = users;
+      _cacheRank = _currentUserRank;
+      _cacheUser = _currentUserId;
       if (mounted) {
         setState(() {
           _leaders = users;
           _isLoading = false;
         });
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('leaderboard', '_loadLeaderboard failed', error: e, stack: stk);
       if (mounted) {
         setState(() {
-          _errorMessage = 'خطا در بارگذاری: ${e.toString()}';
+          // اگر نتیجهٔ قبلی داریم همان را نشان بده؛ خطا فقط وقتی لیست خالی است
+          if (_leaders.isEmpty) {
+            _errorMessage = context.tr('lb.k001', {'p0': '${e.toString()}'});
+          }
           _isLoading = false;
         });
       }
@@ -106,14 +130,14 @@ class _LeaderboardTabState extends State<LeaderboardTab> {
             {
               'user_id': item['user_id'],
               'name': byId[item['user_id']]?['name'] ??
-                  'کاربر ${(item['user_id'] as String).substring(0, 6)}',
+                  '${context.tr('lb.k002')} ${(item['user_id'] as String).substring(0, 6)}',
               'total_xp': item['total_xp'] ?? 0,
               'avatar_url': byId[item['user_id']]?['avatar_url'],
             }
         ];
       }
-    } catch (e) {
-      print('Error getting from user_progress: $e');
+    } catch (e, stk) {
+      Log.e('leaderboard', 'Error getting from user_progress: $e', error: e, stack: stk);
     }
 
     try {
@@ -126,8 +150,8 @@ class _LeaderboardTabState extends State<LeaderboardTab> {
       if (response.isNotEmpty) {
         return List<Map<String, dynamic>>.from(response);
       }
-    } catch (e) {
-      print('Error getting from profiles: $e');
+    } catch (e, stk) {
+      Log.e('leaderboard', 'Error getting from profiles: $e', error: e, stack: stk);
     }
 
     return []; // بدون داده‌ی ساختگی؛ حالت خالی نمایش داده می‌شود
@@ -147,7 +171,7 @@ class _LeaderboardTabState extends State<LeaderboardTab> {
       for (final r in rows) {
         out.putIfAbsent(r['user_id'] as String, () => []).add(r);
       }
-    } catch (_) {}
+    } catch (err, stk) { Log.w('leaderboard', '_getBadgesFor ignored error', error: err, stack: stk); }
     return out;
   }
 
@@ -189,7 +213,7 @@ class _LeaderboardTabState extends State<LeaderboardTab> {
       clipBehavior: Clip.antiAlias,
       decoration: const BoxDecoration(color: _ink, shape: BoxShape.circle),
       child: has
-          ? Image.network(url.trim(),
+          ? NetImage(url.trim(),
               fit: BoxFit.cover,
               errorBuilder: (c, e, s) => Icon(Icons.person_rounded,
                   size: size * 0.5, color: theme.effectivePrimary))
@@ -201,11 +225,11 @@ class _LeaderboardTabState extends State<LeaderboardTab> {
   Widget _xpLabel(int xp, {double size = 12}) => Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.star_rounded, size: size + 2, color: _ink),
+          Icon(Icons.star_rounded, size: size + 2, color: Provider.of<ThemeProvider>(context, listen: false).textColor),
           const SizedBox(width: 3),
           Text('$xp',
               style: TextStyle(
-                  fontSize: size, fontWeight: FontWeight.w800, color: _ink)),
+                  fontSize: size, fontWeight: FontWeight.w800, color: Provider.of<ThemeProvider>(context, listen: false).textColor)),
         ],
       );
 
@@ -236,7 +260,8 @@ class _LeaderboardTabState extends State<LeaderboardTab> {
           .eq('user_id', otherId)
           .maybeSingle();
       return r?['allow_buddy_requests'] != false;
-    } catch (_) {
+    } catch (err, stk) {
+      Log.w('leaderboard', '_acceptsRequests ignored error', error: err, stack: stk);
       return true; // ستون هنوز ساخته نشده
     }
   }
@@ -262,13 +287,13 @@ class _LeaderboardTabState extends State<LeaderboardTab> {
             children: [
               _avatar(user['avatar_url'], 72, theme),
               const SizedBox(height: 10),
-              Text(user['name'] ?? 'کاربر',
+              Text(user['name'] ?? context.tr('lb.k002'),
                   style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w800,
                       color: theme.textColor)),
               const SizedBox(height: 4),
-              Text('سطح ${(xp / 100).floor() + 1}  |  $xp XP',
+              Text(context.tr('lb.k003', {'p0': '${(xp / 100).floor() + 1}', 'xp': '$xp'}),
                   style:
                       TextStyle(fontSize: 13, color: theme.textSecondaryColor)),
               const SizedBox(height: 18),
@@ -288,14 +313,19 @@ class _LeaderboardTabState extends State<LeaderboardTab> {
                   }
                   if (rel == 'me') return const SizedBox.shrink();
                   final label = switch (rel) {
-                    'accepted' => 'هم‌مسیر شما هستند',
-                    'sent' => 'درخواست فرستاده شده',
-                    'incoming' => 'درخواستش را در چت‌ها ببین',
-                    _ => 'درخواست هم‌مسیری',
+                    'accepted' => context.tr('bc.chat.msg'),
+                    'sent' => context.tr('lb.k004'),
+                    'incoming' => context.tr('lb.k005'),
+                    _ => context.tr('lb.k006'),
                   };
                   return StatefulBuilder(
                     builder: (c2, setS) => GestureDetector(
-                      onTap: rel != 'none' || _sending
+                      onTap: rel == 'accepted'
+                          ? () {
+                              Navigator.pop(ctx);
+                              openBuddyChat(context, id);
+                            }
+                          : rel != 'none' || _sending
                           ? null
                           : () async {
                               setS(() => _sending = true);
@@ -303,21 +333,22 @@ class _LeaderboardTabState extends State<LeaderboardTab> {
                               final nav = Navigator.of(ctx);
                               try {
                                 if (!await _acceptsRequests(id)) {
-                                  messenger.showSnackBar(const SnackBar(
+                                  messenger.showSnackBar(SnackBar(
                                       content: Text(
-                                          'این کاربر درخواست هم‌مسیری دریافت نمی‌کند')));
+                                          context.tr('lb.k007'))));
                                 } else {
                                   await BuddyMatcherService()
                                       .sendBuddyRequestWithMatch(
                                           _currentUserId!, id);
-                                  messenger.showSnackBar(const SnackBar(
-                                      content: Text('درخواست ارسال شد')));
+                                  messenger.showSnackBar(SnackBar(
+                                      content: Text(context.tr('lb.k008'))));
                                 }
                                 nav.pop();
-                              } catch (_) {
-                                messenger.showSnackBar(const SnackBar(
+                              } catch (err, stk) {
+                                Log.w('leaderboard', '_showUser ignored error', error: err, stack: stk);
+                                messenger.showSnackBar(SnackBar(
                                     content:
-                                        Text('ارسال درخواست انجام نشد')));
+                                        Text(context.tr('lb.k009'))));
                               } finally {
                                 _sending = false;
                                 if (c2.mounted) setS(() {});
@@ -377,12 +408,12 @@ class _LeaderboardTabState extends State<LeaderboardTab> {
                 size: 28, color: theme.effectivePrimary),
           ),
           const SizedBox(height: 6),
-          const Text('تالار افتخارات',
+          Text(context.tr('lb.k010'),
               style: TextStyle(
-                  fontSize: 20, fontWeight: FontWeight.w800, color: _ink)),
+                  fontSize: 20, fontWeight: FontWeight.w800, color: theme.textColor)),
           const SizedBox(height: 4),
-          const Text('بهترین قهرمانان اپلیکیشن',
-              style: TextStyle(fontSize: 13, color: Color(0xFF3C4034))),
+          Text(context.tr('lb.k011'),
+              style: TextStyle(fontSize: 13, color: theme.textSecondaryColor)),
           if (_currentUserRank > 0) ...[
             const SizedBox(height: 8),
             Container(
@@ -390,13 +421,13 @@ class _LeaderboardTabState extends State<LeaderboardTab> {
               padding: const EdgeInsets.symmetric(horizontal: 14),
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: theme.cardColor,
                   borderRadius: BorderRadius.circular(16)),
-              child: Text('رتبه شما: $_currentUserRank',
-                  style: const TextStyle(
+              child: Text(context.tr('lb.k012', {'_currentUserRank': '$_currentUserRank'}),
+                  style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
-                      color: _ink)),
+                      color: theme.textColor)),
             ),
           ],
         ],
@@ -456,7 +487,7 @@ class _LeaderboardTabState extends State<LeaderboardTab> {
             const SizedBox(height: 6),
             _avatar(u['avatar_url'], 56, theme),
             const SizedBox(height: 6),
-            Text(u['name'] ?? 'کاربر',
+            Text(u['name'] ?? context.tr('lb.k002'),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.center,
@@ -473,7 +504,7 @@ class _LeaderboardTabState extends State<LeaderboardTab> {
                 decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.75),
                     borderRadius: BorderRadius.circular(11)),
-                child: Text('$badges مدال',
+                child: Text(context.tr('lb.k013', {'badges': '$badges'}),
                     style: const TextStyle(fontSize: 11, color: _ink)),
               ),
             ],
@@ -494,10 +525,10 @@ class _LeaderboardTabState extends State<LeaderboardTab> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text('$rank',
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.w800,
-                          color: _ink)),
+                          color: theme.textColor)),
                   _xpLabel((u['total_xp'] ?? 0) as int),
                 ],
               ),
@@ -531,11 +562,11 @@ class _LeaderboardTabState extends State<LeaderboardTab> {
           height: 32,
           decoration: BoxDecoration(
               color: theme.primarySoft, shape: BoxShape.circle),
-          child: const Icon(Icons.format_list_numbered_rounded,
-              size: 18, color: _ink),
+          child: Icon(Icons.format_list_numbered_rounded,
+              size: 18, color: theme.textColor),
         ),
         const SizedBox(width: 8),
-        Text('سایر قهرمانان',
+        Text(context.tr('lb.k014'),
             style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w800,
@@ -587,7 +618,7 @@ class _LeaderboardTabState extends State<LeaderboardTab> {
                 style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w800,
-                    color: isMe ? _ink : theme.textColor)),
+                    color: theme.textColor)),
           ),
           const SizedBox(width: 12),
           _avatar(user['avatar_url'], 40, theme),
@@ -599,13 +630,13 @@ class _LeaderboardTabState extends State<LeaderboardTab> {
                 Row(
                   children: [
                     Flexible(
-                      child: Text(user['name'] ?? 'کاربر',
+                      child: Text(user['name'] ?? context.tr('lb.k002'),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w700,
-                              color: isMe ? _ink : theme.textColor)),
+                              color: theme.textColor)),
                     ),
                     if (isMe) ...[
                       const SizedBox(width: 6),
@@ -616,7 +647,7 @@ class _LeaderboardTabState extends State<LeaderboardTab> {
                         decoration: BoxDecoration(
                             color: theme.effectivePrimary,
                             borderRadius: BorderRadius.circular(11)),
-                        child: Text('شما',
+                        child: Text(context.tr('lb.k015'),
                             style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w700,
@@ -626,12 +657,10 @@ class _LeaderboardTabState extends State<LeaderboardTab> {
                   ],
                 ),
                 if (badges > 0)
-                  Text('$badges مدال',
+                  Text(context.tr('lb.k013', {'badges': '$badges'}),
                       style: TextStyle(
                           fontSize: 11,
-                          color: isMe
-                              ? const Color(0xFF3C4034)
-                              : theme.textSecondaryColor)),
+                          color: theme.textSecondaryColor)),
               ],
             ),
           ),
@@ -669,7 +698,7 @@ class _LeaderboardTabState extends State<LeaderboardTab> {
               height: 88,
               decoration: BoxDecoration(
                   color: theme.tone(tone).bg, shape: BoxShape.circle),
-              child: Icon(icon, size: 40, color: _ink),
+              child: Icon(icon, size: 40, color: theme.tone(tone).fg),
             ),
             const SizedBox(height: 16),
             Text(title,
@@ -691,18 +720,7 @@ class _LeaderboardTabState extends State<LeaderboardTab> {
   }
 
   Widget _buildLoadingState(Color primaryColor, ThemeProvider theme) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          CircularProgressIndicator(color: theme.effectivePrimary),
-          const SizedBox(height: 16),
-          Text('در حال بارگذاری تالار افتخارات...',
-              style:
-                  TextStyle(color: theme.textSecondaryColor, fontSize: 13)),
-        ],
-      ),
-    );
+    return const SkeletonList(itemCount: 8);
   }
 
   Widget _buildErrorState(Color primaryColor, ThemeProvider theme) {
@@ -710,7 +728,7 @@ class _LeaderboardTabState extends State<LeaderboardTab> {
       theme,
       Icons.cloud_off_rounded,
       Tone.rose,
-      'مشکلی پیش اومد',
+      context.tr('lb.k017'),
       _errorMessage,
       action: GestureDetector(
         onTap: _loadLeaderboard,
@@ -726,7 +744,7 @@ class _LeaderboardTabState extends State<LeaderboardTab> {
               Icon(Icons.refresh_rounded,
                   size: 18, color: theme.effectivePrimary),
               const SizedBox(width: 6),
-              Text('تلاش مجدد',
+              Text(context.tr('lb.k018'),
                   style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
@@ -743,8 +761,8 @@ class _LeaderboardTabState extends State<LeaderboardTab> {
       theme,
       Icons.emoji_events_rounded,
       Tone.butter,
-      'تالار افتخارات خالیه',
-      'با انجام عادت‌ها و کارها XP جمع کن تا اسمت اینجا بیاد',
+      context.tr('lb.k019'),
+      context.tr('lb.k020'),
     );
   }
 }

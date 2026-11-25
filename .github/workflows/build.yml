@@ -37,11 +37,23 @@ jobs:
     - name: Get dependencies
       run: flutter pub get
     
+    - name: Prepare signing key
+      env:
+        KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+      run: |
+        if [ -n "$KEYSTORE_BASE64" ]; then
+          echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/dacko.jks"
+          echo "KEYSTORE_PATH=$RUNNER_TEMP/dacko.jks" >> "$GITHUB_ENV"
+        else
+          echo "KEYSTORE_BASE64 secret not set: falling back to debug signing"
+        fi
+
     - name: Build APK
       run: |
         # دانلودهای گرادل گاهی از گیت‌هاب ارور ۵۰۴ می‌دهند؛ تا ۴ بار تلاش مجدد
         for i in 1 2 3 4; do
-          flutter build apk --release \
+          flutter build apk --release --build-number=${{ github.run_number }} \
+            --dart-define=APP_VERSION=1.0.0+${{ github.run_number }} \
             --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL }} \
             --dart-define=SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }} && exit 0
           echo "Build attempt $i failed, retrying in 30s..."
@@ -49,6 +61,18 @@ jobs:
         done
         exit 1
     
+    - name: APK size report
+      run: |
+        f=build/app/outputs/flutter-apk/app-release.apk
+        mb=$(( $(stat -c%s "$f") / 1048576 ))
+        echo "APK size: ${mb} MB (limit ${APK_MAX_MB} MB)" | tee -a "$GITHUB_STEP_SUMMARY"
+        if [ "$mb" -gt "$APK_MAX_MB" ]; then
+          echo "::error::APK is larger than ${APK_MAX_MB} MB: check new dependencies/assets"
+          exit 1
+        fi
+      env:
+        APK_MAX_MB: 80
+
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:

@@ -1,5 +1,6 @@
 // lib/features/arena/screens/congratulation_screen.dart
 
+import '/widgets/net_image.dart';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -7,6 +8,7 @@ import 'package:provider/provider.dart';
 import '/providers/theme_provider.dart';
 import '/core/app_palette.dart';
 import '/l10n/app_strings.dart';
+import '/core/dk.dart';
 
 class _Confetto {
   final double left;
@@ -73,7 +75,7 @@ class _CongratulationScreenState extends State<CongratulationScreen>
   late Animation<double> _fadeAnimation;
   int _quoteIndex = 0;
 
-  static const int _quoteCount = 3;
+  static const int _quoteCount = 15;
 
   @override
   void initState() {
@@ -156,7 +158,7 @@ class _CongratulationScreenState extends State<CongratulationScreen>
                           ),
                           const SizedBox(height: 6),
                           Text(
-                            context.tr('ad.cg.subtitle'),
+                            context.trv('ad.cg.subtitle'),
                             style: TextStyle(
                               fontSize: 16,
                               color: theme.textSecondaryColor,
@@ -368,7 +370,7 @@ class _CongratulationScreenState extends State<CongratulationScreen>
       ),
       child: widget.avatarImageUrl != null
           ? ClipOval(
-              child: Image.network(
+              child: NetImage(
                 widget.avatarImageUrl!,
                 width: 120,
                 height: 120,

@@ -1,5 +1,6 @@
 // lib/services/storage_service.dart
 
+import '/core/logging/app_logger.dart';
 import 'dart:typed_data';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:image/image.dart' as img;
@@ -119,8 +120,8 @@ class StorageService {
             return originalBytes;
           }
           return _encodeWithResize(decoded, originalBytes.length, maxSizeKB);
-        } catch (e) {
-          print('Web compression failed, returning original: $e');
+        } catch (e, stk) {
+          Log.e('storage', 'Web compression failed, returning original: $e', error: e, stack: stk);
           return originalBytes;
         }
       }
@@ -207,8 +208,8 @@ class StorageService {
       await _client.storage.from(bucket).remove(paths);
 
       print('Deleted ${paths.length} files from $bucket');
-    } catch (e) {
-      print('Error deleting user files: $e');
+    } catch (e, stk) {
+      Log.e('storage', 'Error deleting user files: $e', error: e, stack: stk);
     }
   }
 }

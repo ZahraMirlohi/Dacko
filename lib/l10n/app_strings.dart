@@ -13,7 +13,10 @@ import 'package:flutter/material.dart';
 import 'strings_ad.dart';
 import 'strings_bd.dart';
 import 'strings_ct.dart';
+import 'strings_sq.dart';
+import 'strings_bc.dart';
 import 'strings_ex.dart';
+import 'strings_tx.dart';
 import 'strings_af.dart';
 import 'strings_ah.dart';
 import 'strings_an.dart';
@@ -40,6 +43,22 @@ class AppStrings {
     return text;
   }
 
+  /// متن چرخشی: کلیدهای base.1 .. base.N. [seed] ثابت = برای نمایش در UI (در یک روز عوض نشود)؛
+  /// بدون seed = تصادفی (برای نوتیفیکیشن).
+  static String v(String lang, String base, {int? seed, Map<String, String>? args}) {
+    final table = lang == 'en' ? _en : _fa;
+    var n = 0;
+    while (table.containsKey('$base.${n + 1}')) {
+      n++;
+    }
+    if (n == 0) return t(lang, base, args);
+    final i = (seed ?? DateTime.now().microsecondsSinceEpoch) % n + 1;
+    return t(lang, '$base.$i', args);
+  }
+
+  /// seed روزانه: در طول یک روز یک متن، فردا متن دیگر
+  static int get daySeed => DateTime.now().difference(DateTime(2024)).inDays;
+
   // ───────────────────────── فارسی (طنز) ─────────────────────────
   static const Map<String, String> _fa = {
     ...authFa,
@@ -51,7 +70,10 @@ class AppStrings {
     ...ahFa,
     ...bdFa,
     ...ctFa,
+    ...sqFa,
+    ...bcFa,
     ...exFa,
+    ...txFa,
     // عمومی
     'app.name': 'Dacko',
     'common.cancel': 'بی‌خیال',
@@ -138,19 +160,44 @@ class AppStrings {
 
     'settings.remind_time': 'ساعت یادآور روزانه',
     'notif.channel': 'یادآور روزانه',
-    'notif.title': 'Dacko',
-    'notif.body1': 'عادت‌هات دلشون برات تنگ شده. یه سر بزن.',
-    'notif.body2': 'استریکت بدون تو غذا نمی‌خوره. بیا نجاتش بده.',
-    'notif.body3': 'پنج دقیقه وقت داری؟ قهرمان‌ها از همین پنج دقیقه‌ها ساخته می‌شن.',
-    'notif.body4': 'امروز هنوز تیکی نخوردی؛ ما که قضاوت نمی‌کنیم ;)',
+    'notif.streakChannel': 'هشدار استریک',
+    'notif.habitChannel': 'یادآور عادت',
+    'notif.title': 'داکو',
+    'notif.body1': 'یه سر به عادت‌هات بزنی بد نیست',
+    'notif.body2': 'عادت‌هات هنوز سر جاشونن؛ برخلاف بعضی قول‌های اول هفته',
+    'notif.body3': 'قرار نبود برنامه‌هات فقط در حد اسکرین‌شات باقی بمونن!',
+    'notif.body4': 'برنامه‌هات منتظرن روی ماهتو ببینن',
+    'notif.body5': 'حالا که عادت ساختی، یه یادی ازشون بکن، گناه دارن!',
+    'notif.body6': 'عادت ساختی که تیک بزنی، نه اینکه قاب بگیری',
+    'notif.body7': 'استریکت داره به غیبتت اعتراض می‌کنه؛ رسیدگی کن.',
+    'notif.body8': 'استریکت داره نفس‌های آخرشو می‌کشه، یه سر بهش بزن، می‌خواد وصیت کنه',
+    'notif.body9': 'استریکت همیشه روی تو حساب کرده',
+    'notif.body10': 'یه تیک بزن، قول می‌دم مشتری شی!',
+    'notif.body11': 'استریکت منتظر انگشتای زیبای توئه تا یه عادت تیک بزنی',
+    'notif.body12': 'این همه روز رو تیک زدی؛ حیفه امروز رو بی‌خیال بشی.',
+    'notif.body13': 'در شأن یه استریک نیست که اینقدر منتظرت بمونه! اونم غرور داره، بالاخره یه روز می‌شکنه',
+    'notif.body14': 'رئیس‌جمهورم باشی، پنج دقیقه وقت داری!',
+    'notif.body15': 'لازم نیست امروز شق‌القمر کنی؛ یه کار کوچیک هم حسابه.',
+    'notif.body16': 'پنج دقیقه از وقتت رو سرمایه‌گذاری کن!',
+    'notif.body17': 'هنوز برای شروع دیر نشده! کارت با پنج دقیقه هم راه می‌افته.',
+    'notif.body18': 'امروز قرار نیست دنیا رو فتح کنی؛ یه تیک هم کفایت می‌کنه.',
+    'notif.body19': 'پنج دقیقه برای عادتت وقت بذار! قول می‌دم بیشتر از یک ساعت طول نکشه.',
+    'notif.body20': 'اگه فکر می‌کنی برام مهمه که پنج دقیقه از وقتت رو بهم بدی، درست فکر کردی؛ برام مهمه :)',
+    'notif.body21': 'فردوسی سی سال شاهنامه نوشت، تو پنج دقیقه وقت نداری یه عادت انجام بدی؟!',
+    'notif.body22': 'پنج دقیقه وقت داری؟ باور کن جای دوری نمی‌ره.',
+    'notif.body23': 'کار کوچیک، بهانهٔ بزرگ نمی‌خواد؛ پنج دقیقه کافیه برای شروع.',
+    'notif.body24': 'امروز هنوز تیکی نزدی؛ نمی‌گی دلمون برات تنگ می‌شه؟',
+    'notif.body25': 'چرا هنوز شروع نکردی؟ زیرلفظی می‌خوای؟',
+    'notif.body26': 'امروز که نبودی تیک بزنی، هیچی از گلوم پایین نمی‌رفت!',
+    'notif.body27': 'برای شروع هیچ‌وقت دیر نیست!',
+    'notif.body28': 'همیشه شروع کردن سخته، ولی اگه فکر کردی تموم کردن آسونه، سخت در اشتباهی :)',
+    'notif.body29': 'اگه فکر کردی برای شروع کردن میام نازتو می‌کشم، سخت در اشتباهی',
+    'notif.body30': 'اگه شروع کنی یه شکلات پیش من داری!',
 
     // استریک
     'streak.title': 'استریک روزانه',
     'streak.record': 'رکورد {n}',
     'streak.days': 'روز',
-    'streak.start': 'امروز رو شروع کن!',
-    'streak.keep': 'استریکت منتظرته؛ یه تیک بزن.',
-    'streak.today_done': 'امروز رو گرفتی. فردا هم بیا!',
 
     'profile.title': 'پروفایل',
     'profile.stat_age': 'امتیاز XP',
@@ -193,7 +240,10 @@ class AppStrings {
     ...ahEn,
     ...bdEn,
     ...ctEn,
+    ...sqEn,
+    ...bcEn,
     ...exEn,
+    ...txEn,
     'app.name': 'Dacko',
     'common.cancel': 'Cancel',
     'common.ok': 'OK',
@@ -280,18 +330,43 @@ class AppStrings {
 
     'settings.remind_time': 'Daily reminder time',
     'notif.channel': 'Daily reminder',
+    'notif.streakChannel': 'Streak warning',
+    'notif.habitChannel': 'Habit reminders',
     'notif.title': 'Dacko',
-    'notif.body1': 'Your habits miss you. Come say hi.',
-    'notif.body2': 'Your streak needs you. Do not let it down.',
-    'notif.body3': 'Got five minutes? Heroes are made of those.',
-    'notif.body4': 'No check-ins today yet. No judgment, promise.',
+    'notif.body1': 'Dropping by your habits wouldn\'t hurt.',
+    'notif.body2': 'Your habits are still right where you left them, unlike some Monday promises.',
+    'notif.body3': 'Your plans weren\'t supposed to stay screenshots!',
+    'notif.body4': 'Your plans are waiting to see your face.',
+    'notif.body5': 'You built a habit, so spare it a thought. It\'s not its fault!',
+    'notif.body6': 'You built a habit to tick it, not to frame it.',
+    'notif.body7': 'Your streak is protesting your absence; please attend to it.',
+    'notif.body8': 'Your streak is breathing its last. Drop by, it wants to write its will.',
+    'notif.body9': 'Your streak has always counted on you.',
+    'notif.body10': 'Tick one habit, I promise you\'ll become a regular!',
+    'notif.body11': 'Your streak is waiting for your lovely fingers to tick a habit.',
+    'notif.body12': 'You\'ve ticked so many days; it would be a shame to give up on today.',
+    'notif.body13': 'It\'s beneath a streak to wait this long! It has pride too, and one day it will break.',
+    'notif.body14': 'Even if you were the president, you\'d have five minutes!',
+    'notif.body15': 'No need to do anything extraordinary today; one small thing counts.',
+    'notif.body16': 'Invest five minutes of your time!',
+    'notif.body17': 'It\'s not too late to start! Even five minutes gets you going.',
+    'notif.body18': 'You\'re not conquering the world today; one tick is enough.',
+    'notif.body19': 'Give your habit five minutes! I promise it won\'t take more than an hour.',
+    'notif.body20': 'If you think it matters to me that you give me five minutes, you\'re right; it does :)',
+    'notif.body21': 'Ferdowsi spent thirty years writing the Shahnameh, and you can\'t spare five minutes for a habit?!',
+    'notif.body22': 'Got five minutes? Trust me, it\'s not going anywhere.',
+    'notif.body23': 'A small task needs no big excuse; five minutes is enough to start.',
+    'notif.body24': 'No ticks yet today; don\'t you think we miss you?',
+    'notif.body25': 'Why haven\'t you started yet? Do you need a hand-holding?',
+    'notif.body26': 'While you weren\'t around ticking today, I couldn\'t swallow a thing!',
+    'notif.body27': 'It\'s never too late to start!',
+    'notif.body28': 'Starting is always hard, but if you think finishing is easy, you\'re badly mistaken :)',
+    'notif.body29': 'If you think I\'ll come coax you into starting, you\'re badly mistaken.',
+    'notif.body30': 'Start, and you\'ve got a chocolate waiting with me!',
 
     'streak.title': 'Daily streak',
     'streak.record': 'Record {n}',
     'streak.days': 'days',
-    'streak.start': 'Start today!',
-    'streak.keep': 'Your streak is waiting. Tick one off.',
-    'streak.today_done': 'Today is done. See you tomorrow!',
 
     'profile.title': 'Profile',
     'profile.stat_age': 'XP',
@@ -330,6 +405,11 @@ extension TrContext on BuildContext {
     final lang = Localizations.localeOf(this).languageCode;
     return AppStrings.t(lang, key, args);
   }
+
+  /// متن چرخشی که در یک روز ثابت می‌ماند (جلوگیری از پرش متن در rebuild)
+  String trv(String base) => AppStrings.v(
+      Localizations.localeOf(this).languageCode, base,
+      seed: AppStrings.daySeed);
 
   bool get isEnglish => Localizations.localeOf(this).languageCode == 'en';
 }

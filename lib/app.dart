@@ -6,6 +6,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 
 import '/core/app_theme.dart';
+import '/core/logging/app_logger.dart';
 import '/features/auth/screens/login_screen.dart';
 import '/features/auth/screens/reset_password_screen.dart';
 import '/features/home/screens/main_screen.dart';
@@ -124,6 +125,7 @@ class _AppNavigatorState extends State<_AppNavigator> {
       },
       child: Navigator(
         key: key,
+        observers: [LogNavigatorObserver()],
         onGenerateRoute: (routeSettings) {
           return MaterialPageRoute(
             builder: (context) => Consumer<AuthProvider>(

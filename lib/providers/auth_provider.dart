@@ -10,6 +10,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+import '/core/logging/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -22,6 +23,7 @@ enum SignUpResult { signedIn, needsEmailConfirmation }
 /// پاسخ‌های سوال‌های معرفی (همه اختیاری)
 class OnboardingAnswers {
   final String? goal;
+  final List<String> goals;
   final String? firstTask;
   final String? energy; // intro | mixed | extro
   final String? style; // planner | mixed | flow
@@ -31,6 +33,7 @@ class OnboardingAnswers {
 
   const OnboardingAnswers({
     this.goal,
+    this.goals = const [],
     this.firstTask,
     this.energy,
     this.style,
@@ -40,7 +43,7 @@ class OnboardingAnswers {
   });
 
   Map<String, dynamic> toJson() => {
-        'goals': goal == null ? <String>[] : [goal],
+        'goals': goals.isNotEmpty ? goals : (goal == null ? <String>[] : [goal]),
         'goal': goal,
         'first_task': firstTask,
         'energy': energy,
@@ -99,7 +102,8 @@ class AuthProvider extends ChangeNotifier {
 
   Future<void> _onAuthEvent(AuthState data) async {
     final event = data.event;
-    if (kDebugMode) debugPrint('Auth event: $event');
+    Log.i('auth', 'event', fields: {'event': event.name});
+    Log.setUser(data.session?.user.id);
 
     switch (event) {
       case AuthChangeEvent.signedOut:
@@ -114,8 +118,13 @@ class AuthProvider extends ChangeNotifier {
       case AuthChangeEvent.initialSession:
         if (_holdSignIn) break;
         final user = data.session?.user;
+        if (user != null && !_needsPasswordReset && await _looksLikeRecoveryLogin(user)) {
+          _needsPasswordReset = true;
+        }
         if (user != null && user.id != _userId) {
           await _loadForUser(user);
+        } else if (_needsPasswordReset) {
+          notifyListeners();
         }
         break;
       default:
@@ -144,9 +153,12 @@ class AuthProvider extends ChangeNotifier {
         notifyListeners();
         return;
       }
+      if (!_needsPasswordReset && await _looksLikeRecoveryLogin(user)) {
+        _needsPasswordReset = true;
+      }
       await _loadForUser(user);
-    } catch (e) {
-      if (kDebugMode) debugPrint('checkLoginStatus error: $e');
+    } catch (e, stk) {
+      Log.e('auth', 'checkLoginStatus error: $e', error: e, stack: stk);
       _isLoading = false;
       notifyListeners();
     }
@@ -223,8 +235,8 @@ class AuthProvider extends ChangeNotifier {
         // پروفایل هنوز ساخته نشده (مثلاً تریگر SQL اجرا نشده): بعد از ثبت‌نام می‌سازیمش
         await _ensureProfile(uid, _userEmail ?? '', _userName ?? '');
       }
-    } catch (e) {
-      if (kDebugMode) debugPrint('profile refresh skipped: $e');
+    } catch (e, stk) {
+      Log.e('auth', 'profile refresh skipped: $e', error: e, stack: stk);
     }
 
     try {
@@ -249,9 +261,9 @@ class AuthProvider extends ChangeNotifier {
           changed = true;
         }
       }
-    } catch (e) {
+    } catch (e, stk) {
       // جدول هنوز ساخته نشده یا آفلاین: اگر کاربر تازه ثبت‌نام نکرده، مزاحمش نمی‌شویم
-      if (kDebugMode) debugPrint('onboarding refresh skipped: $e');
+      Log.e('auth', 'onboarding refresh skipped: $e', error: e, stack: stk);
     }
 
     // پاسخ‌هایی که قبلاً به‌خاطر آفلاین بودن ارسال نشده بودند
@@ -273,6 +285,7 @@ class AuthProvider extends ChangeNotifier {
           .signInWithPassword(email: email.trim(), password: password);
       _failedLogins = 0;
       _lockUntil = null;
+      _clearRecoveryMark();
     } on AuthException catch (e) {
       if (e.code == 'invalid_credentials' ||
           e.message.toLowerCase().contains('invalid login')) {
@@ -323,7 +336,7 @@ class AuthProvider extends ChangeNotifier {
     _holdSignIn = false;
     try {
       await _client.auth.signOut();
-    } catch (_) {}
+    } catch (err, stk) { Log.w('auth', 'cancelRecovery ignored error', error: err, stack: stk); }
   }
 
   Future<SignUpResult> signUpWithEmail({
@@ -348,7 +361,7 @@ class AuthProvider extends ChangeNotifier {
       }
 
       if (res.session == null) {
-        _justSignedUp = false;
+        // _justSignedUp می‌ماند تا بعد از باز شدن لینک تایید، معرفی نشان داده شود
         return SignUpResult.needsEmailConfirmation;
       }
 
@@ -376,8 +389,8 @@ class AuthProvider extends ChangeNotifier {
         await service.createProfile(uid, email, name.isEmpty ? email.split('@').first : name);
       }
       await service.createUserProgress(uid);
-    } catch (e) {
-      if (kDebugMode) debugPrint('ensureProfile skipped: $e');
+    } catch (e, stk) {
+      Log.e('auth', 'ensureProfile skipped: $e', error: e, stack: stk);
     }
   }
 
@@ -391,8 +404,39 @@ class AuthProvider extends ChangeNotifier {
     );
   }
 
+  static const _recoveryKey = 'recovery_requested_at';
+
   Future<void> sendPasswordReset(String email) async {
     await _client.auth.resetPasswordForEmail(email.trim(), redirectTo: redirectUrl);
+    // نشانه‌ای برای وقتی که رویداد بازیابی هنگام باز شدن لینک از دست رفت (مثلاً برنامه بسته بود)
+    try {
+      (await SharedPreferences.getInstance())
+          .setInt(_recoveryKey, DateTime.now().millisecondsSinceEpoch);
+    } catch (err, stk) { Log.w('auth', 'sendPasswordReset ignored error', error: err, stack: stk); }
+  }
+
+  Future<void> _clearRecoveryMark() async {
+    try {
+      (await SharedPreferences.getInstance()).remove(_recoveryKey);
+    } catch (err, stk) { Log.w('auth', '_clearRecoveryMark ignored error', error: err, stack: stk); }
+  }
+
+  /// آیا این ورود تازه از لینک بازیابی آمده؟ (درخواست در ۲ ساعت اخیر + نشست در چند دقیقهٔ اخیر ساخته شده)
+  Future<bool> _looksLikeRecoveryLogin(User user) async {
+    try {
+      final at = (await SharedPreferences.getInstance()).getInt(_recoveryKey);
+      if (at == null) return false;
+      final now = DateTime.now();
+      if (now.difference(DateTime.fromMillisecondsSinceEpoch(at)) >
+          const Duration(hours: 2)) {
+        return false;
+      }
+      final last = DateTime.tryParse(user.lastSignInAt ?? '');
+      return last != null && now.difference(last.toLocal()).abs() < const Duration(minutes: 3);
+    } catch (err, stk) {
+      Log.w('auth', '_looksLikeRecoveryLogin ignored error', error: err, stack: stk);
+      return false;
+    }
   }
 
   Future<void> resendConfirmation(String email) async {
@@ -401,12 +445,14 @@ class AuthProvider extends ChangeNotifier {
 
   Future<void> updatePassword(String newPassword) async {
     await _client.auth.updateUser(UserAttributes(password: newPassword));
+    await _clearRecoveryMark();
     _needsPasswordReset = false;
     notifyListeners();
   }
 
   /// کاربر صفحهٔ بازیابی رمز را بست
   void dismissPasswordReset() {
+    _clearRecoveryMark();
     _needsPasswordReset = false;
     notifyListeners();
   }
@@ -423,6 +469,7 @@ class AuthProvider extends ChangeNotifier {
     await prefs.setString('onboarding_answers_$uid', jsonEncode(answers.toJson()));
     await prefs.setBool('onboarding_done_$uid', true);
     await prefs.setBool('onboarding_pending_$uid', true);
+    await prefs.setBool('intro_pending_$uid', true); // اینترو آموزشی در صفحه اصلی
     _justSignedUp = false;
     _onboardingDone = true;
     notifyListeners();
@@ -436,6 +483,7 @@ class AuthProvider extends ChangeNotifier {
     if (uid == null) return;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('onboarding_done_$uid', true);
+    await prefs.setBool('intro_pending_$uid', true);
     _justSignedUp = false;
     _onboardingDone = true;
     notifyListeners();
@@ -457,8 +505,8 @@ class AuthProvider extends ChangeNotifier {
 
       await prefs.remove('onboarding_pending_$uid');
       return true;
-    } catch (e) {
-      if (kDebugMode) debugPrint('onboarding upload postponed: $e');
+    } catch (e, stk) {
+      Log.e('auth', 'onboarding upload postponed: $e', error: e, stack: stk);
       return false;
     }
   }
@@ -471,13 +519,13 @@ class AuthProvider extends ChangeNotifier {
 
     try {
       await _client.auth.signOut();
-    } catch (e) {
-      if (kDebugMode) debugPrint('signOut error: $e');
+    } catch (e, stk) {
+      Log.e('auth', 'signOut error: $e', error: e, stack: stk);
     }
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove('user_id');
-    } catch (_) {}
+    } catch (err, stk) { Log.w('auth', 'forceLogout ignored error', error: err, stack: stk); }
   }
 
   void setHasUsername(bool value) {

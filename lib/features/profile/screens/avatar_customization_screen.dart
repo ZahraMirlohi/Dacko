@@ -1,5 +1,7 @@
 // lib/features/profile/widgets/avatar_customization_screen.dart
 
+import '/widgets/net_image.dart';
+import '/core/logging/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '/services/supabase_service.dart';
@@ -11,6 +13,7 @@ import 'package:image_picker/image_picker.dart';
 import '/services/storage_service.dart';
 import 'user_avatar.dart';
 import 'dart:typed_data';
+import '/core/dk.dart';
 
 class AvatarCustomizationScreen extends StatefulWidget {
   final String userId;
@@ -257,7 +260,7 @@ class _AvatarCustomizationScreenState extends State<AvatarCustomizationScreen> {
                     ),
                     child: ClipOval(
                       child: hasAvatar
-                          ? Image.network(
+                          ? NetImage(
                               _profile.avatarUrl!,
                               width: 138,
                               height: 138,
@@ -544,7 +547,8 @@ class _AvatarCustomizationScreenState extends State<AvatarCustomizationScreen> {
           ),
         );
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('avatar_customization', '_pickAndUploadAvatar failed', error: e, stack: stk);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -647,7 +651,8 @@ class _AvatarCustomizationScreenState extends State<AvatarCustomizationScreen> {
           ),
         );
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('avatar_customization', '_removeAvatar failed', error: e, stack: stk);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -716,7 +721,7 @@ class _AvatarCustomizationScreenState extends State<AvatarCustomizationScreen> {
                           ? primaryColor
                           : (theme.isDarkMode
                               ? const Color(0xFF2A2A2A)
-                              : Colors.grey.shade100),
+                              : Dk.f(Colors.grey.shade100)),
                   borderRadius: BorderRadius.circular(16),
                   border: isSelected
                       ? Border.all(color: primaryColor, width: 2)
@@ -810,7 +815,8 @@ class _AvatarCustomizationScreenState extends State<AvatarCustomizationScreen> {
         );
         Navigator.pop(context, true);
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('avatar_customization', '_saveAvatar failed', error: e, stack: stk);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

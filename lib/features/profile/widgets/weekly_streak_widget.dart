@@ -1,10 +1,13 @@
 // lib/features/profile/widgets/weekly_streak_widget.dart
 
+import '/core/logging/app_logger.dart';
 import 'package:flutter/material.dart';
+import '/l10n/app_strings.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import 'package:provider/provider.dart';
 import '/services/supabase_service.dart';
 import '/providers/theme_provider.dart';
+import '/core/dk.dart';
 
 class WeeklyStreakWidget extends StatefulWidget {
   final String userId;
@@ -60,7 +63,8 @@ class _WeeklyStreakWidgetState extends State<WeeklyStreakWidget> {
           _isLoading = false;
         });
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('weekly_streak', '_loadWeekDays failed', error: e, stack: stk);
       if (mounted) {
         setState(() {
           _isLoading = false;
@@ -74,7 +78,9 @@ class _WeeklyStreakWidgetState extends State<WeeklyStreakWidget> {
     final theme = Provider.of<ThemeProvider>(context);
     final primaryColor = theme.primaryColor;
 
-    final weekDays = ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'];
+    final weekDays = context.isEnglish
+        ? ['S', 'S', 'M', 'T', 'W', 'T', 'F']
+        : ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'];
 
     final jalaliToday = Jalali.fromDateTime(DateTime.now());
     final todayIndex = jalaliToday.weekDay - 1;
@@ -100,7 +106,7 @@ class _WeeklyStreakWidgetState extends State<WeeklyStreakWidget> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'استریک هفتگی',
+                context.tr('wk.k001'),
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -117,7 +123,7 @@ class _WeeklyStreakWidgetState extends State<WeeklyStreakWidget> {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
-                  '${widget.weeklyStreak} روز',
+                  context.tr('wk.k002', {'p0': '${widget.weeklyStreak}'}),
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -147,7 +153,7 @@ class _WeeklyStreakWidgetState extends State<WeeklyStreakWidget> {
                               ? primaryColor.withValues(alpha: 0.2)
                               : (theme.isDarkMode
                                   ? const Color(0xFF2A2A2A)
-                                  : Colors.grey.shade200),
+                                  : Dk.f(Colors.grey.shade200)),
                       border: isToday && !isActive
                           ? Border.all(color: primaryColor, width: 2)
                           : null,
@@ -219,21 +225,21 @@ class _WeeklyStreakWidgetState extends State<WeeklyStreakWidget> {
 
   String _getStreakMessage() {
     if (widget.weeklyStreak == 0) {
-      return 'استریکت صفره. عادت‌ها قهر نکردن، فقط منتظرن بفهمی.';
+      return context.tr('wk.k003');
     } else if (widget.weeklyStreak < 3) {
-      return '${widget.weeklyStreak} روز پیاپی. هنوز زوده کسی باور کنه، ولی داریم نگاه می‌کنیم.';
+      return context.tr('wk.k004', {'p0': '${widget.weeklyStreak}'});
     } else if (widget.weeklyStreak < 5) {
-      return '${widget.weeklyStreak} روز پیاپی! بدنت داره شک می‌کنه که نکنه آدم شدی.';
+      return context.tr('wk.k005', {'p0': '${widget.weeklyStreak}'});
     } else if (widget.weeklyStreak < 7) {
-      return '${widget.weeklyStreak} روز پیاپی؛ فقط ${7 - widget.weeklyStreak} روز مونده. الان ول کنی خودت از خودت خجالت می‌کشی.';
+      return context.tr('wk.k006', {'p0': '${widget.weeklyStreak}', 'p1': '${7 - widget.weeklyStreak}'});
     } else {
-      return 'هفته کامل! حالا سعی کن آخر هفته هم همین‌قدر آدم بمونی.';
+      return context.tr('wk.k007');
     }
   }
 
   Color _getStreakColor(Color primaryColor) {
     if (widget.weeklyStreak == 0) {
-      return Colors.grey.shade600;
+      return Dk.s(Colors.grey.shade600);
     } else if (widget.weeklyStreak < 3) {
       return const Color(0xFFFFA500);
     } else if (widget.weeklyStreak < 5) {

@@ -1,5 +1,6 @@
 // lib/main.dart
 
+import 'core/timeout_http_client.dart';
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
@@ -10,6 +11,7 @@ import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'app.dart';
+import 'core/logging/app_logger.dart';
 import 'providers/auth_provider.dart';
 import 'providers/calendar_provider.dart';
 import 'providers/settings_provider.dart';
@@ -18,24 +20,23 @@ import 'providers/theme_provider.dart';
 import 'services/audio_player_service.dart';
 import 'services/download_service.dart';
 import 'services/local_storage_service.dart';
+import '/core/dk.dart';
 
 void main() {
   // همهٔ print های برنامه فقط در حالت دیباگ چاپ می‌شن (در نسخهٔ نهایی ساکتند و کند نمی‌کنن)
   runZonedGuarded(
     _bootstrap,
-    (error, stack) {
-      if (kDebugMode) debugPrint('Uncaught: $error\n$stack');
-    },
+    (error, stack) => Log.f('zone', 'Uncaught error', error: error, stack: stack),
+    // همهٔ print های برنامه به سیستم لاگ می‌روند (کنسول فقط در دیباگ)
     zoneSpecification: ZoneSpecification(
-      print: (self, parent, zone, line) {
-        if (kDebugMode) parent.print(zone, line);
-      },
+      print: (self, parent, zone, line) => Log.fromPrint(line),
     ),
   );
 }
 
 Future<void> _bootstrap() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Log.init();
 
   try {
     // خواندن همزمان مواردی که به هم وابسته نیستن
@@ -65,8 +66,8 @@ Future<void> _bootstrap() async {
         child: const HeroApp(),
       ),
     );
-  } catch (e) {
-    if (kDebugMode) debugPrint('Startup error: $e');
+  } catch (e, st) {
+    Log.f('app', 'Startup error', error: e, stack: st);
     runApp(_StartupError(error: e.toString(), onRetry: main));
   }
 }
@@ -88,6 +89,7 @@ Future<void> _initSupabase() async {
   await Supabase.initialize(
     url: supabaseUrl,
     anonKey: supabaseAnonKey,
+    httpClient: TimeoutHttpClient(),
     authOptions: const FlutterAuthClientOptions(
       authFlowType: AuthFlowType.pkce,
       autoRefreshToken: true,
@@ -124,7 +126,7 @@ class _StartupError extends StatelessWidget {
                 Text(
                   error,
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.grey.shade600),
+                  style: TextStyle(color: Dk.s(Colors.grey.shade600)),
                 ),
                 const SizedBox(height: 16),
                 ElevatedButton(

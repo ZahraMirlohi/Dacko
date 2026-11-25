@@ -1,3 +1,4 @@
+import '/core/logging/app_logger.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -6,6 +7,7 @@ import '/providers/theme_provider.dart';
 import '/core/app_palette.dart';
 import '/l10n/app_strings.dart';
 import '/services/notification_service.dart';
+import '/core/dk.dart';
 
 class HabitTimerWidget extends StatefulWidget {
   final String habitId;
@@ -148,7 +150,7 @@ class _HabitTimerWidgetState extends State<HabitTimerWidget> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         content: Text(
           text,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w600,
             color: Color(0xFF090909),
@@ -202,7 +204,8 @@ class _HabitTimerWidgetState extends State<HabitTimerWidget> {
           }
         });
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('habit_timer', '_saveTime failed', error: e, stack: stk);
       if (mounted) {
         setState(() {
           _isSaved = false;

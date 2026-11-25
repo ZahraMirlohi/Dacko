@@ -1,5 +1,6 @@
 // lib/features/profile/screens/personality_screen.dart
 
+import '/core/logging/app_logger.dart';
 import '/widgets/bottom_safe.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -9,6 +10,7 @@ import '/services/buddy_matcher_service.dart';
 import '/providers/sync_provider.dart';
 import '/providers/theme_provider.dart';
 import '../models/user_personality.dart';
+import '/core/dk.dart';
 
 class PersonalityScreen extends StatefulWidget {
   const PersonalityScreen({super.key});
@@ -184,7 +186,8 @@ class _PersonalityScreenState extends State<PersonalityScreen> {
         );
         Navigator.pop(context, true);
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('personality', '_savePersonality failed', error: e, stack: stk);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -424,9 +427,9 @@ class _PersonalityScreenState extends State<PersonalityScreen> {
                   children: [
                     Text(
                       context.tr('pm.pe.mbti'),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
-                        color: Color(0xFFBFC5B3),
+                        color: Dk.l(Color(0xFFBFC5B3)),
                       ),
                     ),
                     const SizedBox(height: 2),
@@ -444,9 +447,9 @@ class _PersonalityScreenState extends State<PersonalityScreen> {
                         _selectedMBTI!.description,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
-                          color: Color(0xFFBFC5B3),
+                          color: Dk.l(Color(0xFFBFC5B3)),
                         ),
                       ),
                   ],

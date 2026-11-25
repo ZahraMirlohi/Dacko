@@ -1,10 +1,12 @@
 // lib/features/profile/widgets/character_customization.dart
 
+import '/core/logging/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/character_model.dart';
 import '../models/hero_class_model.dart';
 import '/providers/theme_provider.dart';
+import '/core/dk.dart';
 
 class CharacterCustomization extends StatefulWidget {
   final Character character;
@@ -157,7 +159,7 @@ class _CharacterCustomizationState extends State<CharacterCustomization> {
                         ? color
                         : (theme.isDarkMode
                             ? const Color(0xFF2A2A2A)
-                            : Colors.grey.shade100),
+                            : Dk.f(Colors.grey.shade100)),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                       color: isSelected ? color : Colors.transparent,
@@ -226,7 +228,7 @@ class _CharacterCustomizationState extends State<CharacterCustomization> {
                       ? _parseColor(_heroClass.primaryColor)
                       : (theme.isDarkMode
                           ? const Color(0xFF2A2A2A)
-                          : Colors.grey.shade200),
+                          : Dk.f(Colors.grey.shade200)),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: isSelected
@@ -292,7 +294,7 @@ class _CharacterCustomizationState extends State<CharacterCustomization> {
                       ? _parseColor(_heroClass.primaryColor)
                       : (theme.isDarkMode
                           ? const Color(0xFF2A2A2A)
-                          : Colors.grey.shade200),
+                          : Dk.f(Colors.grey.shade200)),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: isSelected
@@ -352,7 +354,7 @@ class _CharacterCustomizationState extends State<CharacterCustomization> {
             filled: true,
             fillColor: theme.isDarkMode
                 ? const Color(0xFF2A2A2A)
-                : Colors.grey.shade100,
+                : Dk.f(Colors.grey.shade100),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,
               vertical: 12,
@@ -475,7 +477,8 @@ class _CharacterCustomizationState extends State<CharacterCustomization> {
         return Color(int.parse('FF${colorStr.substring(1)}', radix: 16));
       }
       return const Color(0xFF2563EB);
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('character_customization', '_parseColor failed', error: e, stack: stk);
       return const Color(0xFF2563EB);
     }
   }

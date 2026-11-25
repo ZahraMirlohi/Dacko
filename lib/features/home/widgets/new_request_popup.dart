@@ -36,7 +36,7 @@ class _NewRequestPopupState extends State<NewRequestPopup>
     final theme = context.watch<ThemeProvider>();
     final text = widget.count > 1
         ? context.tr('mp.req.many', {'n': '${widget.count}'})
-        : context.tr('mp.req.one');
+        : context.trv('mp.req.one');
     return AnimatedBuilder(
       animation: _c,
       // لرزش کوتاه در ابتدای هر چرخه، بعد استراحت
@@ -52,7 +52,9 @@ class _NewRequestPopupState extends State<NewRequestPopup>
           child: Container(
             padding: const EdgeInsets.fromLTRB(14, 10, 8, 10),
             decoration: BoxDecoration(
-              color: const Color(0xFF090909),
+              color: theme.isDarkMode
+                  ? theme.cardSecondaryColor
+                  : const Color(0xFF090909),
               borderRadius: BorderRadius.circular(28),
               boxShadow: theme.softShadow,
             ),

@@ -1,9 +1,11 @@
 // lib/features/home/screens/main_screen.dart
 
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../core/logging/app_logger.dart';
 import '../../../l10n/app_strings.dart';
 import '../../../services/supabase_service.dart';
 import '../../arena/screens/arena_screen.dart';
@@ -15,6 +17,7 @@ import '../../../config/nav_items.dart';
 import '../../../providers/settings_provider.dart';
 import '../../../services/notification_service.dart';
 import '../widgets/new_request_popup.dart';
+import '../widgets/intro_tour.dart';
 import '../../../providers/theme_provider.dart'; // اضافه کنید
 
 class MainScreen extends StatefulWidget {
@@ -32,6 +35,8 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   String? _uid;
 
   int _currentIndex = 0;
+  // تب‌ها فقط بار اولِ باز شدن ساخته می‌شوند (راه‌اندازی سریع‌تر: دیتای چت/اکسپلور/پروفایل موقع شروع لود نمی‌شود)
+  final List<bool> _built = [true, false, false, false];
   final List<int> _tabHistory = []; // برای دکمه‌ی بک: یک مرحله برگشت
   DateTime? _lastBack;
 
@@ -53,6 +58,49 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     _runDailyCheck();
     _initRequests();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final u = await SupabaseService().getCurrentUser();
+      if (u != null && mounted) {
+        maybeShowIntroTour(context, u.id, (i) {
+          if (!mounted) return;
+          setState(() {
+            _currentIndex = i;
+            _built[i] = true;
+          });
+        });
+      }
+    });
+    // اجازهٔ اعلان (اندروید ۱۳+) و تازه‌سازی یادآورها؛ بعد از لحظه‌ای تا باز شدن صفحه مزاحم نشود
+    Future.delayed(const Duration(seconds: 2), () async {
+      await NotificationService.instance.requestPermission();
+      await NotificationService.instance.reschedule();
+    });
+    Future.delayed(const Duration(milliseconds: 3500), _warnIfVpn);
+  }
+
+  static bool _vpnWarned = false;
+
+  // اینترفیس‌های VPN در اندروید tun/ppp/wg/ipsec نام دارند
+  Future<void> _warnIfVpn() async {
+    if (_vpnWarned || !mounted) return;
+    try {
+      final ifs = await NetworkInterface.list();
+      final vpn = ifs.any((i) => RegExp(r'^(tun|tap|ppp|wg|ipsec|utun)').hasMatch(i.name.toLowerCase()));
+      if (!vpn || !mounted) return;
+      _vpnWarned = true;
+      await showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          icon: const Icon(Icons.vpn_lock_rounded, size: 36),
+          title: Text(ctx.tr('vpn.title')),
+          content: Text(ctx.tr('vpn.body')),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx), child: Text(ctx.tr('vpn.ok'))),
+          ],
+        ),
+      );
+    } catch (err, stk) { Log.w('main', '_warnIfVpn ignored error', error: err, stack: stk); }
   }
 
   @override
@@ -61,6 +109,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     if (state == AppLifecycleState.resumed) {
       _popupDismissed = false;
       _refreshPending();
+      NotificationService.instance.reschedule();
     }
   }
 
@@ -91,7 +140,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
                 NotificationService.instance.showNow(
                   3001,
                   'Dacko',
-                  context.tr('mp.req.one'),
+                  context.trv('mp.req.one'),
                   channel: 'buddy_requests',
                   channelName: 'Requests',
                 );
@@ -99,8 +148,8 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
             },
           )
           .subscribe();
-    } catch (e) {
-      debugPrint('request listener failed: $e');
+    } catch (e, stk) {
+      Log.e('main', 'request listener failed: $e', error: e, stack: stk);
     }
   }
 
@@ -114,7 +163,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
           .eq('to_user_id', id)
           .eq('status', 'pending');
       if (mounted) setState(() => _pendingRequests = (rows as List).length);
-    } catch (_) {}
+    } catch (err, stk) { Log.w('main', '_refreshPending ignored error', error: err, stack: stk); }
   }
 
   void _openRequests() {
@@ -122,8 +171,10 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       _popupDismissed = true;
       if (_currentIndex != 1) _tabHistory.add(_currentIndex);
       _currentIndex = 1;
+      _built[1] = true;
     });
-    ChatScreen.openRequestsSignal.value++;
+    // بعد از فریم: اگر تب چت همین حالا ساخته شده، listener اش آماده است
+    WidgetsBinding.instance.addPostFrameCallback((_) => ChatScreen.openRequestsSignal.value++);
   }
 
   @override
@@ -136,7 +187,10 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       onPopInvokedWithResult: (didPop, _) {
         if (didPop) return;
         if (_tabHistory.isNotEmpty) {
-          setState(() => _currentIndex = _tabHistory.removeLast());
+          setState(() {
+            _currentIndex = _tabHistory.removeLast();
+            _built[_currentIndex] = true;
+          });
           return;
         }
         if (_currentIndex != 0) {
@@ -172,11 +226,13 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
                 ArenaScreen(
                   profileRefreshNotifier: _profileRefreshNotifier,
                 ),
-                const ChatScreen(),
-                ExploreScreen(refreshNotifier: _exploreRefreshNotifier),
-                ProfileScreen(
-                  refreshNotifier: _profileRefreshNotifier,
-                ),
+                _built[1] ? const ChatScreen() : const SizedBox.shrink(),
+                _built[2]
+                    ? ExploreScreen(refreshNotifier: _exploreRefreshNotifier)
+                    : const SizedBox.shrink(),
+                _built[3]
+                    ? ProfileScreen(refreshNotifier: _profileRefreshNotifier)
+                    : const SizedBox.shrink(),
               ],
             ),
           ),
@@ -210,12 +266,14 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
               child: CustomBottomNavBar(
                 currentIndex: _currentIndex,
                 onTap: (index) {
+                  Log.screen(const ['arena', 'chat', 'explore', 'profile'][index]);
                   setState(() {
                     if (index != _currentIndex) {
                       _tabHistory.add(_currentIndex);
                       if (_tabHistory.length > 10) _tabHistory.removeAt(0);
                     }
                     _currentIndex = index;
+                    _built[index] = true;
                   });
 
                   if (index == 3) {
@@ -242,8 +300,8 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       if (user != null) {
         await supabase.runDailyCheck(user.id);
       }
-    } catch (e) {
-      print('Error in daily check: $e');
+    } catch (e, stk) {
+      Log.e('main', 'Error in daily check: $e', error: e, stack: stk);
     }
   }
 }

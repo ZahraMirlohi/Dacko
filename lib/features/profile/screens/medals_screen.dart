@@ -1,6 +1,8 @@
 // lib/features/profile/screens/medals_screen.dart
 
+import '/core/logging/app_logger.dart';
 import 'package:flutter/material.dart';
+import '/l10n/app_strings.dart';
 import 'package:provider/provider.dart';
 import '/core/app_palette.dart';
 import '/providers/theme_provider.dart';
@@ -75,8 +77,8 @@ class _MedalsScreenState extends State<MedalsScreen> {
         _challenges = c;
         _loading = false;
       });
-    } catch (e) {
-      debugPrint('medals load error: $e');
+    } catch (e, stk) {
+      Log.e('medals', 'medals load error: $e', error: e, stack: stk);
       if (mounted) setState(() => _loading = false);
     }
   }
@@ -91,7 +93,7 @@ class _MedalsScreenState extends State<MedalsScreen> {
         backgroundColor: theme.backgroundColor,
         appBar: AppBar(
           backgroundColor: theme.backgroundColor,
-          title: Text('مدال‌ها و افتخارات',
+          title: Text(context.tr('md.k001'),
               style: TextStyle(
                   color: theme.textColor,
                   fontSize: 18,
@@ -104,7 +106,7 @@ class _MedalsScreenState extends State<MedalsScreen> {
                     child: Padding(
                       padding: const EdgeInsets.all(32),
                       child: Text(
-                          'هنوز مدالی نگرفته‌ای. یک ماموریت یا چالش را تمام کن تا اولین مدال به نامت بخورد.',
+                          context.tr('md.k002'),
                           textAlign: TextAlign.center,
                           style: TextStyle(
                               fontSize: 14,
@@ -116,9 +118,9 @@ class _MedalsScreenState extends State<MedalsScreen> {
                     padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
                     children: [
                       if (_quests.isNotEmpty)
-                        _group(theme, 'ماموریت‌ها', _quests, Tone.mint),
+                        _group(theme, context.tr('md.k003'), _quests, Tone.mint),
                       if (_challenges.isNotEmpty)
-                        _group(theme, 'چالش‌ها', _challenges, Tone.butter),
+                        _group(theme, context.tr('md.k004'), _challenges, Tone.butter),
                     ],
                   ),
       ),

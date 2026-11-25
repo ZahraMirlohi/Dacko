@@ -1,5 +1,6 @@
 // lib/features/chat/screens/user_profile_screen.dart
 
+import '/core/logging/app_logger.dart';
 import '/l10n/app_strings.dart';
 import '../widgets/avatar_viewer.dart';
 import '/widgets/bottom_safe.dart';
@@ -12,6 +13,7 @@ import '/services/chat_service.dart';
 import '/services/supabase_service.dart';
 import '/providers/theme_provider.dart';
 import '/features/profile/models/user_photo_model.dart';
+import '/core/dk.dart';
 
 class UserProfileScreen extends StatefulWidget {
   final String userId;
@@ -82,7 +84,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           _isLoading = false;
         });
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('user_profile', '_loadUserData failed', error: e, stack: stk);
       if (!mounted) return;
       setState(() {
         _errorMessage = context.tr('ct.up.loadErr', {'e': e.toString()});
@@ -109,7 +112,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         _photos = photos;
         _isLoadingPhotos = false;
       });
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('user_profile', '_loadUserPhotos failed', error: e, stack: stk);
       if (!mounted) return;
       setState(() => _isLoadingPhotos = false);
     }
@@ -155,7 +159,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           const SizedBox(height: 16),
           Text(
             context.tr('ct.up.loading'),
-            style: const TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
+            style: TextStyle(fontSize: 13, color: Dk.s(Color(0xFF6B7280))),
           ),
         ],
       ),
@@ -505,7 +509,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               placeholder: (context, url) => Container(
                 color: theme.isDarkMode
                     ? const Color(0xFF2A2A2A)
-                    : Colors.grey.shade200,
+                    : Dk.f(Colors.grey.shade200),
                 child: Icon(
                   Icons.image,
                   color: theme.textSecondaryColor,
@@ -514,7 +518,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               errorWidget: (context, url, error) => Container(
                 color: theme.isDarkMode
                     ? const Color(0xFF2A2A2A)
-                    : Colors.grey.shade200,
+                    : Dk.f(Colors.grey.shade200),
                 child: Icon(
                   Icons.broken_image,
                   color: theme.textSecondaryColor,

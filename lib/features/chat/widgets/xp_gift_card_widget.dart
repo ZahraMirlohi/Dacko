@@ -1,5 +1,6 @@
 // lib/features/chat/widgets/xp_gift_card_widget.dart
 
+import '/core/logging/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '/services/supabase_service.dart';
@@ -72,8 +73,8 @@ class _XPGiftCardWidgetState extends State<XPGiftCardWidget> {
           _isInitialized = true;
         }
       }
-    } catch (e) {
-      print('Error checking gift status: $e');
+    } catch (e, stk) {
+      Log.e('xp_gift_card', 'Error checking gift status: $e', error: e, stack: stk);
     } finally {
       _isChecking = false;
     }
@@ -108,8 +109,8 @@ class _XPGiftCardWidgetState extends State<XPGiftCardWidget> {
           );
         }
       }
-    } catch (e) {
-      print('Error receiving gift: $e');
+    } catch (e, stk) {
+      Log.e('xp_gift_card', 'Error receiving gift: $e', error: e, stack: stk);
       if (mounted) {
         setState(() {
           _isLoading = false;

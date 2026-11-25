@@ -1,5 +1,6 @@
 // lib/features/auth/screens/signup_screen.dart
 
+import '/core/logging/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -70,7 +71,8 @@ class _SignupScreenState extends State<SignupScreen> {
         // وارد شد؛ HeroApp خودش معرفی را نشان می‌دهد. این صفحه باید بسته شود.
         navigator.popUntil((r) => r.isFirst);
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('signup', '_signup failed', error: e, stack: stk);
       SoundService.instance.play(Sfx.error);
       if (mounted) setState(() => _error = authErrorText(context, e));
     } finally {
@@ -86,7 +88,8 @@ class _SignupScreenState extends State<SignupScreen> {
     final auth = context.read<AuthProvider>();
     try {
       await auth.signInWithGoogle();
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('signup', '_google failed', error: e, stack: stk);
       if (mounted) setState(() => _error = context.tr('auth.err_google'));
     } finally {
       if (mounted) setState(() => _googleLoading = false);

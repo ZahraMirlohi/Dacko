@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '/core/app_palette.dart';
 import '/l10n/app_strings.dart';
 import '/providers/theme_provider.dart';
+import '/core/dk.dart';
 
 class TermsAndConditionsScreen extends StatelessWidget {
   const TermsAndConditionsScreen({super.key});
@@ -125,7 +126,7 @@ class TermsAndConditionsScreen extends StatelessWidget {
               height: 1.9,
               color: theme.isDarkMode
                   ? theme.textSecondaryColor
-                  : const Color(0xFFD5DAC8),
+                  : Dk.l(const Color(0xFFD5DAC8)),
             ),
           ),
         ],

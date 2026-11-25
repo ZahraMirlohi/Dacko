@@ -1,5 +1,6 @@
 // lib/services/audio_player_service.dart
 
+import '/core/logging/app_logger.dart';
 import 'dart:async';
 import 'package:just_audio/just_audio.dart';
 import 'package:flutter/material.dart';
@@ -165,8 +166,8 @@ class AudioPlayerService extends ChangeNotifier {
       await _player.pause();
       _isPlaying = false;
       notifyListeners();
-    } catch (e) {
-      debugPrint('[AudioPlayerService] Pause error: $e');
+    } catch (e, stk) {
+      Log.e('audio_player', '[AudioPlayerService] Pause error: $e', error: e, stack: stk);
     }
   }
 
@@ -185,8 +186,8 @@ class AudioPlayerService extends ChangeNotifier {
       _currentUrl = null;
       _currentFileName = null;
       notifyListeners();
-    } catch (e) {
-      debugPrint('[AudioPlayerService] Stop error: $e');
+    } catch (e, stk) {
+      Log.e('audio_player', '[AudioPlayerService] Stop error: $e', error: e, stack: stk);
     }
   }
 
@@ -204,8 +205,8 @@ class AudioPlayerService extends ChangeNotifier {
         await _player.play();
         _isPlaying = true;
         notifyListeners();
-      } catch (e) {
-        debugPrint('Resume error: $e');
+      } catch (e, stk) {
+        Log.e('audio_player', 'Resume error: $e', error: e, stack: stk);
         await play(url, fileName: fileName);
       }
     } else {
@@ -222,8 +223,8 @@ class AudioPlayerService extends ChangeNotifier {
       await _player.seek(position);
       _position = position;
       notifyListeners();
-    } catch (e) {
-      debugPrint('[AudioPlayerService] Seek error: $e');
+    } catch (e, stk) {
+      Log.e('audio_player', '[AudioPlayerService] Seek error: $e', error: e, stack: stk);
     }
   }
 
@@ -245,8 +246,8 @@ class AudioPlayerService extends ChangeNotifier {
       _currentFileName = null;
       notifyListeners();
       debugPrint('Player released');
-    } catch (e) {
-      debugPrint('Release error: $e');
+    } catch (e, stk) {
+      Log.e('audio_player', 'Release error: $e', error: e, stack: stk);
     }
   }
 

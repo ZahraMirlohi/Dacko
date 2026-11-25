@@ -1,5 +1,6 @@
 // lib/features/arena/screens/arena_screen.dart
 
+import '/core/tour_target.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -350,19 +351,21 @@ class _ArenaScreenState extends State<ArenaScreen>
     return Semantics(
       button: true,
       label: context.tr('ah.fab.add'),
-      child: GestureDetector(
+      child: TourTarget(id: 'add', child: GestureDetector(
         onTap: _showAddSheet,
         child: Container(
           width: size,
           height: size,
-          decoration: const BoxDecoration(
-            color: Color(0xFF090909),
+          decoration: BoxDecoration(
+            color: theme.isDarkMode
+                ? theme.cardSecondaryColor
+                : const Color(0xFF090909),
             shape: BoxShape.circle,
           ),
           child: Icon(Icons.add_rounded,
               size: size * 0.52, color: theme.primaryColor),
         ),
-      ),
+      )),
     );
   }
 
@@ -617,7 +620,7 @@ class _ArenaScreenState extends State<ArenaScreen>
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 300),
               child: Text(
-                context.tr(_motivationKey(p)),
+                context.trv(_motivationKey(p)),
                 key: ValueKey(_motivationKey(p)),
                 textAlign: TextAlign.center,
                 maxLines: 2,

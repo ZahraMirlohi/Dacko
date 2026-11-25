@@ -1,3 +1,5 @@
+import '/widgets/skeleton.dart';
+import '/core/logging/app_logger.dart';
 import '/l10n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -7,11 +9,12 @@ import '/providers/theme_provider.dart';
 import '/providers/sync_provider.dart';
 import '/core/app_palette.dart';
 import '../widgets/card_image.dart';
+import '/core/dk.dart';
 
 class PackagesTab extends StatefulWidget {
   final List<Package> packages;
   final String currentUserId;
-  final VoidCallback onRefresh;
+  final Future<void> Function() onRefresh;
 
   const PackagesTab({
     super.key,
@@ -168,8 +171,8 @@ class _PackagesTabState extends State<PackagesTab> {
         _activePackageIds = userPackages.map((p) => p.id).toSet();
         _isLoadingActive = false;
       });
-    } catch (e) {
-      print('Error loading active packages: $e');
+    } catch (e, stk) {
+      Log.e('packages', 'Error loading active packages: $e', error: e, stack: stk);
 
       if (!mounted) return;
 
@@ -203,8 +206,8 @@ class _PackagesTabState extends State<PackagesTab> {
         final id = item['id'] as String;
         return Package.fromMap(item, id);
       }).toList();
-    } catch (e) {
-      print('Error getting user active packages: $e');
+    } catch (e, stk) {
+      Log.e('packages', 'Error getting user active packages: $e', error: e, stack: stk);
       return [];
     }
   }
@@ -215,29 +218,14 @@ class _PackagesTabState extends State<PackagesTab> {
     final Color primaryColor = theme.primaryColor;
 
     return Container(
-      color: theme.backgroundColor, // از Color(0xFFF7FCEB)
+      color: theme.backgroundColor, // از Dk.f(Color(0xFFF7FCEB))
       child: _buildBody(primaryColor, theme),
     );
   }
 
   Widget _buildBody(Color primaryColor, ThemeProvider theme) {
     if (_isLoadingActive) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(color: primaryColor),
-            const SizedBox(height: 16),
-            Text(
-              context.tr('ex.pkg.loading'),
-              style: TextStyle(
-                color: theme.textSecondaryColor,
-                fontSize: 13,
-              ),
-            ),
-          ],
-        ),
-      );
+      return const PackagesSkeleton();
     }
 
     if (widget.packages.isEmpty) {
@@ -250,7 +238,11 @@ class _PackagesTabState extends State<PackagesTab> {
         .where((p) => !_activePackageIds.contains(p.id))
         .toList();
 
-    return SingleChildScrollView(
+    return RefreshIndicator(
+     edgeOffset: 96,
+     onRefresh: widget.onRefresh,
+     child: SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.fromLTRB(20, 96, 20, 120),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -310,6 +302,7 @@ class _PackagesTabState extends State<PackagesTab> {
           ],
         ],
       ),
+     ),
     );
   }
 
@@ -343,7 +336,7 @@ class _PackagesTabState extends State<PackagesTab> {
           height: 32,
           decoration:
               BoxDecoration(color: theme.tone(tone).bg, shape: BoxShape.circle),
-          child: Icon(icon, size: 18, color: const Color(0xFF090909)),
+          child: Icon(icon, size: 18, color: theme.tone(tone).fg),
         ),
         const SizedBox(width: 8),
         Text(title,
@@ -420,7 +413,8 @@ class _PackagesTabState extends State<PackagesTab> {
           ),
         );
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('packages', '_activatePackage failed', error: e, stack: stk);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -455,7 +449,7 @@ class _PackagesTabState extends State<PackagesTab> {
                 height: 56,
                 decoration: BoxDecoration(
                     color: const Color(0xFFFFD3CF), shape: BoxShape.circle),
-                child: const Icon(Icons.power_settings_new_rounded,
+                child: Icon(Icons.power_settings_new_rounded,
                     size: 28, color: Color(0xFF090909)),
               ),
               const SizedBox(height: 14),
@@ -529,7 +523,7 @@ class _PackagesTabState extends State<PackagesTab> {
                 width: 38,
                 height: 38,
                 decoration: BoxDecoration(color: soft, shape: BoxShape.circle),
-                child: Icon(icon, size: 18, color: ink),
+                child: Icon(icon, size: 18, color: theme.tone(Tone.lime).fg),
               ),
               const SizedBox(width: 12),
               Text(label,
@@ -686,12 +680,14 @@ class _PackagesTabState extends State<PackagesTab> {
                           ? _sheetButton(
                               context.tr('ex.pkg.activate_btn'),
                               Icons.play_arrow_rounded,
-                              ink,
-                              theme.effectivePrimary, () {
+                              theme.isDarkMode ? theme.effectivePrimary : ink,
+                              theme.isDarkMode ? ink : theme.effectivePrimary, () {
                               Navigator.pop(ctx);
                               _activatePackage(package, primaryColor);
                             })
-                          : _sheetButton(context.tr('ex.close'), null, ink, Colors.white,
+                          : _sheetButton(context.tr('ex.close'), null,
+                              theme.isDarkMode ? theme.cardSecondaryColor : ink,
+                              theme.isDarkMode ? theme.textColor : Colors.white,
                               () => Navigator.pop(ctx)),
                     ),
                   ],
@@ -711,10 +707,10 @@ class _PackagesTabState extends State<PackagesTab> {
         decoration:
             BoxDecoration(color: bg, borderRadius: BorderRadius.circular(13)),
         child: Text(t,
-            style: const TextStyle(
+            style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: Color(0xFF090909))),
+                color: Provider.of<ThemeProvider>(context, listen: false).textColor)),
       );
 
   Widget _sheetButton(
@@ -814,8 +810,8 @@ class _PackagesTabState extends State<PackagesTab> {
 
         print(
             '✅ Removed ${habitsToRemove.length} habits from package "${package.title}"');
-      } catch (e) {
-        print('Error removing package habits from cache: $e');
+      } catch (e, stk) {
+        Log.e('packages', 'Error removing package habits from cache: $e', error: e, stack: stk);
       }
 
       // ۳. ریفرش
@@ -832,7 +828,8 @@ class _PackagesTabState extends State<PackagesTab> {
           ),
         );
       }
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('packages', '_deactivatePackage failed', error: e, stack: stk);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -909,8 +906,8 @@ class _PackageCard extends StatelessWidget {
     // بستهٔ فعال: پر با رنگ اصلی + قاب ضخیم تا از بسته‌های غیرفعال کاملاً متمایز باشد
     final tone = theme.tone(_tones[package.id.hashCode.abs() % _tones.length]);
     final Color cardBg = isActive ? theme.effectivePrimary : tone.bg;
-    final Color on = isActive ? theme.onPrimaryColor : _ink;
-    final Color onBody = isActive ? theme.onPrimaryColor : const Color(0xFF3C4034);
+    final Color on = isActive ? theme.onPrimaryColor : theme.textColor;
+    final Color onBody = isActive ? theme.onPrimaryColor : theme.textSecondaryColor;
     final habits = package.habits.take(3).toList();
     final remaining = package.habits.length - habits.length;
     final white70 = Colors.white.withValues(alpha: 0.7);

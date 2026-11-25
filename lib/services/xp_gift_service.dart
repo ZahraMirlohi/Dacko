@@ -1,5 +1,6 @@
 // lib/services/xp_gift_service.dart
 
+import '/core/logging/app_logger.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../features/chat/models/xp_gift.dart';
 import 'supabase_service.dart';
@@ -37,8 +38,8 @@ class XPGiftService {
       _giftCache[giftId] = _CachedGift(gift: gift, timestamp: DateTime.now());
 
       return gift;
-    } catch (e) {
-      print('Error getting gift: $e');
+    } catch (e, stk) {
+      Log.e('xp_gift', 'Error getting gift: $e', error: e, stack: stk);
       return null;
     }
   }
@@ -87,8 +88,8 @@ class XPGiftService {
       clearGiftCache(giftId);
 
       return true;
-    } catch (e) {
-      print('Error receiving gift: $e');
+    } catch (e, stk) {
+      Log.e('xp_gift', 'Error receiving gift: $e', error: e, stack: stk);
       return false;
     }
   }
@@ -103,8 +104,8 @@ class XPGiftService {
           .order('sent_at', ascending: false);
 
       return response.map((data) => XPGift.fromMap(data)).toList();
-    } catch (e) {
-      print('Error getting received gifts: $e');
+    } catch (e, stk) {
+      Log.e('xp_gift', 'Error getting received gifts: $e', error: e, stack: stk);
       return [];
     }
   }
@@ -119,8 +120,8 @@ class XPGiftService {
           .order('sent_at', ascending: false);
 
       return response.map((data) => XPGift.fromMap(data)).toList();
-    } catch (e) {
-      print('Error getting sent gifts: $e');
+    } catch (e, stk) {
+      Log.e('xp_gift', 'Error getting sent gifts: $e', error: e, stack: stk);
       return [];
     }
   }

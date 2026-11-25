@@ -1,3 +1,5 @@
+import '/widgets/net_image.dart';
+import '/core/logging/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -34,7 +36,7 @@ class _BuddyListViewState extends State<BuddyListView> {
       if (me == null) return;
       final list = await _chat.getBuddies(me);
       if (mounted) setState(() => _buddies = list);
-    } catch (_) {}
+    } catch (err, stk) { Log.w('buddy_list', '_load ignored error', error: err, stack: stk); }
     if (mounted) setState(() => _loading = false);
   }
 
@@ -67,7 +69,8 @@ class _BuddyListViewState extends State<BuddyListView> {
       setState(() => _buddies.removeWhere((x) => x['user_id'] == id));
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(context.tr('bd.removed'))));
-    } catch (_) {
+    } catch (err, stk) {
+      Log.w('buddy_list', '_remove ignored error', error: err, stack: stk);
       if (mounted) {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text(context.tr('bd.error'))));
@@ -122,7 +125,7 @@ class _BuddyListViewState extends State<BuddyListView> {
                     decoration:
                         BoxDecoration(color: tc.bg, shape: BoxShape.circle),
                     child: has
-                        ? Image.network(url.trim(),
+                        ? NetImage(url.trim(),
                             fit: BoxFit.cover,
                             errorBuilder: (c, e, s) =>
                                 Icon(Icons.person_rounded, color: tc.fg))

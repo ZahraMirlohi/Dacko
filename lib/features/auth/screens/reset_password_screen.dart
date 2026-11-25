@@ -2,6 +2,7 @@
 //
 // بعد از باز شدن لینک «بازیابی رمز» در برنامه نشان داده می‌شود.
 
+import '/core/logging/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -42,7 +43,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     try {
       await auth.updatePassword(_password.text);
       messenger.showSnackBar(SnackBar(content: Text(done)));
-    } catch (e) {
+    } catch (e, stk) {
+      Log.e('reset_password', '_save failed', error: e, stack: stk);
       if (mounted) setState(() => _error = authErrorText(context, e));
     } finally {
       if (mounted) setState(() => _loading = false);

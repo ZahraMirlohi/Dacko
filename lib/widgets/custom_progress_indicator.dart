@@ -87,6 +87,7 @@ class _CustomProgressIndicatorState extends State<CustomProgressIndicator>
           child: CustomPaint(
             painter: _ProgressPainter(
               progress: progress,
+              dark: Theme.of(context).brightness == Brightness.dark,
             ),
           ),
         );
@@ -99,9 +100,11 @@ class _CustomProgressIndicatorState extends State<CustomProgressIndicator>
 
 class _ProgressPainter extends CustomPainter {
   final double progress;
+  final bool dark;
 
   _ProgressPainter({
     required this.progress,
+    this.dark = false,
   });
 
   @override
@@ -120,7 +123,7 @@ class _ProgressPainter extends CustomPainter {
     // 1. پس‌زمینه دایره (Track) - مشکی
     // ============================================================
     final trackPaint = Paint()
-      ..color = const Color(0xFF090909)
+      ..color = dark ? const Color(0xFF3A3E33) : const Color(0xFF090909)
       ..style = PaintingStyle.stroke
       ..strokeWidth = trackStrokeWidth
       ..strokeCap = StrokeCap.round;

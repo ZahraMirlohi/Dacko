@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/message_model.dart';
 import '/providers/theme_provider.dart';
+import '/core/dk.dart';
 
 class MessageActionsMenu extends StatelessWidget {
   final ChatMessage message;
@@ -58,7 +59,7 @@ class MessageActionsMenu extends StatelessWidget {
               height: 4,
               margin: const EdgeInsets.only(bottom: 12),
               decoration: BoxDecoration(
-                color: Colors.grey.shade300,
+                color: Dk.l(Colors.grey.shade300),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),

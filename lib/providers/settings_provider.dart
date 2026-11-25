@@ -3,6 +3,7 @@
 // تنظیمات کاربر که روی خود گوشی ذخیره می‌شن (زبان، صدا، لرزش، اعلان‌ها).
 // قبل از runApp با SettingsProvider.load() بارگذاری می‌شه تا اولین فریم درست رسم بشه.
 
+import '/core/logging/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/notification_service.dart';
@@ -50,7 +51,7 @@ class SettingsProvider extends ChangeNotifier {
     SharedPreferences? prefs;
     try {
       prefs = await SharedPreferences.getInstance();
-    } catch (_) {}
+    } catch (err, stk) { Log.w('settings', 'load ignored error', error: err, stack: stk); }
     return SettingsProvider._(prefs);
   }
 
@@ -140,7 +141,8 @@ class SettingsProvider extends ChangeNotifier {
       } else if (value is String) {
         await p.setString(key, value);
       }
-    } catch (_) {
+    } catch (err, stk) {
+      Log.w('settings', '_set ignored error', error: err, stack: stk);
       // ذخیره نشد؛ تنظیم تا آخر همین اجرا کار می‌کنه
     }
   }

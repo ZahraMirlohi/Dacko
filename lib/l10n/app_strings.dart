@@ -43,6 +43,22 @@ class AppStrings {
     return text;
   }
 
+  /// متن چرخشی: کلیدهای base.1 .. base.N. [seed] ثابت = برای نمایش در UI (در یک روز عوض نشود)؛
+  /// بدون seed = تصادفی (برای نوتیفیکیشن).
+  static String v(String lang, String base, {int? seed, Map<String, String>? args}) {
+    final table = lang == 'en' ? _en : _fa;
+    var n = 0;
+    while (table.containsKey('$base.${n + 1}')) {
+      n++;
+    }
+    if (n == 0) return t(lang, base, args);
+    final i = (seed ?? DateTime.now().microsecondsSinceEpoch) % n + 1;
+    return t(lang, '$base.$i', args);
+  }
+
+  /// seed روزانه: در طول یک روز یک متن، فردا متن دیگر
+  static int get daySeed => DateTime.now().difference(DateTime(2024)).inDays;
+
   // ───────────────────────── فارسی (طنز) ─────────────────────────
   static const Map<String, String> _fa = {
     ...authFa,
@@ -144,9 +160,7 @@ class AppStrings {
 
     'settings.remind_time': 'ساعت یادآور روزانه',
     'notif.channel': 'یادآور روزانه',
-    'notif.streak': 'امروز هنوز عادتی ثبت نکردی؛ استریکت داره نفس‌نفس می‌زنه.',
     'notif.streakChannel': 'هشدار استریک',
-    'notif.habitBody': 'وقتشه! عادتت منتظره.',
     'notif.habitChannel': 'یادآور عادت',
     'notif.title': 'داکو',
     'notif.body1': 'یه سر به عادت‌هات بزنی بد نیست',
@@ -184,9 +198,6 @@ class AppStrings {
     'streak.title': 'استریک روزانه',
     'streak.record': 'رکورد {n}',
     'streak.days': 'روز',
-    'streak.start': 'امروز رو شروع کن!',
-    'streak.keep': 'استریکت منتظرته؛ یه تیک بزن.',
-    'streak.today_done': 'امروز رو گرفتی. فردا هم بیا!',
 
     'profile.title': 'پروفایل',
     'profile.stat_age': 'امتیاز XP',
@@ -319,9 +330,7 @@ class AppStrings {
 
     'settings.remind_time': 'Daily reminder time',
     'notif.channel': 'Daily reminder',
-    'notif.streak': 'No habit logged today yet; your streak is gasping.',
     'notif.streakChannel': 'Streak warning',
-    'notif.habitBody': 'Time to go! Your habit is waiting.',
     'notif.habitChannel': 'Habit reminders',
     'notif.title': 'Dacko',
     'notif.body1': 'Dropping by your habits wouldn\'t hurt.',
@@ -358,9 +367,6 @@ class AppStrings {
     'streak.title': 'Daily streak',
     'streak.record': 'Record {n}',
     'streak.days': 'days',
-    'streak.start': 'Start today!',
-    'streak.keep': 'Your streak is waiting. Tick one off.',
-    'streak.today_done': 'Today is done. See you tomorrow!',
 
     'profile.title': 'Profile',
     'profile.stat_age': 'XP',
@@ -399,6 +405,11 @@ extension TrContext on BuildContext {
     final lang = Localizations.localeOf(this).languageCode;
     return AppStrings.t(lang, key, args);
   }
+
+  /// متن چرخشی که در یک روز ثابت می‌ماند (جلوگیری از پرش متن در rebuild)
+  String trv(String base) => AppStrings.v(
+      Localizations.localeOf(this).languageCode, base,
+      seed: AppStrings.daySeed);
 
   bool get isEnglish => Localizations.localeOf(this).languageCode == 'en';
 }

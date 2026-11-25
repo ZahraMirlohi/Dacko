@@ -57,8 +57,8 @@ class StreakCardWidget extends StatelessWidget {
 
     final todayDone = done(todayShown);
     final String footer = currentStreak == 0 && !todayDone
-        ? context.tr('streak.start')
-        : (todayDone ? context.tr('streak.today_done') : context.tr('streak.keep'));
+        ? context.trv('streak.start')
+        : (todayDone ? context.trv('streak.today_done') : context.trv('streak.keep'));
     final IconData stage = currentStreak >= 30
         ? Icons.workspace_premium_rounded
         : currentStreak >= 7

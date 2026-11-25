@@ -36,7 +36,7 @@ class _NewRequestPopupState extends State<NewRequestPopup>
     final theme = context.watch<ThemeProvider>();
     final text = widget.count > 1
         ? context.tr('mp.req.many', {'n': '${widget.count}'})
-        : context.tr('mp.req.one');
+        : context.trv('mp.req.one');
     return AnimatedBuilder(
       animation: _c,
       // لرزش کوتاه در ابتدای هر چرخه، بعد استراحت

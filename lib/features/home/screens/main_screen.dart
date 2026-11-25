@@ -140,7 +140,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
                 NotificationService.instance.showNow(
                   3001,
                   'Dacko',
-                  context.tr('mp.req.one'),
+                  context.trv('mp.req.one'),
                   channel: 'buddy_requests',
                   channelName: 'Requests',
                 );

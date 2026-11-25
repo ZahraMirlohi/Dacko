@@ -150,7 +150,7 @@ class NotificationService {
         await _plugin.zonedSchedule(
           _streakId,
           AppStrings.t(lang, 'notif.title'),
-          AppStrings.t(lang, 'notif.streak'),
+          AppStrings.v(lang, 'notif.streak'),
           when,
           _details('streak_warning', AppStrings.t(lang, 'notif.streakChannel')),
           androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
@@ -179,7 +179,7 @@ class NotificationService {
           await _plugin.zonedSchedule(
             id++,
             h.title,
-            AppStrings.t(lang, 'notif.habitBody'),
+            AppStrings.v(lang, 'notif.habitBody'),
             when,
             _details('habit_reminders', AppStrings.t(lang, 'notif.habitChannel')),
             androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,

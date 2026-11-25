@@ -153,7 +153,7 @@ class TasksTabState extends State<TasksTab> with TickerProviderStateMixin {
                         children: [
                           ArenaStateView(
                             icon: Icons.assignment_outlined,
-                            title: context.tr('ah.tasks.emptyTitle'),
+                            title: context.trv('ah.tasks.emptyTitle'),
                             subtitle: context.tr('ah.empty.sub'),
                             actionLabel: context.tr('ah.fab.task'),
                             actionIcon: Icons.add_rounded,

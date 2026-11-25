@@ -589,8 +589,8 @@ extension TodayTabStateHabitTask on TodayTabState {
             _completedTasks.isEmpty)
           ArenaStateView(
             icon: Icons.check_circle_outline_rounded,
-            title: context.tr('ah.today.emptyTitle'),
-            subtitle: context.tr('ah.today.emptySub'),
+            title: context.trv('ah.today.emptyTitle'),
+            subtitle: context.trv('ah.today.emptySub'),
             actionLabel: context.tr('ah.fab.habit'),
             actionIcon: Icons.add_rounded,
             onAction: () => Navigator.push(

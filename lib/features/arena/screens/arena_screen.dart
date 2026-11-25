@@ -620,7 +620,7 @@ class _ArenaScreenState extends State<ArenaScreen>
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 300),
               child: Text(
-                context.tr(_motivationKey(p)),
+                context.trv(_motivationKey(p)),
                 key: ValueKey(_motivationKey(p)),
                 textAlign: TextAlign.center,
                 maxLines: 2,
